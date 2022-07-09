@@ -6,7 +6,7 @@ import time
 import jwt
 from django.http import JsonResponse
 
-from key import TOKEN_SECRET_KEY
+from properties import TOKEN_SECRET_KEY
 
 
 # Hash-md5 加密字符串
@@ -38,29 +38,39 @@ def sign_token(payload, exp=3600 * 24):
     return token
 
 
+# 校验登录令牌
+def check_token(token):
+    """
+    :param token: 登录令牌
+    :return: None - 失败(篡改,过期,为空)    payload - 成功
+    """
+    # 校验token
+    try:
+        # 查看令牌是否过期或者被篡改
+        payload = jwt.decode(token, TOKEN_SECRET_KEY, algorithms=['HS256'])
+    except Exception as e:
+        # 如果失败返回 0
+        return None
+    # 如果成功返回1
+    return payload
+
+
 # 登录状态检测装饰器
 def login_decorator(func):
     def wrap(request, *args, **kwargs):
+
         # 校验请求方式
         if request.method != 'POST':
             result = {'result': 0, 'msg': '请求方式错误'}
             return JsonResponse(result)
 
-        # 获取token request.POST.get('token')
+        # 获取token
         token = request.POST.get('token', '')
+        # 校验token信息
+        payload = check_token(token)
 
-        # token是否存在
-        if len(token) == 0:
-            result = {'result': -1, 'msg': '请先登录'}
-            return JsonResponse(result)
-
-        # 校验token
-        try:
-            # 查看令牌是否过期或者被篡改
-            payload = jwt.decode(token, TOKEN_SECRET_KEY, algorithms=['HS256'])
-        except Exception as e:
-            # 如果失败需要进行重新登录
-            result = {'result': -1, 'msg': r"请重新登录!"}
+        if payload is None:
+            result = {'result': 0, 'msg': '请先登录'}
             return JsonResponse(result)
 
         # 获取令牌中的user_id信息
@@ -68,4 +78,5 @@ def login_decorator(func):
         request.user_id = user_id
 
         return func(request, *args, **kwargs)
+
     return wrap

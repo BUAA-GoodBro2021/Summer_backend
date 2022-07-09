@@ -7,7 +7,7 @@ import platform
 from django.core.mail import EmailMessage
 from django.template import loader
 
-from key import *
+from properties import *
 from Login_utils import sign_token
 
 
