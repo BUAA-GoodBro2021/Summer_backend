@@ -1,5 +1,5 @@
 """
-Django Login Utils
+登录检测相关工具类
 """
 import hashlib
 import time
@@ -31,7 +31,7 @@ def sign_token(payload, exp=3600 * 24):
     :param exp: 过期时间
     :return: 签发的登录令牌
     """
-    # 获取当前时间戳，并计算得到该令牌的过期时间
+    # 获取当前时间戳，并计算得到该令牌的过期时间(默认过期时间为1天)
     payload['exp'] = time.time() + exp
     # 使用 HS256 算法配合密钥签发登录令牌
     token = jwt.encode(payload, TOKEN_SECRET_KEY, algorithm='HS256')
@@ -56,7 +56,11 @@ def check_token(token):
 
 
 # 登录状态检测装饰器
-def login_decorator(func):
+def login_checker(func):
+    """
+    :param func: 请求信息
+    :return: 如果成功在request中加入token中记录的user_id，如果失败直接返回重新登陆
+    """
     def wrap(request, *args, **kwargs):
 
         # 校验请求方式
@@ -69,6 +73,7 @@ def login_decorator(func):
         # 校验token信息
         payload = check_token(token)
 
+        # 校验失败
         if payload is None:
             result = {'result': 0, 'msg': '请先登录'}
             return JsonResponse(result)

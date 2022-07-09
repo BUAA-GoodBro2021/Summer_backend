@@ -5,6 +5,7 @@ EMAIL_PORT = 25  # SMTP服务器端口号
 EMAIL_HOST_USER = '3044039051@qq.com'  # 发送邮件的QQ邮箱
 EMAIL_HOST_PASSWORD = 'zosulotgxochdehe'  # 授权码
 EMAIL_USE_TLS = False  # 与SMTP服务器通信时，是否启动TLS链接（安全链接）默认False
+EMAIL_FROM_NAME = 'Super2021'
 
 # 对象存储信息
 bucket_secret_id = 'AKIDNZVAYfV5NO9dqmTv5zcz4sPggPr2yc07'
@@ -31,3 +32,7 @@ TOKEN_SECRET_KEY = 'django-insecure-t$d4)i^$r0kzrn&b1ch0xcgh9^u+0a0ob98^jkg3lu2y
 default_favorite_url = 'https://global-1309504341.cos.ap-beijing.myqcloud.com/default-favorite.jpg'
 default_avatar_url = 'https://global-1309504341.cos.ap-beijing.myqcloud.com/default.jpg'
 default_avatar_url_match = 'https://random-avatar-1309504341.cos.ap-beijing.myqcloud.com/'
+
+# 环境路由
+local_base_url = "http://127.0.0.1:8000"
+production_base_url = "https://summer.super2021.com"
