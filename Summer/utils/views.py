@@ -1,13 +1,27 @@
+from django.forms import model_to_dict
 from django.http import HttpResponse
+from django.core.cache import cache
 from django.shortcuts import render
 from utils.Login_utils import *
 from utils.Redis_utils import *
 from utils.tasks import *
 
 
+# 查看用户缓存信息
+@login_checker
+def query_cache_user(request):
+    user_id = int(request.POST.get('user_id'))
+    # 拼接为键
+    user_key = "user:user:%d" % user_id
+    # 获取缓存
+    user_dict = cache.get(user_key)
+    if user_dict is not None:
+        return JsonResponse(user_dict)
+    else:
+        return JsonResponse({})
+
+
 # 通过邮箱激活用户
-
-
 def active(request, token):
     """
     :param request: 请求体
@@ -82,37 +96,43 @@ def active(request, token):
         return render(request, 'EmailContent-check.html', content)
 
 
+"""""""""
+测试路由部分
+"""""""""
+
+
+# 测试登录装饰器
 @login_checker
 def test_login_checker(request):
     print(request.user_id)
     return HttpResponse(request.user_id)
 
 
+# 测试redis缓存
 @login_checker
 def test_redis_cache(request):
-    r = Redis_utils()
     user_dict = {
         "user_id": 1,
-        "username": "Zhoues"
+        "username": "Summer"
     }
-    r.hset('user', mapping=user_dict)
-    user_dict = r.hgetall_str('user')
-    print(user_dict.get("username"))
-    return HttpResponse("OK")
+    cache.set('user:user_dict', user_dict)
+    print(cache.get("user:user_dict"))
+    return JsonResponse(cache.get("user:user_dict"))
 
 
+# 测试异步消息队列
 @login_checker
 def test_celery(request):
     user_id = request.user_id
     # 拼接为键
-    user_message_key = "message:%d" % user_id
-    # 创建连接对象
-    r = Redis_utils()
-    # 如果没有缓存
-    if not r.exists(user_message_key):
-        message_num = User.objects.get(id=user_id).message_num
-        r.set(user_message_key, message_num)
-    # 自增+1
-    r.incr(user_message_key)
+    user_key = "user:user:%d" % user_id
+    # 获取缓存
+    user_dict = cache.get(user_key)
+    # 缓存中没有
+    if user_dict is None:
+        user_dict = model_to_dict(User.objects.get(id=user_id))
+        cache.set(user_key, user_dict)
+    user_dict['message_num'] += 1
+    cache.set(user_key, user_dict)
     celery_add_message_num.delay(user_id)
-    return HttpResponse(r.get(user_message_key))
+    return JsonResponse(user_dict)

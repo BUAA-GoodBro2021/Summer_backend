@@ -1,7 +1,6 @@
 """
 用户相关的函数式响应
 """
-from django.http import JsonResponse
 from user.models import User
 from utils.Sending_utils import *
 
@@ -101,4 +100,3 @@ def login(request):
     else:
         result = {'result': 0, 'message': r"请求方式错误！"}
         return JsonResponse(result)
-
