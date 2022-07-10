@@ -54,9 +54,9 @@ def send_email(payload, email, mail_type):
         email_title = r"Summer平台重设密码"
         email_body = loader.render_to_string('EmailContent-find.html', content)
     try:
-        msg = EmailMessage(email_title, email_body, EMAIL_HOST_USER, [email])
-        msg.content_subtype = 'html'
-        send_status = msg.send()
+        message = EmailMessage(email_title, email_body, EMAIL_HOST_USER, [email])
+        message.content_subtype = 'html'
+        send_status = message.send()
         return send_status
     except Exception:
         return 0

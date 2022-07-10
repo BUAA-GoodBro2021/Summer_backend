@@ -1,11 +1,13 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from user.models import User
 from utils.Login_utils import *
 from utils.Redis_utils import *
+from utils.tasks import *
 
 
 # 通过邮箱激活用户
+
+
 def active(request, token):
     """
     :param request: 请求体
@@ -97,3 +99,20 @@ def test_redis_cache(request):
     user_dict = r.hgetall_str('user')
     print(user_dict.get("username"))
     return HttpResponse("OK")
+
+
+@login_checker
+def test_celery(request):
+    user_id = request.user_id
+    # 拼接为键
+    user_message_key = "message:%d" % user_id
+    # 创建连接对象
+    r = Redis_utils()
+    # 如果没有缓存
+    if not r.exists(user_message_key):
+        message_num = User.objects.get(id=user_id).message_num
+        r.set(user_message_key, message_num)
+    # 自增+1
+    r.incr(user_message_key)
+    celery_add_message_num.delay(user_id)
+    return HttpResponse(r.get(user_message_key))

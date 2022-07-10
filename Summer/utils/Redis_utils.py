@@ -13,9 +13,6 @@ class Redis_utils(redis.Redis):
         super().__init__(host=host, port=port, db=db, password=password)
 
     # 对 redis 中的哈希结构的取值进行简化(需要进行字节解码编码之间的转换)
-    def hget_str(self, name, key):
-        return self.hget(name, key).decode('utf-8')
-
     def hgetall_str(self, name):
         bytes_dict = self.hgetall(name)
         print(bytes_dict)

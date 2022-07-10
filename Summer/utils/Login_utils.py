@@ -48,7 +48,7 @@ def check_token(token):
     try:
         # 查看令牌是否过期或者被篡改
         payload = jwt.decode(token, TOKEN_SECRET_KEY, algorithms=['HS256'])
-    except Exception as e:
+    except Exception:
         # 如果失败返回 0
         return None
     # 如果成功返回1
@@ -65,7 +65,7 @@ def login_checker(func):
 
         # 校验请求方式
         if request.method != 'POST':
-            result = {'result': 0, 'msg': '请求方式错误'}
+            result = {'result': 0, 'message': '请求方式错误'}
             return JsonResponse(result)
 
         # 获取token
@@ -75,7 +75,7 @@ def login_checker(func):
 
         # 校验失败
         if payload is None:
-            result = {'result': 0, 'msg': '请先登录'}
+            result = {'result': 0, 'message': '请先登录'}
             return JsonResponse(result)
 
         # 获取令牌中的user_id信息
