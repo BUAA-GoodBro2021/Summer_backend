@@ -110,12 +110,23 @@ WSGI_APPLICATION = 'Summer.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': db_ENGINE,
-        'NAME': db_NAME,
-        'USER': db_USER,
-        'PASSWORD': db_PASSWORD,
-        'HOST': db_HOST,
-        'PORT': db_PORT
+        'ENGINE': mysql_ENGINE,
+        'NAME': mysql_NAME,
+        'USER': mysql_USER,
+        'PASSWORD': mysql_PASSWORD,
+        'HOST': mysql_HOST,
+        'PORT': mysql_PORT,
+    }
+}
+
+CACHES = {
+    'default': {
+        "BACKEND": redis_BACKEND,
+        "LOCATION": "redis://" + redis_HOST + ":" + str(redis_PORT),
+        "OPTIONS": {
+            "CLIENT_CLASS": redis_CLIENT_CLASS,
+            "PASSWORD": redis_PASSWORD
+        }
     }
 }
 

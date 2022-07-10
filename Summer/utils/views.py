@@ -1,9 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-
-from properties import *
 from user.models import User
 from utils.Login_utils import *
+from utils.Redis_utils import *
 
 
 # 通过邮箱激活用户
@@ -85,3 +84,16 @@ def active(request, token):
 def test_login_checker(request):
     print(request.user_id)
     return HttpResponse(request.user_id)
+
+
+@login_checker
+def test_redis_cache(request):
+    r = Redis_utils()
+    user_dict = {
+        "user_id": 1,
+        "username": "Zhoues"
+    }
+    r.hset('user', mapping=user_dict)
+    user_dict = r.hgetall_str('user')
+    print(user_dict.get("username"))
+    return HttpResponse("OK")

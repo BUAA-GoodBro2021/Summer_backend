@@ -1,7 +1,6 @@
 """
 邮件验证相关工具类
 """
-import os
 import platform
 from random import Random
 
@@ -59,5 +58,5 @@ def send_email(payload, email, mail_type):
         msg.content_subtype = 'html'
         send_status = msg.send()
         return send_status
-    except Exception as e:
+    except Exception:
         return 0
