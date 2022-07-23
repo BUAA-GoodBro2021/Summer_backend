@@ -17,8 +17,8 @@ class User(models.Model):
 
     def to_dic(self):
         return {
-            'user_id' : self.id,
-            'username' : self.username,
+            'user_id': self.id,
+            'username': self.username,
             'email': self.email,
 
             'message_num': self.message_num,

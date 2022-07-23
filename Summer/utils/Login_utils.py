@@ -7,11 +7,10 @@ import jwt
 from django.http import JsonResponse
 
 from properties import TOKEN_SECRET_KEY
-
-# Hash-md5 加密字符串
 from utils.Redis_utils import cache_get_by_id
 
 
+# Hash-md5 加密字符串
 def hash_encode(str_key):
     """
     :param str_key: 需要使用 md5 加密的字符串

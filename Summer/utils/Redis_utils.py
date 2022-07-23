@@ -37,4 +37,3 @@ def cache_get_by_id(app_label, model_name, model_id):
         cache.set(key, model_dict)
 
     return key, model_dict
-
