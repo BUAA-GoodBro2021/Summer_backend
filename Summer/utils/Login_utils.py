@@ -8,8 +8,10 @@ from django.http import JsonResponse
 
 from properties import TOKEN_SECRET_KEY
 
-
 # Hash-md5 加密字符串
+from utils.Redis_utils import cache_get_by_id
+
+
 def hash_encode(str_key):
     """
     :param str_key: 需要使用 md5 加密的字符串
@@ -55,12 +57,49 @@ def check_token(token):
     return payload
 
 
-# 登录状态检测装饰器
+# 登录状态检测装饰器(没有进行超管检测)
 def login_checker(func):
     """
     :param func: 请求信息
     :return: 如果成功在request中加入token中记录的user_id，如果失败直接返回重新登陆
     """
+
+    def wrap(request, *args, **kwargs):
+
+        # 校验请求方式
+        if request.method != 'POST':
+            result = {'result': 0, 'message': '请求方式错误'}
+            return JsonResponse(result)
+
+        # 获取token
+        token = request.POST.get('token', '')
+        # 校验token信息
+        payload = check_token(token)
+
+        # 校验失败
+        if payload is None or payload['user_id'] <= 0:
+            result = {'result': 0, 'message': '请先登录'}
+            return JsonResponse(result)
+
+        # 获取令牌中的user_id信息
+        user_id = payload.get('user_id', 0)
+        request.user_id = user_id
+
+        # 加入缓存
+        cache_get_by_id('user', 'user', user_id)
+
+        return func(request, *args, **kwargs)
+
+    return wrap
+
+
+# 登录状态检测装饰器(进行超管检测)
+def super_admin_checker(func):
+    """
+    :param func: 请求信息
+    :return: 如果成功在request中加入token中记录的user_id，如果失败直接返回重新登陆
+    """
+
     def wrap(request, *args, **kwargs):
 
         # 校验请求方式
@@ -79,8 +118,17 @@ def login_checker(func):
             return JsonResponse(result)
 
         # 获取令牌中的user_id信息
-        user_id = payload.get('user_id', '')
+        is_super_admin = payload.get('is_super_admin', 0)
+        if is_super_admin != 1:
+            result = {'result': 0, 'message': '不好意思，您没有超级管理员的权限'}
+            return JsonResponse(result)
+
+        # 获取令牌中的user_id信息
+        user_id = payload.get('user_id', 0)
         request.user_id = user_id
+
+        # 加入缓存
+        cache_get_by_id('user', 'user', user_id)
 
         return func(request, *args, **kwargs)
 

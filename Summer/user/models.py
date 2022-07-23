@@ -15,6 +15,22 @@ class User(models.Model):
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     updated_time = models.DateTimeField('更新时间', auto_now=True)
 
+    def to_dic(self):
+        return {
+            'user_id' : self.id,
+            'username' : self.username,
+            'email': self.email,
+
+            'message_num': self.message_num,
+
+            'is_active': self.is_active,
+            'is_super_admin': self.is_super_admin,
+
+            'created_time': self.created_time,
+            'updated_time': self.updated_time,
+
+        }
+
     # 站内信+1
     def add_message_num(self):
         self.message_num += 1
