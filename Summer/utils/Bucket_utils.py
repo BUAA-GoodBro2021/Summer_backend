@@ -130,7 +130,7 @@ class Bucket:
                 return {'result': result, 'label': response.get('Label')}
         return {'result': -1, 'label': None}
 
-    def video_audit_submit(self, bucket_name, key_name, host='https://milimili.super2021.com/'):
+    def video_audit_submit(self, bucket_name, key_name, host=production_base_url):
         """
         :param bucket_name: bucket's name
         :param key_name: key's name in bucket
