@@ -84,20 +84,32 @@ class Bucket:
 
     def delete_object(self, bucket_name, key_name):
         """
-        :param bucket_name: bucket's name
-        :param key_name: key's name in bucket
+        :param bucket_name: bucket's name or list
+        :param key_name: key's name in bucket or list
         :return: delete unsuccessfully, 1 delete successfully
         """
-        try:
-            self.client.delete_object(
-                Bucket=bucket_name + self.app_id,
-                Key=key_name
-            )
-        except Exception as e:
-            print(e)
-            return -1
-        else:
+        if type(bucket_name) == list:
+            for i in range(bucket_name):
+                try:
+                    self.client.delete_object(
+                        Bucket=bucket_name + self.app_id,
+                        Key=key_name
+                    )
+                except Exception as e:
+                    print(e)
+                    return -1
             return 1
+        if type(bucket_name) == str:
+            try:
+                self.client.delete_object(
+                    Bucket=bucket_name + self.app_id,
+                    Key=key_name
+                )
+            except Exception as e:
+                print(e)
+                return -1
+            else:
+                return 1
 
     def query_object(self, bucket_name, key_name):
         """
