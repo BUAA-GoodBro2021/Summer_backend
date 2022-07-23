@@ -48,24 +48,39 @@ class Bucket:
 
     def upload_file(self, bucket_name, key_name, file_name):
         """
-        :param bucket_name: bucket's name
-        :param key_name: key's name in bucket
-        :param file_name: file's name in /media
+        :param bucket_name: bucket's name or list
+        :param key_name: key's name in bucket or list
+        :param file_name: file's name in /media or list
         :return: -1:create or update unsuccessfully, 1 create or update successfully
         """
-        try:
-            self.client.upload_file(
-                Bucket=bucket_name + self.app_id,
-                LocalFilePath=self.base_path + '/media/' + file_name,
-                Key=key_name,
-                PartSize=1,
-                MAXThread=10
-            )
-        except Exception as e:
-            print(e)
-            return -1
-        else:
+        if type(bucket_name) == list:
+            for i in range(bucket_name):
+                try:
+                    self.client.upload_file(
+                        Bucket=bucket_name[i] + self.app_id,
+                        LocalFilePath=self.base_path + '/media/' + file_name[i],
+                        Key=key_name[i],
+                        PartSize=1,
+                        MAXThread=10
+                    )
+                except Exception as e:
+                    print(e)
+                    return -1
             return 1
+        if type(bucket_name) == str:
+            try:
+                self.client.upload_file(
+                    Bucket=bucket_name + self.app_id,
+                    LocalFilePath=self.base_path + '/media/' + file_name,
+                    Key=key_name,
+                    PartSize=1,
+                    MAXThread=10
+                )
+            except Exception as e:
+                print(e)
+                return -1
+            else:
+                return 1
 
     def delete_object(self, bucket_name, key_name):
         """
