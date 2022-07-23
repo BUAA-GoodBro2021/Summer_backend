@@ -1,6 +1,4 @@
-from django.forms import model_to_dict
 from django.http import HttpResponse
-from django.core.cache import cache
 from django.shortcuts import render
 
 from properties import production_base_url
@@ -33,7 +31,7 @@ def active(request, token):
 
     # 获取用户信息
     try:
-        user = User.objects.get(id=user_id)
+        user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     except Exception:
         # 返回修改成功的界面
         content["title"] = "激活失败"
@@ -41,21 +39,24 @@ def active(request, token):
         return render(request, 'EmailContent-check.html', content)
 
     # 获取到用户名
-    username = user.username
+    username = user_dict.get("username", "")
 
     # 使用邮箱激活账号
     if 'email' in payload.keys():
         email = payload.get('email')
 
         # 激活用户 验证邮箱
-        user.is_active = True
-        user.email = email
+        user_dict['is_active'] = True
+        user_dict['email'] = email
 
         # TODO 设置随机头像
         # avatar_url = default_avatar_url_match + str(random.choice(range(1, 301))) + '.png'
         # user.avatar_url = avatar_url
 
-        user.save()
+        # 同步缓存
+        cache.set(user_key, user_dict)
+        # 同步mysql
+        celery_activate_user.delay(user_id, email)
 
         # 删除其他伪用户
         user_list = User.objects.filter(username=username, is_active=False)
@@ -73,9 +74,8 @@ def active(request, token):
     if 'password' in payload.keys():
         password = payload.get('password')
 
-        # 修改密码
-        user.password = password
-        user.save()
+        # 同步mysql(password不在缓存里面)
+        celery_change_password.delay(user_id, password)
 
         # TODO 发送站内信
 

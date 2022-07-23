@@ -6,11 +6,11 @@ import os
 
 from django.apps import apps
 from django.core.cache import cache
-from django.forms import model_to_dict
 
 
 # 根据所属APP名, 类名和id 进行缓存并获取该实体的缓存键和信息字典
 # (先看缓存是否存在, 如果不存在, 查询mysql信息并存入缓存, 返回缓存中的值)
+# 该函数必须需要被try包裹
 def cache_get_by_id(app_label, model_name, model_id):
     """
     :param app_label:   APP名
