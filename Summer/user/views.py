@@ -1,7 +1,9 @@
 """
 用户相关的函数式响应
 """
-from user.models import User
+from django.core.cache import cache
+from user.tasks import *
+from utils.File_utils import *
 from utils.Sending_utils import *
 
 
@@ -100,3 +102,38 @@ def login(request):
     else:
         result = {'result': 0, 'message': r"请求方式错误！"}
         return JsonResponse(result)
+
+
+# 上传头像
+@login_checker
+def upload_avatar(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取用户上传的头像并保存
+    avatar = request.FILES.get("avatar", None)
+    # 获取文件尾缀并修改名称
+    suffix = '.' + avatar.name.split(".")[-1]
+    avatar.name = str(user_id) + suffix
+    # 保存至media
+    user = User.objects.get(id=user_id)
+    user.avatar = avatar
+    user.save()
+
+    # 获取上传结果
+    upload_result = upload_image(avatar, "avatar-summer", user_id)
+
+    if upload_result['result'] == 0:
+        return JsonResponse(upload_result)
+
+    # 获取图片路由
+    avatar_url = upload_result['image_url']
+    # 获取信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    # 修改信息，同步缓存
+    user_dict['avatar_url'] = avatar_url
+    cache.set(user_key, user_dict)
+    # 同步mysql
+    celery_change_avatar.delay(user_id, avatar_url)
+
+    result = {'result': 1, 'message': r"上传成功！", 'user': user_dict}
+    return JsonResponse(result)

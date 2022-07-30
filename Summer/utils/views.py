@@ -58,11 +58,6 @@ def active(request, token):
         # 同步mysql
         celery_activate_user.delay(user_id, email, avatar_url)
 
-        # 删除其他伪用户
-        user_list = User.objects.filter(username=username, is_active=False)
-        if user_list:
-            user_list.delete()
-
         # TODO 发送站内信
 
         # 返回注册成功的界面
