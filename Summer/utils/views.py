@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-
-from properties import production_base_url
+import random
+from properties import *
 from utils.Login_utils import *
 from utils.Redis_utils import *
 from utils.tasks import *
@@ -39,7 +39,7 @@ def active(request, token):
         return render(request, 'EmailContent-check.html', content)
 
     # 获取到用户名
-    username = user_dict.get("username", "")
+    username = user_dict['username']
 
     # 使用邮箱激活账号
     if 'email' in payload.keys():
@@ -49,14 +49,14 @@ def active(request, token):
         user_dict['is_active'] = True
         user_dict['email'] = email
 
-        # TODO 设置随机头像
-        # avatar_url = default_avatar_url_match + str(random.choice(range(1, 301))) + '.png'
-        # user.avatar_url = avatar_url
+        # 设置随机头像
+        avatar_url = default_avatar_url_match + str(random.choice(range(1, 31))) + '.png'
+        user_dict['avatar_url'] = avatar_url
 
         # 同步缓存
         cache.set(user_key, user_dict)
         # 同步mysql
-        celery_activate_user.delay(user_id, email)
+        celery_activate_user.delay(user_id, email, avatar_url)
 
         # 删除其他伪用户
         user_list = User.objects.filter(username=username, is_active=False)
@@ -100,7 +100,6 @@ def test_login_checker(request):
 # 测试异步消息队列
 @login_checker
 def test_celery(request):
-
     # 通过装饰器获得id
     user_id = request.user_id
 

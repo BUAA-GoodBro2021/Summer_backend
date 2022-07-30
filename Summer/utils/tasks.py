@@ -10,10 +10,11 @@ def celery_add_message_num(user_id):
 
 
 @app.task
-def celery_activate_user(user_id, email):
+def celery_activate_user(user_id, email, avatar_url):
     user = User.objects.get(id=user_id)
     user.is_active = True
     user.email = email
+    user.avatar_url = avatar_url
     user.save()
     return user
 

@@ -39,7 +39,7 @@ def register(request):
             return JsonResponse(result)
 
         # 生成假用户
-        user = User.objects.create(username=username, password=password1, is_active=False)
+        user = User.objects.create(username=username, password=hash_encode(password1), is_active=False)
 
         # 需要加密的信息
         payload = {
@@ -84,7 +84,7 @@ def login(request):
         # 获取用户实体
         user = User.objects.get(username=username, is_active=True)
 
-        if user.password != password:
+        if user.password != hash_encode(password):
             result = {'result': 0, 'message': r'用户名或者密码有误!'}
             return JsonResponse(result)
 
