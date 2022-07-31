@@ -7,7 +7,7 @@ from utils.File_utils import *
 from utils.Sending_utils import *
 
 
-# 用户注册(不需要登录状态检验)
+# 用户注册
 def register(request):
     """
     :param request: 请求体
@@ -61,7 +61,7 @@ def register(request):
         return JsonResponse(result)
 
 
-# 用户注册(不需要登录状态检验)
+# 用户注册
 def login(request):
     """
     :param request: 请求体
@@ -104,6 +104,48 @@ def login(request):
         return JsonResponse(result)
 
 
+# 找回密码
+def find_password(request):
+    if request.method == 'POST':
+        # 获取表单信息
+        username = request.POST.get('username', '')
+        # 是否存在该用户
+        if not User.objects.filter(username=username).exists():
+            result = {'result': 0, 'message': r'用户名不存在!'}
+            return JsonResponse(result)
+        # 获取该用户实体
+        user = User.objects.get(username=username)
+        # 获取密码
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+
+        if len(password1) == 0 or len(password2) == 0:
+            result = {'result': 0, 'message': r'用户名与密码不允许为空!'}
+            return JsonResponse(result)
+
+        if password1 != password2:
+            result = {'result': 0, 'message': r'两次密码不一致!'}
+            return JsonResponse(result)
+
+        email = user.email
+        # 需要加密的信息
+        payload = {
+            'user_id': user.id,
+            'password': hash_encode(password1),
+        }
+        # 发送邮件
+        send_result = send_email(payload, email, 'find')
+        if not send_result:
+            result = {'result': 0, 'message': r'发送失败!请检查邮箱格式'}
+            return JsonResponse(result)
+        else:
+            result = {'result': 1, 'message': r'发送成功!请及时在邮箱中完成修改密码的确认.'}
+            return JsonResponse(result)
+    else:
+        result = {'result': 0, 'message': r"请求方式错误！"}
+        return JsonResponse(result)
+
+
 # 上传头像
 @login_checker
 def upload_avatar(request):
@@ -112,7 +154,7 @@ def upload_avatar(request):
     # 获取用户上传的头像并保存
     avatar = request.FILES.get("avatar", None)
     # 获取文件尾缀并修改名称
-    suffix = '.' + avatar.name.split(".")[-1]
+    suffix = '.' + (avatar.name.split("."))[-1]
     avatar.name = str(user_id) + suffix
     # 保存至media
     user = User.objects.get(id=user_id)

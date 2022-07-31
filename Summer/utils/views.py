@@ -38,9 +38,6 @@ def active(request, token):
         content["message"] = "有其他好兄弟比你稍微快一点，使用相同的用户名激活邮箱啦，再去挑选一个你喜欢的用户名叭！"
         return render(request, 'EmailContent-check.html', content)
 
-    # 获取到用户名
-    username = user_dict['username']
-
     # 使用邮箱激活账号
     if 'email' in payload.keys():
         email = payload.get('email')
@@ -70,7 +67,11 @@ def active(request, token):
         password = payload.get('password')
 
         # 同步mysql(password不在缓存里面)
-        celery_change_password.delay(user_id, password)
+        # celery_change_password.delay(user_id, password)
+        # 需要立即修改，使用异步不合适
+        user = User.objects.get(id=user_id)
+        user.password = password
+        user.save()
 
         # TODO 发送站内信
 

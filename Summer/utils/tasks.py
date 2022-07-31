@@ -6,7 +6,7 @@ from user.models import User
 def celery_add_message_num(user_id):
     user = User.objects.get(id=user_id)
     user.add_message_num()
-    return user
+    return user.to_dic()
 
 
 @app.task
@@ -20,11 +20,12 @@ def celery_activate_user(user_id, email, avatar_url):
     user_list = User.objects.filter(username=user.username, is_active=False)
     if user_list:
         user_list.delete()
-    return user
+    return user.to_dic()
 
 
 @app.task
 def celery_change_password(user_id, password):
     user = User.objects.get(id=user_id)
     user.password = password
-    return user
+    user.save()
+    return user.to_dic()
