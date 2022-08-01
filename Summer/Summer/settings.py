@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'corsheaders',  # 跨域请求
+    'channels',     # websocket支持
     'utils',
     'user',
     'team',
