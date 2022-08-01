@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'corsheaders',  # 跨域请求
     'utils',
     'user',
-    'super_admin',
     'team',
 ]
 

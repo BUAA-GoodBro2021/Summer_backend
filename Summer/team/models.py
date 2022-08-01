@@ -1,7 +1,5 @@
 from django.db import models
 
-from django.db import models
-
 
 # 用户实体
 class Team(models.Model):
@@ -9,7 +7,7 @@ class Team(models.Model):
     team_name = models.CharField('团队名称', max_length=30, default='')
 
     # 数量系列
-    user_num = models.IntegerField('成员的数量', default=0)
+    user_num = models.IntegerField('成员的数量', default=1)
 
     # 头像系列
     avatar_url = models.CharField('团队头像路径', max_length=128, default='')
