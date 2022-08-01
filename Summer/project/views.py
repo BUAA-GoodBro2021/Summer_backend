@@ -13,7 +13,7 @@ def create_project(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
-    team_id = request.POST.get('team_id', '')
+    team_id = request.POST.get('team_id', 0)
     project_name = request.POST.get('project_name', '')
 
     # 判断权限
@@ -39,7 +39,7 @@ def create_project(request):
     team_dict['project_num'] += 1
     cache.set(team_key, team_dict)
     # project_dict['file_num'] += 1
-    # cache.set(project_key, project_key)
+    # cache.set(project_key, project_dict)
 
     # 同步mysql(TODO 项目的文件数量+1, 团队的项目数量+1)
     celery_create_project.delay(team_id, project.id)
@@ -55,8 +55,8 @@ def rename_project(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
-    team_id = request.POST.get('team_id', '')
-    project_id = request.POST.get('project_id', '')
+    team_id = request.POST.get('team_id', 0)
+    project_id = request.POST.get('project_id', 0)
     project_name = request.POST.get('project_name', '')
 
     # 判断权限
@@ -69,7 +69,7 @@ def rename_project(request):
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
 
     project_dict['project_name'] = project_name
-    cache.set(project_key, project_key)
+    cache.set(project_key, project_dict)
 
     # 同步mysql
     celery_rename_project.delay(project_id, project_name)
@@ -94,8 +94,14 @@ def remove_project_to_bin(request):
 
     # 修改信息，同步缓存
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
+
+    # 是否已经在回收站里面
+    if project_dict['is_delete'] == 1:
+        result = {'result': 0, 'message': r'该项目已经添加至回收站，请勿重复添加!'}
+        return JsonResponse(result)
+
     project_dict['is_delete'] = 1
-    cache.set(project_key, project_key)
+    cache.set(project_key, project_dict)
 
     # 同步mysql
     celery_remove_project_to_bin.delay(project_id)
