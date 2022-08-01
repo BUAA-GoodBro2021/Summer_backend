@@ -6,18 +6,27 @@
 </head>
 <body>
 <div>
-    <input type="text" placeholder="请输入" id="txt">
+    <input type="text" placeholder="请输入" id="txt" oninput="tagChange()">
 </div>
 
 <script>
     socket = new WebSocket("ws://127.0.0.1:8000/document/{{ document_id }}/");
     let tag = document.getElementById("txt");
+    let mutex = 0;
     socket.onmessage = function (event) {
-        tag.innerText = event.data;
+        if(mutex === 0) {
+            tag.value = event.data;
+        }
     }
-    tag.onchange = function () {
-        socket.send(tag.value);
-    }
+    tagChange = function () {
+        if(mutex === 0) {
+            mutex = 1;
+            setTimeout(function (){
+                socket.send(tag.value)
+                mutex = 0;
+            }, 500);
+        }
+    };
 </script>
 
 </body>

@@ -10,10 +10,16 @@ class Consumer(WebsocketConsumer):
         self.accept()
         document_id = self.scope['url_route']['kwargs'].get('document_id')
         async_to_sync(self.channel_layer.group_add)(document_id, self.channel_name)
+        async_to_sync(self.channel_layer.group_send)(document_id, {
+            'type': 'document.update',
+            'message': {'text': self.content}
+        })
 
     def websocket_receive(self, message):
         document_id = self.scope['url_route']['kwargs'].get('document_id')
-        async_to_sync(self.channel_layer.group_send)(document_id, {'type': 'document.update', 'message': message})
+        async_to_sync(self.channel_layer.group_send)(document_id, {
+            'type': 'document.update', 'message': message
+        })
 
     def websocket_disconnect(self, message):
         document_id = self.scope['url_route']['kwargs'].get('document_id')
