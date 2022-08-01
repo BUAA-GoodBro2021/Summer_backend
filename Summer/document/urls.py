@@ -8,4 +8,5 @@ urlpatterns = [
     path('list_document_user', views.list_document_user),
     path('rename_document', views.rename_project),
     path('delete_document', views.delete_document),
+    path('save_document', views.save_document),
 ]

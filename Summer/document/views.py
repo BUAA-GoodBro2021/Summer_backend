@@ -122,3 +122,19 @@ def delete_document(request):
 
     result = {'result': 1, 'message': r'删除文档成功!'}
     return JsonResponse(result)
+
+
+@login_checker
+def save_document(request):
+    # 获取用户信息
+    user_id = request.user_id
+
+    # 获取表单信息
+    document_id = request.POST.get('document_id', '')
+
+    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
+
+    document_content = document_dict['document_content']
+    celery_save_document.delay(document_id, document_content)
+    result = {'result': 1, 'message': r'保存文档成功!', document_dict}
+    return JsonResponse(result)
