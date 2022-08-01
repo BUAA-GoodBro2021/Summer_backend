@@ -8,7 +8,7 @@ class Project(models.Model):
     file_num = models.IntegerField('文件的数量', default=0)
 
     # 判断是否删除
-    is_delete = models.IntegerField('是否删除', default=0)
+    is_delete = models.IntegerField('是否删除', default=0)  # 0-未删除   1-伪删除
 
     # 实体属性
     created_time = models.DateTimeField('创建时间', auto_now_add=True)

@@ -50,3 +50,9 @@ class Team(models.Model):
     def del_project_num(self):
         self.project_num -= 1
         self.save(update_fields=['project_num'])
+
+
+# 团队与项目的关联表
+class TeamToProject(models.Model):
+    team_id = models.IntegerField('团队id', default=0)
+    project_id = models.IntegerField('项目id', default=0)
