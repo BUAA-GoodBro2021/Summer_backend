@@ -28,6 +28,7 @@
             mutex = 1;
             setTimeout(function (){
                 socket.send(tag.value)
+                {#覆盖完成后恢复#}
                 mutex = 0;
             }, 200);
         }
