@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'utils',
     'user',
     'team',
+    'document',
 ]
 
 MIDDLEWARE = [
