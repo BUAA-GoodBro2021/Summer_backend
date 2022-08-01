@@ -13,7 +13,7 @@ def create_project(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
-    team_id = request.POST.get('team_id', '')
+    team_id = request.POST.get('team_id', 0)
     project_name = request.POST.get('project_name', '')
 
     # 判断权限
@@ -55,8 +55,8 @@ def rename_project(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
-    team_id = request.POST.get('team_id', '')
-    project_id = request.POST.get('project_id', '')
+    team_id = request.POST.get('team_id', 0)
+    project_id = request.POST.get('project_id', 0)
     project_name = request.POST.get('project_name', '')
 
     # 判断权限
@@ -69,7 +69,7 @@ def rename_project(request):
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
 
     project_dict['project_name'] = project_name
-    cache.set(project_key, project_key)
+    cache.set(project_key, project_dict)
 
     # 同步mysql
     celery_rename_project.delay(project_id, project_name)
