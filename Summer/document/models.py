@@ -3,6 +3,8 @@ from django.db import models
 
 # 文档实体
 class Document(models.Model):
+    creator_id = models.IntegerField('创建者id', default=0)
+
     document_title = models.CharField('文档标题', max_length=30, default='')
     document_content = models.TextField('文档内容', default='')
 
@@ -19,3 +21,9 @@ class Document(models.Model):
             'created_time': self.created_time,
             'updated_time': self.updated_time,
         }
+
+
+# 用户与文档关联表
+class UserToDocument(models.Model):
+    user_id = models.IntegerField('用户id', default=0)
+    document_id = models.IntegerField('文档id', default=0)
