@@ -83,7 +83,7 @@ def list_team_user(request):
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     team_key, team_dict = cache_get_by_id('team', 'team', team_id)
-    result = {'result': 1, 'message': r'创建团队成功!', 'user': user_dict, 'is_super_admin': is_super_admin,
+    result = {'result': 1, 'message': r'查询成功!', 'user': user_dict, 'is_super_admin': is_super_admin,
               'team': team_dict, 'user_list': user_list}
     return JsonResponse(result)
 
