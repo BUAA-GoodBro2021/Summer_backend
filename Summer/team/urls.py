@@ -6,6 +6,7 @@ urlpatterns = [
     path('create_team', views.create_team),
     path('list_team_user', views.list_team_user),
     path('list_team_project', views.list_team_project),
+    path('list_team_bin', views.list_team_bin),
     path('invite_user', views.invite_user),
     path('join_team', views.join_team),
     path('set_super_admin', views.set_super_admin),
