@@ -94,6 +94,12 @@ def remove_project_to_bin(request):
 
     # 修改信息，同步缓存
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
+
+    # 是否已经在回收站里面
+    if project_dict['is_delete'] == 1:
+        result = {'result': 0, 'message': r'该项目已经添加至回收站，请勿重复添加!'}
+        return JsonResponse(result)
+
     project_dict['is_delete'] = 1
     cache.set(project_key, project_dict)
 
