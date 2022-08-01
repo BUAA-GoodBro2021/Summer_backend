@@ -6,7 +6,7 @@
 </head>
 <body>
 <div>
-    <input type="text" placeholder="请输入" id="txt" oninput="tagChange()">
+    <input type="text" placeholder="请输入" id="txt" oninput="textUpdate()">
 </div>
 
 <script>
@@ -23,7 +23,7 @@
         }
     }
     {#当文本框更新时，禁止其他客户端接收信息，向服务端发送更新信息，延时覆盖#}
-    tagChange = function () {
+    textUpdate = function () {
         if(mutex === 0) {
             mutex = 1;
             setTimeout(function (){
