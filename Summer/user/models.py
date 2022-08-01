@@ -46,7 +46,7 @@ class User(models.Model):
         self.team_num += 1
         self.save(update_fields=['team_num'])
 
-    # 团队的数量+1
+    # 团队的数量-1
     def del_team_num(self):
         self.team_num -= 1
         self.save(update_fields=['team_num'])

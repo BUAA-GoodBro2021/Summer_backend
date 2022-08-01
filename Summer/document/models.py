@@ -4,7 +4,7 @@ from django.db import models
 # 文档实体
 class Document(models.Model):
     document_title = models.CharField('文档标题', max_length=30, default='')
-    document_content = models.CharField('文档内容', max_length=256, default='')
+    document_content = models.TextField('文档内容', default='')
 
     # 实体属性
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
