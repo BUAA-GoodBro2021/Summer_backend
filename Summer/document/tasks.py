@@ -1,5 +1,5 @@
 from Summer.celery import app
-from document.models import Document
+from document.models import *
 
 
 @app.task
@@ -12,6 +12,9 @@ def celery_rename_document(document_id, document_title):
 
 @app.task
 def celery_delete_document(document_id):
+    user_to_document_list = UserToDocument.objects.filter(document_id=document_id)
+    for every_user_to_document in user_to_document_list:
+        every_user_to_document.delete()
     document = Document.objects.get(id=document_id)
     document.delete()
     return document.to_dic()
