@@ -154,6 +154,46 @@ def join_team(request):
     return JsonResponse(result)
 
 
+# 将普通成员移除
+@login_checker
+def remove_user(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    team_id = request.POST.get('team_id', '')
+    set_user_id = request.POST.get('set_user_id', '')
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id, is_super_admin=1).exists():
+        result = {'result': 0, 'message': r'你不属于该团队或者没有权限, 请联系该团队的管理员申请加入或者提高权限!'}
+        return JsonResponse(result)
+
+    # 检查将要操作的用户是不是为管理员
+    if UserToTeam.objects.filter(user_id=set_user_id, team_id=team_id, is_super_admin=1).exists():
+        result = {'result': 0, 'message': r'该成员已经为管理员, 无法移除!'}
+        return JsonResponse(result)
+
+    # 关系表修正
+    UserToTeam.objects.get(user_id=set_user_id, team_id=team_id).delete()
+
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    team_key, team_dict = cache_get_by_id('team', 'team', team_id)
+
+    # 用户的团队数-1, 团队人数-1
+    # 修改信息，同步缓存
+    user_dict['team_num'] -= 1
+    team_dict['user_num'] -= 1
+    cache.set(user_key, user_dict)
+    cache.set(team_key, team_dict)
+
+    # 同步mysql
+    celery_remove_user.delay(user_id, team_id)
+
+    result = {'result': 1, 'message': r'移除该成员成功!', 'user': user_dict}
+    return JsonResponse(result)
+
+
 # 将普通成员变为管理员
 @login_checker
 def set_super_admin(request):
