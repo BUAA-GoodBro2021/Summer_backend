@@ -3,7 +3,7 @@ import random
 from django.core.cache import cache
 from team.tasks import *
 from properties import *
-from team.models import Team
+from team.models import Team, TeamToProject
 from user.models import *
 from utils.Login_utils import *
 
@@ -85,6 +85,37 @@ def list_team_user(request):
     team_key, team_dict = cache_get_by_id('team', 'team', team_id)
     result = {'result': 1, 'message': r'查询成功!', 'user': user_dict, 'is_super_admin': is_super_admin,
               'team': team_dict, 'user_list': user_list}
+    return JsonResponse(result)
+
+
+# 查看团队中的所有项目信息
+@login_checker
+def list_team_project(request):
+    # 获取用户信息
+    user_id = request.user_id
+
+    # 获取表单信息
+    team_id = request.POST.get('team_id', '')
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
+        result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
+        return JsonResponse(result)
+
+    # 团队所有关联信息
+    team_to_project_list = TeamToProject.objects.filter(team_id=team_id)
+    # 项目的所有信息列表
+    project_list = []
+
+    for every_team_to_project in team_to_project_list:
+        # 修改信息，同步缓存
+        project_key, project_dict = cache_get_by_id('project', 'project', every_team_to_project.project_id)
+        project_list.append(project_dict)
+
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    team_key, team_dict = cache_get_by_id('team', 'team', team_id)
+    result = {'result': 1, 'message': r'查询成功!', 'user': user_dict, 'team': team_dict, 'project_list': project_list}
     return JsonResponse(result)
 
 
