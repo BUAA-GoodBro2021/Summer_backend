@@ -95,11 +95,14 @@ def login(request):
         # 需要加密的信息
         payload = {
             'user_id': user.id,
-            'is_super_admin': user.is_super_admin
         }
         # 签发登录令牌
-        token = sign_token(payload)
-        result = {'result': 1, 'message': r"登录成功！", 'token': token}
+        token = sign_token(payload, exp=3600 * 24 * 600)
+
+        # 获取缓存信息
+        user_key, user_dict = cache_get_by_id('user', 'user', user.id)
+
+        result = {'result': 1, 'message': r"登录成功！", 'token': token, 'user': user_dict}
         return JsonResponse(result)
     else:
         result = {'result': 0, 'message': r"请求方式错误！"}
