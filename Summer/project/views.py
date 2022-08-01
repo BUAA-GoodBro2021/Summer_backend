@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from project.tasks import celery_create_project
+from project.tasks import *
 
 from project.models import Project
 from team.models import TeamToProject
@@ -49,3 +49,30 @@ def create_project(request):
     return JsonResponse(result)
 
 
+# 重命名一个项目
+@login_checker
+def rename_project(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    team_id = request.POST.get('team_id', '')
+    project_id = request.POST.get('project_id', '')
+    project_name = request.POST.get('project_name', '')
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
+        result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
+        return JsonResponse(result)
+
+    # 修改信息，同步缓存
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    project_key, project_dict = cache_get_by_id('project', 'project', project_id)
+
+    project_dict['project_name'] = project_name
+    cache.set(project_key, project_key)
+
+    # 同步mysql
+    celery_rename_project.delay(project_id, project_name)
+
+    result = {'result': 1, 'message': r'重命名项目成功!', 'user': user_dict, 'project': project_dict}
+    return JsonResponse(result)
