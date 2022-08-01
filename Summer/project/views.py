@@ -109,3 +109,30 @@ def remove_project_to_bin(request):
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'将项目放入回收站成功!', 'user': user_dict}
     return JsonResponse(result)
+
+
+# 将回收站中的项目恢复
+@login_checker
+def recover_project_from_bin(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+
+    # 修改信息，同步缓存
+    project_key, project_dict = cache_get_by_id('project', 'project', project_id)
+
+    # 是否已经在回收站里面
+    if project_dict['is_delete'] == 0:
+        result = {'result': 0, 'message': r'该项目已经恢复，请勿重复恢复!'}
+        return JsonResponse(result)
+
+    project_dict['is_delete'] = 0
+    cache.set(project_key, project_dict)
+
+    # 同步mysql
+    celery_recover_project_from_bin.delay(project_id)
+
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    result = {'result': 1, 'message': r'将回收站恢复成功!', 'user': user_dict}
+    return JsonResponse(result)

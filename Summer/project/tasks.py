@@ -27,3 +27,11 @@ def celery_remove_project_to_bin(project_id):
     project.is_delete = 1
     project.save()
     return project.to_dic()
+
+
+@app.task
+def celery_recover_project_from_bin(project_id):
+    project = Project.objects.get(id=project_id)
+    project.is_delete = 0
+    project.save()
+    return project.to_dic()
