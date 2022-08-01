@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'corsheaders',  # 跨域请求
-    'channels',     # websocket支持
+    'channels',  # websocket支持
     'utils',
     'user',
     'team',
@@ -127,7 +127,10 @@ CACHES = {
     'default': {
         "BACKEND": redis_BACKEND,
         "LOCATION": "redis://" + redis_HOST + ":" + str(redis_PORT),
+        'TIMEOUT': redis_TIMEOUT,
         "OPTIONS": {
+            'MAX_ENTRIES': redis_MAX_ENTRIES,
+            'CULL_FREQUENCY': redis_CULL_FREQUENCY,
             "CLIENT_CLASS": redis_CLIENT_CLASS,
             "PASSWORD": redis_PASSWORD
         }
