@@ -15,6 +15,8 @@ class Document(models.Model):
     def to_dic(self):
         return {
             'document_id': self.id,
+            'creator_id': self.creator_id,
+
             'document_title': self.document_title,
             'document_content': self.document_content,
 
