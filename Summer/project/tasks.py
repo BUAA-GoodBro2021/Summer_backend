@@ -19,3 +19,11 @@ def celery_rename_project(project_id, project_name):
     project.project_name = project_name
     project.save()
     return project.to_dic()
+
+
+@app.task
+def celery_remove_project_to_bin(project_id):
+    project = Project.objects.get(id=project_id)
+    project.is_delete = 1
+    project.save()
+    return project.to_dic()

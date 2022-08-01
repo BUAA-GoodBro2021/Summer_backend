@@ -110,7 +110,9 @@ def list_team_project(request):
     for every_team_to_project in team_to_project_list:
         # 修改信息，同步缓存
         project_key, project_dict = cache_get_by_id('project', 'project', every_team_to_project.project_id)
-        project_list.append(project_dict)
+        # 只展示未删除的项目
+        if project_dict['is_delete'] == 0:
+            project_list.append(project_dict)
 
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
