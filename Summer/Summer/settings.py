@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'utils',
     'user',
     'super_admin',
+    'team',
 ]
 
 MIDDLEWARE = [

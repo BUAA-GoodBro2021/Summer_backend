@@ -19,11 +19,12 @@ def register(request):
 
         # 获取表单信息
         username = request.POST.get('username', '')
+        real_name = request.POST.get('real_name', '')
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')
 
-        if len(username) == 0 or len(password1) == 0 or len(password2) == 0:
-            result = {'result': 0, 'message': r'用户名与密码不允许为空!'}
+        if len(username) == 0 or len(real_name) == 0 or len(password1) == 0 or len(password2) == 0:
+            result = {'result': 0, 'message': r'用户名, 真实姓名与密码不允许为空!'}
             return JsonResponse(result)
 
         if User.objects.filter(username=username, is_active=True).exists():
@@ -41,7 +42,8 @@ def register(request):
             return JsonResponse(result)
 
         # 生成假用户
-        user = User.objects.create(username=username, password=hash_encode(password1), is_active=False)
+        user = User.objects.create(username=username, real_name=real_name, password=hash_encode(password1),
+                                   is_active=False)
 
         # 需要加密的信息
         payload = {
