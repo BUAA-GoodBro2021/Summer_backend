@@ -39,7 +39,7 @@ def create_project(request):
     team_dict['project_num'] += 1
     cache.set(team_key, team_dict)
     # project_dict['file_num'] += 1
-    # cache.set(project_key, project_key)
+    # cache.set(project_key, project_dict)
 
     # 同步mysql(TODO 项目的文件数量+1, 团队的项目数量+1)
     celery_create_project.delay(team_id, project.id)
@@ -95,7 +95,7 @@ def remove_project_to_bin(request):
     # 修改信息，同步缓存
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
     project_dict['is_delete'] = 1
-    cache.set(project_key, project_key)
+    cache.set(project_key, project_dict)
 
     # 同步mysql
     celery_remove_project_to_bin.delay(project_id)
