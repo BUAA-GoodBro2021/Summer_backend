@@ -168,13 +168,20 @@ def remove_user(request):
         result = {'result': 0, 'message': r'你不属于该团队或者没有权限, 请联系该团队的管理员申请加入或者提高权限!'}
         return JsonResponse(result)
 
+    # 该成员是否存在于组织内部
+    try:
+        set_user_to_team = UserToTeam.objects.get(user_id=set_user_id, team_id=team_id)
+    except Exception:
+        result = {'result': 0, 'message': r'该成员不在团队内部!'}
+        return JsonResponse(result)
+
     # 检查将要操作的用户是不是为管理员
-    if UserToTeam.objects.filter(user_id=set_user_id, team_id=team_id, is_super_admin=1).exists():
+    if set_user_to_team.is_super_admin == 1:
         result = {'result': 0, 'message': r'该成员已经为管理员, 无法移除!'}
         return JsonResponse(result)
 
     # 关系表修正
-    UserToTeam.objects.get(user_id=set_user_id, team_id=team_id).delete()
+    set_user_to_team.delete()
 
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
@@ -207,12 +214,19 @@ def set_super_admin(request):
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id, is_super_admin=1).exists():
         result = {'result': 0, 'message': r'你不属于该团队或者没有权限, 请联系该团队的管理员申请加入或者提高权限!'}
         return JsonResponse(result)
-    # 检查将要操作的用户是不是已经为管理员
-    if UserToTeam.objects.filter(user_id=set_user_id, team_id=team_id, is_super_admin=1).exists():
+
+    # 该成员是否存在于组织内部
+    try:
+        set_user_to_team = UserToTeam.objects.get(user_id=set_user_id, team_id=team_id)
+    except Exception:
+        result = {'result': 0, 'message': r'该成员不在团队内部!'}
+        return JsonResponse(result)
+
+    # 检查将要操作的用户是不是为管理员
+    if set_user_to_team.is_super_admin == 1:
         result = {'result': 0, 'message': r'该成员已经为管理员, 请勿重复设置!'}
         return JsonResponse(result)
 
-    set_user_to_team = UserToTeam.objects.get(user_id=set_user_id, team_id=team_id)
     set_user_to_team.is_super_admin = 1
     set_user_to_team.save()
 
