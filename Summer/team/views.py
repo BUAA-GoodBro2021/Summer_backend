@@ -66,6 +66,9 @@ def list_team_user(request):
 
     # 用户的所有信息列表
     user_list = []
+    # 自己是不是超管
+    is_super_admin = 0
+
     for every_user_to_team in user_to_team_list:
         # 获取缓存
         user_key, user_dict = cache_get_by_id('user', 'user', every_user_to_team.user_id)
@@ -73,11 +76,15 @@ def list_team_user(request):
         user_dict['is_super_admin'] = every_user_to_team.is_super_admin
         # 加入用户信息列表
         user_list.append(user_dict)
+        # 添加权限修饰符
+        if user_id == every_user_to_team.user_id:
+            is_super_admin = every_user_to_team.is_super_admin
 
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     team_key, team_dict = cache_get_by_id('team', 'team', team_id)
-    result = {'result': 1, 'message': r'创建团队成功!', 'user': user_dict, 'team': team_dict, 'user_list': user_list}
+    result = {'result': 1, 'message': r'创建团队成功!', 'user': user_dict, 'is_super_admin': is_super_admin,
+              'team': team_dict, 'user_list': user_list}
     return JsonResponse(result)
 
 
@@ -86,10 +93,8 @@ def list_team_user(request):
 def invite_user(request):
     # 获取用户信息
     user_id = request.user_id
-
     # 获取表单信息
     team_id = request.POST.get('team_id', '')
-
     # 判断权限
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
         result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
@@ -118,11 +123,15 @@ def join_team(request):
     payload = check_token(invitation_code)
     # 校验失败
     if payload is None:
-        result = {'result': 0, 'message': r'邀请码错误, 请联系该团队的管理员重新获取邀请码!'}
+        result = {'result': 0, 'message': r'邀请码错误或过期, 请联系该团队的管理员重新获取邀请码!'}
         return JsonResponse(result)
 
     # 获取邀请码信息
     team_id = payload['team_id']
+
+    if UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
+        result = {'result': 0, 'message': r'你已经在该团队啦, 不要重复加入!'}
+        return JsonResponse(result)
 
     # 创建关系
     UserToTeam.objects.create(user_id=user_id, team_id=team_id)
@@ -144,4 +153,30 @@ def join_team(request):
     result = {'result': 1, 'message': r'加入团队成功!', 'user': user_dict}
     return JsonResponse(result)
 
-#
+
+# 将普通成员变为管理员
+@login_checker
+def set_super_admin(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    team_id = request.POST.get('team_id', '')
+    set_user_id = request.POST.get('set_user_id', '')
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id, is_super_admin=1).exists():
+        result = {'result': 0, 'message': r'你不属于该团队或者没有权限, 请联系该团队的管理员申请加入或者提高权限!'}
+        return JsonResponse(result)
+    # 检查将要操作的用户是不是已经为管理员
+    if UserToTeam.objects.filter(user_id=set_user_id, team_id=team_id, is_super_admin=1).exists():
+        result = {'result': 0, 'message': r'该成员已经为管理员, 请勿重复设置!'}
+        return JsonResponse(result)
+
+    set_user_to_team = UserToTeam.objects.get(user_id=set_user_id, team_id=team_id)
+    set_user_to_team.is_super_admin = 1
+    set_user_to_team.save()
+
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    result = {'result': 1, 'message': r'设置为管理员成功!', 'user': user_dict}
+    return JsonResponse(result)
