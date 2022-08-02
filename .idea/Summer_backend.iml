@@ -20,6 +20,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9 (Summer_backend)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="wiz-editor" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />

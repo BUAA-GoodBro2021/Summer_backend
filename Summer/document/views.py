@@ -102,18 +102,10 @@ def rename_project(request):
 # 删除文档
 @login_checker
 def delete_document(request):
-    # 获取用户信息
-    user_id = request.user_id
-
     # 获取表单信息
     document_id = request.POST.get('document_id', '')
 
     document_key, document_dict = cache_get_by_id('document', 'document', document_id)
-
-    # TODO 需要项目模型
-    if user_id != document_dict['creator_id']:
-        result = {'result': 0, 'message': r'您不是此文档创建者'}
-        return JsonResponse(result)
 
     # 移除缓存中内容
     cache.delete(document_key)
@@ -127,9 +119,6 @@ def delete_document(request):
 
 @login_checker
 def save_document(request):
-    # 获取用户信息
-    user_id = request.user_id
-
     # 获取表单信息
     document_id = request.POST.get('document_id', '')
 

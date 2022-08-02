@@ -4,36 +4,25 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
-<div>
-    <input style="height: 500px; width: 500px;" type="text" placeholder="请输入" id="txt" oninput="textUpdate()">
-</div>
-
+<script src='https://cdn.jsdelivr.net/npm/wiz-editor@0.0.44/client/src/index.js' charset="utf-8"></script>
 <script>
-    {#握手socket#}
-    socket = new WebSocket("wss://summer.super2021.com/websocket/{{ document_id }}/");
-    {#获取对应文本框#}
-    let tag = document.getElementById("txt");
-    {#设置同步#}
-    let mutex = 0;
-    {#当每半秒写完时，接收发送信息#}
-    socket.onmessage = function (event) {
-        if(mutex === 0) {
-            tag.value = event.data;
-        }
-    }
-    {#当文本框更新时，禁止其他客户端接收信息，向服务端发送更新信息，延时覆盖#}
-    textUpdate = function () {
-        if(mutex === 0) {
-            mutex = 1;
-            setTimeout(function (){
-                socket.send(tag.value)
-                {#覆盖完成后恢复#}
-                mutex = 0;
-            }, 200);
-        }
-    };
+const {
+  Editor,
+  createEditorPromise,
+  assert,
+  BlockElement,
+  blockUtils,
+  containerUtils,
+  CommandItemData,
+  MenuItem,
+  domUtils,
+  getEditor,
+  AuthMessage,
+  OnProgress,
+  EditorOptions,
+  SelectionDetail,
+  EditorDoc,
+} = window.WizEditor;
 </script>
-
-</body>
+<body></body>
 </html>
