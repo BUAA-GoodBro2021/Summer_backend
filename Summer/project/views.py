@@ -146,11 +146,11 @@ def add_star_project(request):
     # 获取表单信息
     project_id = request.POST.get('project_id', '')
     # 如果已经设置为星标项目了
-    if UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0).exists():
+    if UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id).exists():
         result = {'result': 0, 'message': r'已经设置为星标，请勿重复设置!'}
         return JsonResponse(result)
     # 创建关联
-    UserToProjectStar.objects.create(user_id=user_id, project_id=project_id, is_delete=0)
+    UserToProjectStar.objects.create(user_id=user_id, project_id=project_id)
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'设置星标成功!', 'user': user_dict}
     return JsonResponse(result)
@@ -164,11 +164,11 @@ def del_star_project(request):
     # 获取表单信息
     project_id = request.POST.get('project_id', '')
     # 如果已经设置为星标项目了
-    if not UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0).exists():
+    if not UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id).exists():
         result = {'result': 0, 'message': r'已经取消星标，请勿重复取消!'}
         return JsonResponse(result)
     # 删除关联
-    UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0).delete()
+    UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id).delete()
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'取消星标成功!', 'user': user_dict}
     return JsonResponse(result)
