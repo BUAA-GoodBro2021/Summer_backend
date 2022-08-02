@@ -15,4 +15,15 @@ jobs:
       - name: pull and reload
         env:
           DST: ${{secrets.DST_FOLDER}}
-        run: sshpass -p ${{secrets.PASSWORD}} ssh -o StrictHostKeyChecking=no ${{secrets.USER}}@${{secrets.IP}} "cd ${DST}; git config --global http.postBuffer 1048576000; git pull; uwsgi --reload uwsgi.pid; nginx -s reload; killall -9 celery; (celery -A Summer worker -P gevent -c 1000 > celery.log 2>&1 &); killall -9 daphne; (daphne -p 8003 Summer.asgi:application > daphne.log 2>&1 &)"
+        run: sshpass -p ${{secrets.PASSWORD}} ssh -o StrictHostKeyChecking=no ${{secrets.USER}}@${{secrets.IP}} "cd ${DST}; git config --global http.postBuffer 1048576000; git pull; uwsgi --reload uwsgi.pid; nginx -s reload"
+  
+      - name: start celery
+        env:
+          DST: ${{secrets.DST_FOLDER}}
+        run: sshpass -p ${{secrets.PASSWORD}} ssh -o StrictHostKeyChecking=no ${{secrets.USER}}@${{secrets.IP}} "cd ${DST};  killall -9 celery; celery -A Summer worker -P gevent -c 1000 > celery.log 2>&1 &"
+    
+    
+      - name: start daphne
+        env:
+          DST: ${{secrets.DST_FOLDER}}
+        run: sshpass -p ${{secrets.PASSWORD}} ssh -o StrictHostKeyChecking=no ${{secrets.USER}}@${{secrets.IP}} "cd ${DST}; killall -9 daphne; daphne -p 8003 Summer.asgi:application > daphne.log 2>&1 &"
