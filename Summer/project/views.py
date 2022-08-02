@@ -139,6 +139,7 @@ def recover_project_from_bin(request):
 
 
 # 设置星标项目
+@login_checker
 def add_star_project(request):
     # 获取用户信息
     user_id = request.user_id
@@ -156,6 +157,7 @@ def add_star_project(request):
 
 
 # 取消设置星标项目
+@login_checker
 def del_star_project(request):
     # 获取用户信息
     user_id = request.user_id
