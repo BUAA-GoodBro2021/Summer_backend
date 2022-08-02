@@ -3,7 +3,7 @@ from django.db import models
 
 class Project(models.Model):
     project_name = models.CharField('项目名称', max_length=30, default='')
-
+    project_description = models.CharField('项目简介', max_length=30, default='')
     # 数量系列
     file_num = models.IntegerField('文件的数量', default=0)
 
@@ -18,6 +18,7 @@ class Project(models.Model):
         return {
             'project_id': self.id,
             'project_name': self.project_name,
+            'project_description': self.project_description,
 
             'file_num': self.file_num,
 
