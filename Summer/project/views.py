@@ -15,6 +15,7 @@ def create_project(request):
     # 获取表单信息
     team_id = request.POST.get('team_id', 0)
     project_name = request.POST.get('project_name', '')
+    project_description = request.POST.get('project_description', '')
 
     # 判断权限
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
@@ -22,7 +23,7 @@ def create_project(request):
         return JsonResponse(result)
 
     # 创建一个项目对象
-    project = Project.objects.create(project_name=project_name)
+    project = Project.objects.create(project_name=project_name, project_description=project_description)
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=project.id)
 
