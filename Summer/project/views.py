@@ -61,6 +61,10 @@ def rename_project(request):
     project_name = request.POST.get('project_name', '')
     project_description = request.POST.get('project_description', '')
 
+    if len(project_name) == 0:
+        result = {'result': 0, 'message': r'项目名称不允许为空!'}
+        return JsonResponse(result)
+
     # 判断权限
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
         result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
@@ -74,9 +78,11 @@ def rename_project(request):
     project_dict['project_description'] = project_description
     cache.set(project_key, project_dict)
 
-    # 同步mysql
-    project_info = (project_name, project_description)
-    celery_rename_project.delay(project_id, project_info)
+    # 同步mysql(celery好像不支持三个参数)
+    project = Project.objects.get(id=project_id)
+    project.project_name = project_name
+    project.project_description = project_name
+    project.save()
 
     result = {'result': 1, 'message': r'修改项目信息成功!', 'user': user_dict, 'project': project_dict}
     return JsonResponse(result)
