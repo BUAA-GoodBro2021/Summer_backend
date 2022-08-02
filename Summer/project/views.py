@@ -104,7 +104,7 @@ def remove_project_to_bin(request):
     cache.set(project_key, project_dict)
 
     # 同步mysql
-    celery_remove_project_to_bin.delay(project_id)
+    celery_remove_project_to_bin.delay(user_id, project_id)
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'将项目放入回收站成功!', 'user': user_dict}
@@ -131,7 +131,7 @@ def recover_project_from_bin(request):
     cache.set(project_key, project_dict)
 
     # 同步mysql
-    celery_recover_project_from_bin.delay(project_id)
+    celery_recover_project_from_bin.delay(user_id, project_id)
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'将回收站恢复成功!', 'user': user_dict}
@@ -139,13 +139,34 @@ def recover_project_from_bin(request):
 
 
 # 设置星标项目
-def star_project(request):
+def add_star_project(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
     project_id = request.POST.get('project_id', '')
+    # 如果已经设置为星标项目了
+    if UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0).exists():
+        result = {'result': 0, 'message': r'已经设置为星标，请勿重复设置!'}
+        return JsonResponse(result)
+    # 创建关联
+    UserToProjectStar.objects.create(user_id=user_id, project_id=project_id, is_delete=0)
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    result = {'result': 1, 'message': r'设置星标成功!', 'user': user_dict}
+    return JsonResponse(result)
 
-    # if UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0)
-    #     UserToProjectStar.objects.create(user_id=user_id, project_id=project_id, is_delete=0)
 
-
+# 取消设置星标项目
+def del_star_project(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+    # 如果已经设置为星标项目了
+    if not UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0).exists():
+        result = {'result': 0, 'message': r'已经取消星标，请勿重复取消!'}
+        return JsonResponse(result)
+    # 删除关联
+    UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0).delete()
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    result = {'result': 1, 'message': r'取消星标成功!', 'user': user_dict}
+    return JsonResponse(result)

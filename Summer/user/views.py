@@ -188,7 +188,7 @@ def upload_avatar(request):
     return JsonResponse(result)
 
 
-# 查看用户在哪些团队里面
+# 查看用户的团队列表
 @login_checker
 def list_team(request):
     # 获取用户信息
@@ -204,4 +204,23 @@ def list_team(request):
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
 
     result = {'result': 1, 'message': r"查询团队成功成功！", 'user': user_dict, 'team_list': team_list}
+    return JsonResponse(result)
+
+
+# 查看用户的星标列表
+@login_checker
+def list_star(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 用户所有关联团队的信息
+    user_to_project_star_list = UserToProjectStar.objects.filter(user_id=user_id, is_delete=0)
+    # 团队信息
+    project_list = []
+    for every_user_to_project_star_list in user_to_project_star_list:
+        # 获取缓存信息
+        project_key, project_dict = cache_get_by_id('project', 'project', every_user_to_project_star_list.project_id)
+        project_list.append(project_dict)
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
+    result = {'result': 1, 'message': r"查询星标项目成功成功！", 'user': user_dict, 'project_list': project_list}
     return JsonResponse(result)
