@@ -58,6 +58,7 @@ def rename_project(request):
     team_id = request.POST.get('team_id', 0)
     project_id = request.POST.get('project_id', 0)
     project_name = request.POST.get('project_name', '')
+    project_description = request.POST.get('project_description', '')
 
     # 判断权限
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
@@ -69,10 +70,11 @@ def rename_project(request):
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
 
     project_dict['project_name'] = project_name
+    project_dict['project_description'] = project_description
     cache.set(project_key, project_dict)
 
     # 同步mysql
-    celery_rename_project.delay(project_id, project_name)
+    celery_rename_project.delay(project_id, project_name, project_description)
 
     result = {'result': 1, 'message': r'重命名项目成功!', 'user': user_dict, 'project': project_dict}
     return JsonResponse(result)
