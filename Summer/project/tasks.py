@@ -15,10 +15,10 @@ def celery_create_project(team_id, project_id):
 
 
 @app.task
-def celery_rename_project(project_id,  project_name, project_description):
+def celery_rename_project(project_id,  project_info):
     project = Project.objects.get(id=project_id)
-    project.project_name = project_name
-    project.project_description = project_description
+    project.project_name = project_info[0]
+    project.project_description = project_info[1]
     project.save()
     return project.to_dic()
 
