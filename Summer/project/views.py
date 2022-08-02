@@ -135,7 +135,17 @@ def recover_project_from_bin(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
+    team_id = request.POST.get('team_id', '')
     project_id = request.POST.get('project_id', '')
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
+        result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
+        return JsonResponse(result)
+
+    if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
+        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
+        return JsonResponse(result)
 
     # 修改信息，同步缓存
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
