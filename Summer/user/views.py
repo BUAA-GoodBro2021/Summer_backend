@@ -2,6 +2,8 @@
 用户相关的函数式响应
 """
 from django.core.cache import cache
+
+from user.models import *
 from user.tasks import *
 from utils.File_utils import *
 from utils.Sending_utils import *
@@ -183,4 +185,23 @@ def upload_avatar(request):
     celery_change_avatar.delay(user_id, avatar_url)
 
     result = {'result': 1, 'message': r"上传成功！", 'user': user_dict}
+    return JsonResponse(result)
+
+
+# 查看用户在哪些团队里面
+@login_checker
+def list_team(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 用户所有关联团队的信息
+    user_to_team_list = UserToTeam.objects.filter(user_id=user_id)
+    # 团队信息
+    team_list = []
+    for every_user_to_team in user_to_team_list:
+        # 获取缓存信息
+        team_key, team_dict = cache_get_by_id('team', 'team', every_user_to_team.team_id)
+        team_list.append(team_dict)
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
+    result = {'result': 1, 'message': r"查询团队成功成功！", 'user': user_dict, 'team_list': team_list}
     return JsonResponse(result)

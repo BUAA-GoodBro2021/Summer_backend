@@ -57,3 +57,10 @@ class UserToTeam(models.Model):
     user_id = models.IntegerField('用户id', default=0)
     team_id = models.IntegerField('团队id', default=0)
     is_super_admin = models.IntegerField('是否是团队管理员', default=0)  # 0-普通成员    1-管理员
+
+
+# 用户与星标项目的关联表
+class UserToProjectStar(models.Model):
+    user_id = models.IntegerField('用户id', default=0)
+    project_id = models.IntegerField('项目id', default=0)
+    is_delete = models.IntegerField('是否删除', default=0)  # 0-未删除   1-伪删除

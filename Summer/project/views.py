@@ -136,3 +136,16 @@ def recover_project_from_bin(request):
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'将回收站恢复成功!', 'user': user_dict}
     return JsonResponse(result)
+
+
+# 设置星标项目
+def star_project(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+
+    # if UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id, is_delete=0)
+    #     UserToProjectStar.objects.create(user_id=user_id, project_id=project_id, is_delete=0)
+
+
