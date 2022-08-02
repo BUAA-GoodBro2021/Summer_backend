@@ -70,6 +70,10 @@ def rename_project(request):
         result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
         return JsonResponse(result)
 
+    if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
+        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
+        return JsonResponse(result)
+
     # 修改信息，同步缓存
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
@@ -100,6 +104,10 @@ def remove_project_to_bin(request):
     # 判断权限
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
         result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
+        return JsonResponse(result)
+
+    if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
+        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
     # 修改信息，同步缓存
