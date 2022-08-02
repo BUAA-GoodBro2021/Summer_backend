@@ -25,8 +25,9 @@ def create_document(request):
         result = {'result': 0, 'message': r'文档标题不允许为空!'}
         return JsonResponse(result)
 
-    # 创建文档实体
-    document = Document.objects.create(creator_id=user_id, project_id=project_id, document_title=document_title)
+    # 创建实体
+    document = Document.objects.create(creator_id=user_id, document_title=document_title)
+    ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)

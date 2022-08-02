@@ -1,3 +1,5 @@
+import threading
+
 from channels.generic.websocket import WebsocketConsumer
 from channels.exceptions import StopConsumer
 from asgiref.sync import async_to_sync
@@ -20,6 +22,9 @@ class Consumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(document_id, self.channel_name)
         # 向客户端更新之前写好的内容
         self.send(document_dict['document_content'])
+        timer = threading.Timer(2, self.send(document_dict['document_content']))
+        timer.start()
+        print(timer)
 
     def websocket_receive(self, message):
         # 获取url中的文档id，以此为键
@@ -48,3 +53,4 @@ class Consumer(WebsocketConsumer):
         # 获取发送信息，更新其他客户端
         text = event.get('message').get('text')
         self.send(text)
+
