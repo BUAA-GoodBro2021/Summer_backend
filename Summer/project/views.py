@@ -76,7 +76,7 @@ def rename_project(request):
     # 同步mysql
     celery_rename_project.delay(project_id, project_name, project_description)
 
-    result = {'result': 1, 'message': r'重命名项目成功!', 'user': user_dict, 'project': project_dict}
+    result = {'result': 1, 'message': r'修改项目信息成功!', 'user': user_dict, 'project': project_dict}
     return JsonResponse(result)
 
 
