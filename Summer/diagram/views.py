@@ -59,17 +59,19 @@ def parse_token(request):
 # 重命名绘图
 def rename_diagram(request):
     # 获取表单信息
-    diagram_id = request.POST.get('diagram_id', '')
-    diagram_name = request.POST.get('diagram_name', '')
+    diagram_old_name = request.POST.get('diagram_old_name', '')
+    diagram_new_name = request.POST.get('diagram_new_name', '')
 
-    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
+    diagram = Diagram.objects.get(diagram_name=diagram_old_name)
+
+    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram.id)
 
     # 修改信息，同步缓存
-    diagram_dict['diagram_name'] = diagram_name
+    diagram_dict['diagram_name'] = diagram_new_name
     cache.set(diagram_key, diagram_dict)
 
     # 同步mysql
-    celery_rename_diagram.delay(diagram_id, diagram_name)
+    celery_rename_diagram.delay(diagram.id, diagram_new_name)
     result = {'result': 1, 'message': r'重命名绘图成功!', 'diagram': diagram_dict}
     return JsonResponse(result)
 
@@ -77,14 +79,16 @@ def rename_diagram(request):
 # 删除绘图
 def delete_diagram(request):
     # 获取表单信息
-    diagram_id = request.POST.get('diagram_id', '')
+    diagram_name = request.POST.get('diagram_name', '')
 
-    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
+    diagram = Diagram.objects.get(diagram_name=diagram_name)
+
+    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram.id)
 
     cache.delete(diagram_key)
 
     # 同步mysql
-    celery_delete_diagram.delay(diagram_id)
+    celery_delete_diagram.delay(diagram.id)
 
     result = {'result': 1, 'message': r'删除绘图成功!'}
     return JsonResponse(result)
