@@ -114,7 +114,7 @@ def list_page_detail(request):
     # 获取缓存
     page_key, result = cache_get_by_id_detail('page', 'page', page_id)
     print(result['element_list'])
-    result['element_list'] = literal_eval(result['element_list'])
+    result['element_list'] = result['element_list'].split("|")
     result['result'] = 0
     result['message'] = '成功获取某个页面的详细元素'
 
@@ -174,7 +174,6 @@ def edit_save(request):
     # 获取缓存
     page_key, page_dict = cache_get_by_id_detail('page', 'page', page_id)
     # 同步缓存
-    element_list = element_list.replace("\t", "").replace("\r", "")
     page_dict['element_list'] = element_list
     page_dict['num'] = num
     cache.set(page_key, page_dict)
