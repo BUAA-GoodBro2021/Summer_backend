@@ -99,11 +99,11 @@ def set_redis(request):
     return HttpResponse("Oh no")
 
 
-# 测试登录装饰器
+# 清除
 @login_checker
-def test_login_checker(request):
-    print(request.user_id)
-    return HttpResponse(request.user_id)
+def clear_redis_all(request):
+    cache.clear()
+    return HttpResponse("OK")
 
 
 # 测试异步消息队列

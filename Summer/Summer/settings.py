@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'document',
     'project',
     'diagram',
+    'page',
 ]
 
 MIDDLEWARE = [
