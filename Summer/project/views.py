@@ -34,25 +34,18 @@ def create_project(request):
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=project.id)
 
-    # TODO 创建一个原型设计界面
-
-    # TODO 创建原型设计界面与项目之间的关系
-
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     team_key, team_dict = cache_get_by_id('team', 'team', team_id)
     project_key, project_dict = cache_get_by_id('project', 'project', project.id)
 
-    # 修改信息，同步缓存(TODO 项目的文件数量+1, 团队的项目数量+1)
+    # 修改信息，同步缓存
     team_dict['project_num'] += 1
     cache.set(team_key, team_dict)
-    # project_dict['file_num'] += 1
-    # cache.set(project_key, project_dict)
 
-    # 同步mysql(TODO 项目的文件数量+1, 团队的项目数量+1)
+    # 同步mysql
     celery_create_project.delay(team_id, project.id)
 
-    # TODO 返回值应该包含生成的原型设计界面的信息
     result = {'result': 1, 'message': r'创建项目成功!', 'user': user_dict, 'project': project_dict}
     return JsonResponse(result)
 

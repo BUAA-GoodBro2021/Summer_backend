@@ -24,7 +24,7 @@ class Project(models.Model):
             'project_name': self.project_name,
             'project_description': self.project_description,
 
-            'avatar_url':self.avatar_url,
+            'avatar_url': self.avatar_url,
 
             'file_num': self.file_num,
 
@@ -44,3 +44,9 @@ class Project(models.Model):
     def del_file_num(self):
         self.file_num -= 1
         self.save(update_fields=['file_num'])
+
+
+# 项目与页面的关联表
+class ProjectToPage(models.Model):
+    project_id = models.IntegerField('项目id', default=0)
+    page_id = models.IntegerField('页面id', default=0)
