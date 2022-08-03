@@ -87,3 +87,4 @@ def delete_diagram(request):
     celery_delete_diagram.delay(diagram_id)
 
     result = {'result': 1, 'message': r'删除绘图成功!'}
+    return JsonResponse(result)
