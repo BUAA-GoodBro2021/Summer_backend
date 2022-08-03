@@ -34,15 +34,16 @@ def create_diagram(request):
 @login_checker
 def create_token(request):
     # 获取表单信息
-    diagram_id = request.POST.get('diagram_id', '')
+    project_id = request.POST.get('project_id', '')
 
-    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
-    project_to_diagram = ProjectToDiagram.objects.get(diagram_id=diagram_id)
+    diagram = Diagram.objects.create(diagram_name=str(project_id) + '-' + '未命名')
+
+    ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
     # 签发令牌
     diagram_token = sign_token({
-        'project_id': project_to_diagram.project_id,
-        'diagram_id': diagram_dict['diagram_id'],
-        'diagram_name': diagram_dict['diagram_name']
+        'project_id': project_id,
+        'diagram_id': diagram.id,
+        'diagram_name': diagram.diagram_name
     })
     result = {'result': 1, 'message': '获取绘图token成功!', 'diagram_token': diagram_token}
     return JsonResponse(result)
