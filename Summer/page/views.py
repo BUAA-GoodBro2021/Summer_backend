@@ -237,4 +237,4 @@ def upload_img(request):
 
     # 上传成功并返回图片路径
     result = {'result': 1, 'message': r"上传成功！", 'image_url': image_url}
-    return result
+    return JsonResponse(result)
