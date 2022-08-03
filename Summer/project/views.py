@@ -24,7 +24,8 @@ def create_project(request):
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
         result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
         return JsonResponse(result)
-    # 获取团队随机头像
+
+    # 获取项目随机头像
     avatar_url = default_cover_2_url_match + str(random.choice(range(0, 31))) + '.svg'
 
     # 创建一个项目对象

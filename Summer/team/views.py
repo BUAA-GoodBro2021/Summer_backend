@@ -17,6 +17,10 @@ def create_team(request):
     # 获取表单信息
     team_name = request.POST.get('team_name', '')
 
+    if Team.objects.filter(team_name=team_name).exists():
+        result = {'result': 0, 'message': r'该团队已存在, 请换一个不一样的团队名称!'}
+        return JsonResponse(result)
+
     if len(team_name) == 0:
         result = {'result': 0, 'message': r'团队名称不允许为空!'}
         return JsonResponse(result)
