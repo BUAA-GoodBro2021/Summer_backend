@@ -72,7 +72,7 @@ def list_document_user(request):
 
 # 重命名文档
 @login_checker
-def rename_project(request):
+def rename_document(request):
     # 获取用户信息
     user_id = request.user_id
 
