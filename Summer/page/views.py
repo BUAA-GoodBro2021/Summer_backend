@@ -1,7 +1,11 @@
+from ast import literal_eval
+
+from Summer.settings import BASE_DIR
 from page.models import *
 from project.models import *
 from team.models import TeamToProject
-from user.models import UserToTeam
+from user.models import UserToTeam, User
+from utils.Bucket_utils import Bucket
 from utils.Login_utils import *
 from utils.Redis_utils import *
 from page.tasks import *
@@ -22,7 +26,7 @@ def check_authority(user_id, team_id, project_id, page_id):
         return JsonResponse(result)
 
 
-# 展示项目中的所有页面
+# 创建页面
 @login_checker
 def create_page(request):
     # 获取用户信息
@@ -43,6 +47,10 @@ def create_page(request):
         result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
+    if len(page_name) == 0:
+        result = {'result': 0, 'message': r'原型设计页面名称不能为空!'}
+        return JsonResponse(result)
+
     # 创建实体
     page = Page.objects.create(page_name=page_name, page_height=page_height, page_width=page_width)
 
@@ -53,7 +61,7 @@ def create_page(request):
     celery_create_page.delay(project_id)
 
     # 获取缓存
-    page_key, page_dict = cache_get_by_id_simple('project', 'project', page.id)
+    page_key, page_dict = cache_get_by_id_simple('page', 'page', page.id)
 
     result = {'result': 1, 'message': r'创建页面成功!', 'page': page_dict}
     return JsonResponse(result)
@@ -83,7 +91,7 @@ def list_project_all(request):
 
     for every_project_to_page in project_to_page_list:
         # 获取缓存
-        page_key, page_dict = cache_get_by_id_simple('project', 'project', every_project_to_page.page_id)
+        page_key, page_dict = cache_get_by_id_simple('page', 'page', every_project_to_page.page_id)
         page_list.append(page_dict)
 
     result = {'result': 1, 'message': r'获取项目的所有页面属性成功!', 'page': page_list}
@@ -104,9 +112,9 @@ def list_page_detail(request):
     check_authority(user_id, team_id, project_id, page_id)
 
     # 获取缓存
-    page_key, result = cache_get_by_id_detail('project', 'project', page_id)
-
-    result['element_list'] = list(result['element_list'])
+    page_key, result = cache_get_by_id_detail('page', 'page', page_id)
+    print(result['element_list'])
+    result['element_list'] = literal_eval(result['element_list'])
     result['result'] = 0
     result['message'] = '成功获取某个页面的详细元素'
 
@@ -157,12 +165,17 @@ def edit_save(request):
 
     # 判断权限
     check_authority(user_id, team_id, project_id, page_id)
-
+    # 释放锁
+    try:
+        UserToPage.objects.get(page_id=page_id).delete()
+    except Exception:
+        result = {'result': 0, 'message': r'你好像暂时不处于编辑状态哦~'}
+        return JsonResponse(result)
     # 获取缓存
-    page_key, page_dict = cache_get_by_id_detail('project', 'project', page_id)
+    page_key, page_dict = cache_get_by_id_detail('page', 'page', page_id)
     # 同步缓存
-    element_list = str(element_list)
-    page_dict['element_list'] = str(element_list)
+    element_list = element_list.replace("\t", "").replace("\r", "")
+    page_dict['element_list'] = element_list
     page_dict['num'] = num
     cache.set(page_key, page_dict)
 
@@ -172,8 +185,56 @@ def edit_save(request):
     page.num = num
     page.save()
 
-    # 释放锁
-    UserToPage.objects.get(page_id=page_id).delete()
-
     result = {'result': 1, 'message': r'保存成功'}
     return JsonResponse(result)
+
+
+# 上传图片
+@login_checker
+def upload_img(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取用户上传的头像并保存
+    image = request.FILES.get("file", None)
+    # 获取文件尾缀并修改名称
+    suffix = '.' + (image.name.split("."))[-1]
+    image.name = str(int(time.time() * 1000000)) + suffix
+
+    print(image.name)
+    # 保存至media
+    user = User.objects.get(id=user_id)
+    user.avatar = image
+    user.save()
+
+    # 获取用户上传的头像并检验是否符合要求
+    if not image:
+        result = {'result': 0, 'message': r"请上传图片！"}
+        return result
+
+    if image.size > 1024 * 1024 * 5:
+        result = {'result': 0, 'message': r"图片不能超过1M！"}
+        return result
+
+    # 常见对象存储的对象
+    bucket = Bucket()
+
+    # 上传是否成功
+    upload_result = bucket.upload_file("summer-design", image.name, image.name)
+    if upload_result == -1:
+        os.remove(os.path.join(BASE_DIR, "media/" + image.name))
+        result = {'result': 0, 'message': r"上传失败！"}
+        return result
+
+    # 上传是否可以获取路径
+    image_url = bucket.query_object("summer-design", image.name)
+    if not image_url:
+        os.remove(os.path.join(BASE_DIR, "media/" + image.name))
+        result = {'result': 0, 'message': r"上传失败!！"}
+        return result
+
+    # 删除本地文件
+    os.remove(os.path.join(BASE_DIR, "media/" + image.name))
+
+    # 上传成功并返回图片路径
+    result = {'result': 1, 'message': r"上传成功！", 'image_url': image_url}
+    return result

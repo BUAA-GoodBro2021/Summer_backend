@@ -92,7 +92,7 @@ def upload_image(image, bucket_name, model_id, is_audit=False, image_size=1024 *
     image_url = bucket.query_object(bucket_name, str(model_id) + suffix)
     if not image_url:
         os.remove(os.path.join(BASE_DIR, "media/" + image.name))
-        result = {'result': 0, 'message': r"上传失败！"}
+        result = {'result': 0, 'message': r"上传失败！！"}
         return result
 
     # 删除本地文件
