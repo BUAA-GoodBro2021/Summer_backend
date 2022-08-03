@@ -12,7 +12,7 @@ class Page(models.Model):
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     updated_time = models.DateTimeField('更新时间', auto_now=True)
 
-    def to_dic_single(self):
+    def to_dic_simple(self):
         return {
             'page_id': self.id,
             'page_name': self.page_name,

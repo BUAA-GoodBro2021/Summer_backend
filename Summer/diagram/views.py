@@ -9,7 +9,7 @@ from django.core.cache import cache
 def create_diagram(request):
     # 获取表单信息
     diagram_name = request.POST.get('diagram_name', '')
-    project_id = request.POST.get('project_id', '')
+    project_id = request.POST.get('project_id', 0)
 
     diagram = Diagram.objects.filter(diagram_name=diagram_name)
     if len(diagram) != 0:
@@ -34,7 +34,7 @@ def create_diagram(request):
 @login_checker
 def create_token(request):
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
+    project_id = request.POST.get('project_id', 0)
 
     diagram = Diagram.objects.create(diagram_name=str(project_id) + '-' + '未命名')
 
