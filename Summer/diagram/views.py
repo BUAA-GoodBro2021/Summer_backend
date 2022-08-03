@@ -7,9 +7,6 @@ from django.core.cache import cache
 
 # 创建绘图
 def create_diagram(request):
-    # 获取用户信息
-    user_id = request.user_id
-
     # 获取表单信息
     diagram_name = request.POST.get('diagram_name', '')
     project_id = request.POST.get('project_id', '')
@@ -24,13 +21,12 @@ def create_diagram(request):
         return JsonResponse(result)
 
     # 创建实体
-    diagram = Diagram.objects.create(creator_id=user_id, diagram_name=diagram_name)
+    diagram = Diagram.objects.create(diagram_name=diagram_name)
     ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
 
     # 获取缓存信息
-    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram.id)
-    result = {'result': 1, 'message': r'创建绘图成功!', 'user': user_dict, 'diagram': diagram_dict}
+    result = {'result': 1, 'message': r'创建绘图成功!', 'diagram': diagram_dict}
     return JsonResponse(result)
 
 
