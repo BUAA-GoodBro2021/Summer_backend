@@ -1,7 +1,10 @@
+import random
+
 from django.core.cache import cache
 from project.tasks import *
 
 from project.models import Project
+from properties import *
 from team.models import TeamToProject
 from user.models import *
 from utils.Login_utils import *
@@ -21,9 +24,12 @@ def create_project(request):
     if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
         result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
         return JsonResponse(result)
+    # 获取团队随机头像
+    avatar_url = default_cover_2_url_match + str(random.choice(range(0, 31))) + '.svg'
 
     # 创建一个项目对象
-    project = Project.objects.create(project_name=project_name, project_description=project_description)
+    project = Project.objects.create(project_name=project_name, project_description=project_description,
+                                     avatar_url=avatar_url)
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=project.id)
 

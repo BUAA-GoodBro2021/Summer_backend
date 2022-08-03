@@ -22,7 +22,7 @@ def create_team(request):
         return JsonResponse(result)
 
     # 获取团队随机头像
-    avatar_url = default_avatar_url_match + str(random.choice(range(1, 31))) + '.svg'
+    avatar_url = default_cover_1_url_match + str(random.choice(range(1, 31))) + '.svg'
 
     # 创建团队实体
     team = Team.objects.create(team_name=team_name, avatar_url=avatar_url)

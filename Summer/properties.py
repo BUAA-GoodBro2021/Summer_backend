@@ -42,6 +42,8 @@ TOKEN_SECRET_KEY = 'django-insecure-t$d4)i^$r0kzrn&b1ch0xcgh9^u+0a0ob98^jkg3lu2y
 default_favorite_url = 'https://global-1309504341.cos.ap-beijing.myqcloud.com/default-favorite.jpg'
 default_avatar_url = 'https://global-1309504341.cos.ap-beijing.myqcloud.com/default.jpg'
 default_avatar_url_match = 'https://random-avatar-1309504341.cos.ap-beijing.myqcloud.com/'
+default_cover_1_url_match = 'https://random-cover-1-1309504341.cos.ap-beijing.myqcloud.com/'
+default_cover_2_url_match = 'https://random-cover-2-1309504341.cos.ap-beijing.myqcloud.com/'
 
 # 环境路由
 local_base_url = "http://127.0.0.1:8000"
