@@ -14,7 +14,6 @@ def celery_create_project(team_id, project_id):
     return team.to_dic(), project.to_dic()
 
 
-
 @app.task
 def celery_remove_project_to_bin(user_id, project_id):
     project = Project.objects.get(id=project_id)
