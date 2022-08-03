@@ -41,7 +41,7 @@ def create_token(request):
     # 签发令牌
     diagram_token = sign_token({
         'project_id': project_to_diagram.project_id,
-        'diagram_id': diagram_dict['id'],
+        'diagram_id': diagram_dict['diagram_id'],
         'diagram_name': diagram_dict['diagram_name']
     })
     result = {'result': 1, 'message': '获取绘图token成功!', 'diagram_token': diagram_token}

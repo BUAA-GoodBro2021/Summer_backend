@@ -11,6 +11,7 @@ class Diagram(models.Model):
 
     def to_dic(self):
         return {
+            'diagram_id': self.id,
             'diagram_name': self.diagram_name,
 
             'created_time': self.created_time,
