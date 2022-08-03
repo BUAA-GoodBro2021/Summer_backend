@@ -10,7 +10,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
 app = Celery('Summer')
 app.conf.update(
     BROKER_URL='redis://:' + redis_PASSWORD + '@' +
-               redis_HOST + '/1',
+               redis_HOST + '/4',
 )
 
 # 配置每个应用的 worker 工作
