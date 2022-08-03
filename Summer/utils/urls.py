@@ -8,4 +8,8 @@ urlpatterns = [
     # 测试接口
     path('test_login_checker', views.test_login_checker),
     path('test_celery', views.test_celery),
+
+    path('clear_redis', views.clear_redis),
+    path('set_redis', views.set_redis),
+
 ]
