@@ -12,6 +12,7 @@ def example(request):
     return render(request, 'Websocket-example.html', {"document_id": document_id})
 
 
+# 创建文档
 @login_checker
 def create_document(request):
     # 获取用户信息
