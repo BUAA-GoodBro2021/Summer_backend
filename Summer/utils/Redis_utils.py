@@ -37,3 +37,43 @@ def cache_get_by_id(app_label, model_name, model_id):
         cache.set(key, model_dict)
 
     return key, model_dict
+
+
+# 删除某个类的所有缓存缓存
+def cache_set_all(app_label, model_name):
+    # 加载所有类
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
+    django.setup()
+    try:
+        # 得到需要进行操作的类
+        model = apps.get_model(app_label=app_label, model_name=model_name)
+        # 获取该类的所有对象
+        model_list = model.objects.all()
+
+        for every_model in model_list:
+            cache_get_by_id(app_label, model_name, every_model.id)
+    except Exception:
+        return 0
+
+    return 1
+
+
+# 删除某个类的所有缓存缓存
+def cache_del_all(app_label, model_name):
+    # 加载所有类
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
+    django.setup()
+    try:
+        # 得到需要进行操作的类
+        model = apps.get_model(app_label=app_label, model_name=model_name)
+        # 获取该类的所有对象
+        model_list = model.objects.all()
+
+        for every_model in model_list:
+            # 生成缓存键
+            key = app_label + ":" + model_name + ":" + str(every_model.id)
+            cache.delete(key)
+    except Exception:
+        return 0
+
+    return 1

@@ -81,9 +81,22 @@ def active(request, token):
         return render(request, 'EmailContent-check.html', content)
 
 
-"""""""""
-测试路由部分
-"""""""""
+@login_checker
+def clear_redis(request):
+    app_label = request.POST.get('app_label', '')
+    model_name = request.POST.get('model_name', '')
+    if cache_del_all(app_label, model_name):
+        return HttpResponse("OK")
+    return HttpResponse("Oh no")
+
+
+@login_checker
+def set_redis(request):
+    app_label = request.POST.get('app_label', '')
+    model_name = request.POST.get('model_name', '')
+    if cache_set_all(app_label, model_name):
+        return HttpResponse("OK")
+    return HttpResponse("Oh no")
 
 
 # 测试登录装饰器
