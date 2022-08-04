@@ -9,5 +9,4 @@ urlpatterns = [
     path('recover_project_from_bin', views.recover_project_from_bin),
     path('add_star_project', views.add_star_project),
     path('del_star_project', views.del_star_project),
-    path('list_document', views.list_document),
 ]
