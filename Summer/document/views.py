@@ -118,7 +118,6 @@ def delete_document(request):
     return JsonResponse(result)
 
 
-@login_checker
 def save_document(request):
     # 获取表单信息
     document_id = request.POST.get('document_id', '')
