@@ -154,6 +154,29 @@ def save_document(request):
     return JsonResponse(result)
 
 
+# 编辑文档
+@login_checker
+def edit_document(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+    document_id = request.POST.get('document_id', '')
+
+    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
+
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    # 签发令牌
+    document_token = sign_token_forever({
+        'project_id': int(project_id),
+        'document_id': int(document_dict['document_id']),
+        'document_title': document_dict['document_title'],
+        'username': user_dict['username']
+    })
+    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': document_token}
+    return JsonResponse(result)
+
+
 # 获取文档token
 @login_checker
 def create_token(request):
@@ -177,9 +200,9 @@ def create_token(request):
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     # 签发令牌
-    document_token = sign_token({
-        'project_id': project_id,
-        'document_id': document.id,
+    document_token = sign_token_forever({
+        'project_id': int(project_id),
+        'document_id': int(document.id),
         'document_title': document.document_title,
         'username': user_dict['username']
     })

@@ -39,6 +39,18 @@ def sign_token(payload, exp=3600 * 24):
     return token
 
 
+# 签发登录令牌
+def sign_token_forever(payload):
+    """
+    :param payload: 私有声明字典
+    :param exp: 过期时间
+    :return: 签发的登录令牌
+    """
+    # 使用 HS256 算法配合密钥签发登录令牌
+    token = jwt.encode(payload, TOKEN_SECRET_KEY, algorithm='HS256')
+    return token
+
+
 # 校验登录令牌
 def check_token(token):
     """
@@ -90,7 +102,6 @@ def login_checker(func):
         return func(request, *args, **kwargs)
 
     return wrap
-
 
 # 登录状态检测装饰器(进行超管检测)
 # def super_admin_checker(func):
