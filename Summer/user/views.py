@@ -17,6 +17,7 @@ def register(request):
 
     请求体包含包含 username，password1，password2，email
     """
+    return JsonResponse("暂时不开放注册哦~")
     if request.method == 'POST':
 
         # 获取表单信息
