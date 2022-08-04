@@ -9,4 +9,5 @@ urlpatterns = [
     path('rename_diagram', views.rename_diagram),
     path('delete_diagram', views.delete_diagram),
     path('list_diagram', views.list_diagram),
+    path('update_diagram', views.update_diagram),
 ]
