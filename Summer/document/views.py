@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 
 from django.core.cache import cache
@@ -117,12 +118,12 @@ def delete_document(request):
 
     document_list = []
     for every_project_to_document in project_to_document_list:
-        if every_project_to_document.document_id != document_id:
+        if int(every_project_to_document.document_id) != int(document_id):
             document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
             document_list.append(document_dict)
+
     # 同步mysql
     celery_delete_document.delay(document_id)
-
     result = {'result': 1, 'message': r'删除文档成功!', 'document_list': document_list}
     return JsonResponse(result)
 
