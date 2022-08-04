@@ -173,6 +173,7 @@ def parse_token(request):
     return JsonResponse(result)
 
 
+# 列出文档列表
 @login_checker
 def list_document(request):
     # 获取表单信息

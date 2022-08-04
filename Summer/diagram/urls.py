@@ -8,4 +8,5 @@ urlpatterns = [
     path('parse_token', views.parse_token),
     path('rename_diagram', views.rename_diagram),
     path('delete_diagram', views.delete_diagram),
+    path('list_diagram', views.list_diagram),
 ]
