@@ -81,8 +81,10 @@ def rename_document(request):
     user_id = request.user_id
 
     # 获取表单信息
+    project_id = request.POST.get('project_id', '')
     document_id = request.POST.get('document_id', '')
     document_title = request.POST.get('document_title', '')
+
     if len(document_title) == 0:
         result = {'result': 0, 'message': r'文档标题不允许为空!'}
         return JsonResponse(result)
@@ -103,7 +105,16 @@ def rename_document(request):
 
     # 同步mysql
     celery_rename_document.delay(document_id, document_title)
-    result = {'result': 1, 'message': r'重命名文档成功!', 'document': document_dict}
+
+    # 获取项目的所有文档信息
+    project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
+
+    document_list = []
+    for every_project_to_document in project_to_document_list:
+        document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
+        document_list.append(document_dict)
+
+    result = {'result': 1, 'message': r'重命名文档成功!', 'document_list': document_list}
     return JsonResponse(result)
 
 
