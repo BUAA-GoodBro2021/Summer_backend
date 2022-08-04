@@ -48,8 +48,7 @@ def create_token(request):
     diagram_token = sign_token({
         'project_id': int(project_id),
         'diagram_id': diagram.id,
-        'diagram_name': diagram.diagram_name,
-        'diagram_content': diagram.diagram_content
+        'diagram_name': diagram.diagram_name
     })
     result = {'result': 1, 'message': '获取绘图token成功!', 'diagram_token': diagram_token}
     return JsonResponse(result)
@@ -135,4 +134,14 @@ def update_diagram(request):
 
     celery_update_diagram.delay(diagram_id, diagram_content)
     result = {'result': 1, 'message': '绘图内容更新成功!', 'diagram_dict': diagram_dict}
+    return JsonResponse(result)
+
+
+def get_diagram_content(request):
+    # 获取表单信息
+    diagram_id = request.POST.get('diagram_id', '')
+
+    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
+
+    result = {'result': 1, 'message': '绘图内容获取成功!', 'diagram_content': diagram_dict['diagram_content']}
     return JsonResponse(result)
