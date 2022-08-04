@@ -120,7 +120,7 @@ def list_diagram(request):
 
     diagram_list = []
     for every_project_to_diagram in project_to_diagram_list:
-        diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', every_project_to_diagram.document_id)
+        diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', every_project_to_diagram.diagram_id)
         diagram_list.append(diagram_dict)
     result = {'result': 1, 'message': '获取文档列表成功!', 'diagram_list': diagram_list}
     return JsonResponse(result)
