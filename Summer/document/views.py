@@ -151,8 +151,7 @@ def create_token(request):
         document = Document.objects.get(document_title=str(project_id) + '-' + document_title)
     except Exception:
         document = Document.objects.create(document_title=str(project_id) + '-' + document_title, document_content='')
-
-    ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
+        ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     # 签发令牌
