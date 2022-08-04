@@ -187,7 +187,14 @@ def edit_save(request):
     cache.set(page_key, page_dict)
 
     # 同步mysql(celery好像不支持3个参数以上)
-    celery_save_page.delay(page_id, page_name, page_height, page_width, element_list, num)
+    # celery_save_page.delay(page_id, page_name, page_height, page_width, element_list, num)
+    page = Page.objects.get(id=page_id)
+    page.page_name = page_name
+    page.page_height = page_height
+    page.page_width = page_width
+    page.element_list = element_list
+    page.num = num
+    page.save()
 
     result = {'result': 1, 'message': r'保存成功'}
     return JsonResponse(result)
