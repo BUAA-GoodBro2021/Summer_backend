@@ -2,6 +2,7 @@ import random
 
 from django.core.cache import cache
 
+
 from diagram.models import *
 from document.models import *
 from page.models import *

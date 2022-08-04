@@ -36,13 +36,16 @@ def create_token(request):
     # 获取表单信息
     try:
         project_id = int(request.POST.get('project_id', ''))
-    except:
+    except Exception:
         result = {'result': 0, 'message': '参数格式错误!'}
         return JsonResponse(result)
 
-    diagram = Diagram.objects.create(diagram_name=str(project_id) + '-' + '未命名')
+    try:
+        diagram = Diagram.objects.get(diagram_name=str(project_id) + '-' + '未命名')
+    except Exception:
+        diagram = Diagram.objects.create(diagram_name=str(project_id) + '-' + '未命名')
+        ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
 
-    ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
     # 签发令牌
     diagram_token = sign_token({
         'project_id': project_id,
@@ -104,4 +107,20 @@ def delete_diagram(request):
     celery_delete_diagram.delay(diagram.id)
 
     result = {'result': 1, 'message': r'删除绘图成功!'}
+    return JsonResponse(result)
+
+
+# 列出绘图列表
+@login_checker
+def list_diagram(request):
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+
+    project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=project_id)
+
+    diagram_list = []
+    for every_project_to_diagram in project_to_diagram_list:
+        diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', every_project_to_diagram.diagram_id)
+        diagram_list.append(diagram_dict)
+    result = {'result': 1, 'message': '获取文档列表成功!', 'diagram_list': diagram_list}
     return JsonResponse(result)

@@ -11,4 +11,5 @@ urlpatterns = [
     path('save_document', views.save_document),
     path('parse_token', views.parse_token),
     path('create_token', views.create_token),
+    path('list_document', views.list_document),
 ]

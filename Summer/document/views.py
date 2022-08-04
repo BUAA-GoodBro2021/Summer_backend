@@ -151,8 +151,7 @@ def create_token(request):
         document = Document.objects.get(document_title=str(project_id) + '-' + document_title)
     except Exception:
         document = Document.objects.create(document_title=str(project_id) + '-' + document_title, document_content='')
-
-    ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
+        ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     # 签发令牌
@@ -171,4 +170,20 @@ def parse_token(request):
     # 获取表单信息
     document_token = request.POST.get('document_token', '')
     result = {'result': 1, 'message': '解析文档token成功!', 'payload': check_token(document_token)}
+    return JsonResponse(result)
+
+
+# 列出文档列表
+@login_checker
+def list_document(request):
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+
+    project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
+
+    document_list = []
+    for every_project_to_document in project_to_document_list:
+        document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
+        document_list.append(document_dict)
+    result = {'result': 1, 'message': '获取文档列表成功!', 'document_list': document_list}
     return JsonResponse(result)
