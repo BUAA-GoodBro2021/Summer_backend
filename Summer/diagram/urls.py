@@ -10,5 +10,5 @@ urlpatterns = [
     path('delete_diagram', views.delete_diagram),
     path('list_diagram', views.list_diagram),
     path('update_diagram', views.update_diagram),
-    path('get_diagram_content', views.get_diagram_content)
+    path('get_content', views.get_content)
 ]
