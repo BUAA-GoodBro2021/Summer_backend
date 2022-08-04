@@ -9,4 +9,6 @@ urlpatterns = [
     path('rename_document', views.rename_document),
     path('delete_document', views.delete_document),
     path('save_document', views.save_document),
+    path('parse_token', views.parse_token),
+    path('create_token', views.create_token),
 ]

@@ -129,3 +129,41 @@ def save_document(request):
     celery_save_document.delay(document_id, document_content)
     result = {'result': 1, 'message': r'保存文档成功!', 'document_dict': document_dict}
     return JsonResponse(result)
+
+
+# 获取文档token
+@login_checker
+def create_token(request):
+    # 获取用户信息
+    user_id = request.user_id
+
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+    document_title = request.POST.get('document_title', '')
+
+    try:
+        document = Document.objects.get(document_title=str(project_id) + '-' + document_title)
+    except Exception:
+        document = Document.objects.create(document_title=str(project_id) + '-' + document_title, document_content='')
+
+    ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
+
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
+    # 签发令牌
+    document_token = sign_token({
+        'project_id': project_id,
+        'document_id': document.id,
+        'document_title': document.document_title,
+        'username': user_dict['username']
+    })
+    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': document_token}
+    return JsonResponse(result)
+
+
+# 解析文档token
+def parse_token(request):
+    # 获取表单信息
+    document_token = request.POST.get('document_token', '')
+    result = {'result': 1, 'message': '解析文档token成功!', 'payload': check_token(document_token)}
+    return JsonResponse(result)
