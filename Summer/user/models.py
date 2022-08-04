@@ -4,8 +4,8 @@ from django.db import models
 # 用户实体
 class User(models.Model):
     # 注册系列
-    username = models.CharField('用户名', max_length=30, default='')
-    real_name = models.CharField('真实性名', max_length=30, default='')
+    username = models.CharField('用户名', max_length=100, default='')
+    real_name = models.CharField('真实性名', max_length=100, default='')
     password = models.CharField('密码', max_length=32)
     email = models.EmailField()
 

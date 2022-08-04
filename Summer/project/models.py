@@ -2,8 +2,8 @@ from django.db import models
 
 
 class Project(models.Model):
-    project_name = models.CharField('项目名称', max_length=30, default='')
-    project_description = models.CharField('项目简介', max_length=30, default='')
+    project_name = models.CharField('项目名称', max_length=100, default='')
+    project_description = models.CharField('项目简介', max_length=1000, default='')
 
     # 头像系列
     avatar_url = models.CharField('项目头像路径', max_length=128, default='')

@@ -3,7 +3,7 @@ from django.db import models
 
 # 绘图实体
 class Diagram(models.Model):
-    diagram_name = models.CharField('绘图名称', max_length=30, default='')
+    diagram_name = models.CharField('绘图名称', max_length=100, default='')
 
     # 实体属性
     created_time = models.DateTimeField('创建时间', auto_now_add=True)

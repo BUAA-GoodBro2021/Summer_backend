@@ -3,7 +3,7 @@ from django.db import models
 
 # 用户实体
 class Team(models.Model):
-    team_name = models.CharField('团队名称', max_length=30, default='')
+    team_name = models.CharField('团队名称', max_length=100, default='')
 
     # 数量系列
     user_num = models.IntegerField('成员的数量', default=1)

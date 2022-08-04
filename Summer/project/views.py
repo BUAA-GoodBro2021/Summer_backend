@@ -1,9 +1,13 @@
 import random
 
 from django.core.cache import cache
+
+from diagram.models import *
+from document.models import *
+from page.models import *
 from project.tasks import *
 
-from project.models import Project
+from project.models import *
 from properties import *
 from team.models import TeamToProject
 from user.models import *
@@ -71,7 +75,7 @@ def rename_project(request):
         return JsonResponse(result)
 
     if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
-        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
+        result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
     # 修改信息，同步缓存
@@ -107,7 +111,7 @@ def remove_project_to_bin(request):
         return JsonResponse(result)
 
     if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
-        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
+        result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
     # 修改信息，同步缓存
@@ -144,7 +148,7 @@ def recover_project_from_bin(request):
         return JsonResponse(result)
 
     if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
-        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
+        result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
     # 修改信息，同步缓存
@@ -199,4 +203,68 @@ def del_star_project(request):
     UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id).delete()
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'取消星标成功!', 'user': user_dict}
+    return JsonResponse(result)
+
+
+# 删除项目
+@login_checker
+def delete_project(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    team_id = request.POST.get('team_id', '')
+    project_id = request.POST.get('project_id', '')
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
+        result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
+        return JsonResponse(result)
+
+    if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
+        result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
+        return JsonResponse(result)
+
+    # 列出三大文档信息
+    project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
+    project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
+    project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=project_id)
+
+    page_id_list = [x.page_id for x in project_to_page_list]
+    document_id_list = [x.document_id for x in project_to_document_list]
+    diagram_id_list = [x.diagram_id for x in project_to_diagram_list]
+
+    # 如果有人正在编辑页面, 不允许删除
+    if UserToPage.objects.filter(page_id__in=page_id_list).exists():
+        result = {'result': 0, 'message': r'有人正在编辑界面，不允许删除!'}
+        return JsonResponse(result)
+
+    # 如果有人正在编辑文档, 不允许删除
+    if UserToDocument.objects.filter(document_id__in=document_id_list).exists():
+        result = {'result': 0, 'message': r'有人正在编辑文档，不允许删除!'}
+        return JsonResponse(result)
+
+    # 删除实体
+    Page.objects.filter(id__in=page_id_list).delete()
+    Document.objects.filter(id__in=document_id_list).delete()
+    Diagram.objects.filter(id__in=diagram_id_list).delete()
+
+    # 删除关系(用户)
+    UserToPage.objects.filter(page_id__in=page_id_list).delete()
+    UserToDocument.objects.filter(document_id__in=document_id_list).delete()
+    UserToProjectStar.objects.filter(project_id=project_id).delete()
+
+    # 删除关系(项目)
+    project_to_page_list.delete()
+    project_to_document_list.delete()
+    project_to_diagram_list.delete()
+
+    # 删除实体
+    Project.objects.get(id=project_id).delete()
+
+    # 处理团队
+    team_to_project = TeamToProject.objects.get(project_id=project_id)
+    Team.objects.get(id=team_to_project.team_id).del_project_num()
+    team_to_project.delete()
+
+    result = {'result': 1, 'message': r'删除项目成功!'}
     return JsonResponse(result)
