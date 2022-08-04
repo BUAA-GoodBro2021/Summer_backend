@@ -137,7 +137,7 @@ def update_diagram(request):
     return JsonResponse(result)
 
 
-def get_diagram_content(request):
+def get_content(request):
     # 获取表单信息
     diagram_id = request.POST.get('diagram_id', '')
 
