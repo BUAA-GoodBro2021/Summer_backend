@@ -1,6 +1,8 @@
 import random
 
 from django.core.cache import cache
+
+from document.models import ProjectToDocument
 from project.tasks import *
 
 from project.models import Project
@@ -199,4 +201,19 @@ def del_star_project(request):
     UserToProjectStar.objects.filter(user_id=user_id, project_id=project_id).delete()
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'取消星标成功!', 'user': user_dict}
+    return JsonResponse(result)
+
+
+@login_checker
+def list_document(request):
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+
+    project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
+
+    document_list = []
+    for every_project_to_document in project_to_document_list:
+        document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
+        document_list.append(document_dict)
+    result = {'result': 1, 'message': '获取文档列表成功!', 'document_list': document_list}
     return JsonResponse(result)
