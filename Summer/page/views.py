@@ -180,11 +180,7 @@ def edit_save(request):
     cache.set(page_key, page_dict)
 
     # 同步mysql(celery好像不支持3个参数以上)
-    page = Page.objects.get(id=page_id)
-    page.page_height = page_height
-    page.page_width = page_width
-    page.num = num
-    page.save()
+    celery_save_page.delay(page_id, page_height, page_width, element_list, num)
 
     result = {'result': 1, 'message': r'保存成功'}
     return JsonResponse(result)
@@ -264,42 +260,4 @@ def rename_page(request):
     celery_rename_page.delay(page_id, page_name)
 
     result = {'result': 1, 'message': r'重命名页面成功!', 'page': page_dict}
-    return JsonResponse(result)
-
-
-# 请求保存页面  后端记得判断解锁
-@login_checker
-def edit_save_2(request):
-    # 获取用户信息
-    user_id = request.user_id
-    # 获取表单信息
-    team_id = request.POST.get('team_id', 0)
-    project_id = request.POST.get('project_id', 0)
-    page_id = request.POST.get('page_id', 0)
-    page_height = request.POST.get('page_height', 0.0)
-    page_width = request.POST.get('page_width', 0.0)
-    element_list = request.POST.get('element_list', '')
-    num = int(request.POST.get('num', 0))
-
-    # 判断权限
-    check_authority(user_id, team_id, project_id, page_id)
-    # 释放锁
-    try:
-        UserToPage.objects.get(page_id=page_id).delete()
-    except Exception:
-        result = {'result': 0, 'message': r'你好像暂时不处于编辑状态哦~'}
-        return JsonResponse(result)
-    # 获取缓存
-    page_key, page_dict = cache_get_by_id_detail('page', 'page', page_id)
-    # 同步缓存
-    page_dict['page_height'] = page_height
-    page_dict['page_width'] = page_width
-    page_dict['element_list'] = element_list
-    page_dict['num'] = num
-    cache.set(page_key, page_dict)
-
-    # 同步mysql(celery好像不支持3个参数以上)
-    celery_save_page.delay(page_id, page_height, page_width, element_list, num)
-
-    result = {'result': 1, 'message': r'保存成功'}
     return JsonResponse(result)
