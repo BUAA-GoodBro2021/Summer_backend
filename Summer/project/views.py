@@ -44,7 +44,7 @@ def create_project(request):
     cache.set(team_key, team_dict)
 
     # 同步mysql
-    celery_create_project.delay(team_id, project.id)
+    celery_create_project.delay(team_id)
 
     result = {'result': 1, 'message': r'创建项目成功!', 'user': user_dict, 'project': project_dict}
     return JsonResponse(result)
