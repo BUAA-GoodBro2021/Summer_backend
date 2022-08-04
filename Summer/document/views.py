@@ -127,7 +127,7 @@ def save_document(request):
 
     document_dict['document_content'] = document_content
 
-    cache.save(document_key, document_dict)
+    cache.set(document_key, document_dict)
     celery_save_document.delay(document_id, document_content)
     result = {'result': 1, 'message': r'保存文档成功!', 'document_dict': document_dict}
     return JsonResponse(result)
