@@ -122,10 +122,13 @@ def delete_document(request):
 def save_document(request):
     # 获取表单信息
     document_id = request.POST.get('document_id', '')
+    document_content = request.POST.get('document_content', '')
 
     document_key, document_dict = cache_get_by_id('document', 'document', document_id)
 
-    document_content = document_dict['document_content']
+    document_dict['document_content'] = document_content
+
+    cache.save(document_key, document_dict)
     celery_save_document.delay(document_id, document_content)
     result = {'result': 1, 'message': r'保存文档成功!', 'document_dict': document_dict}
     return JsonResponse(result)
@@ -138,8 +141,12 @@ def create_token(request):
     user_id = request.user_id
 
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
-    document_title = request.POST.get('document_title', '')
+    try:
+        project_id = int(request.POST.get('project_id', ''))
+        document_title = request.POST.get('document_title', '')
+    except:
+        result = {'result': 0, 'message': '参数格式错误!'}
+        return JsonResponse(result)
 
     try:
         document = Document.objects.get(document_title=str(project_id) + '-' + document_title)
@@ -149,7 +156,6 @@ def create_token(request):
     ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
-
     # 签发令牌
     document_token = sign_token({
         'project_id': project_id,

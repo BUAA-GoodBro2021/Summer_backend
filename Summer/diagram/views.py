@@ -34,7 +34,11 @@ def create_diagram(request):
 @login_checker
 def create_token(request):
     # 获取表单信息
-    project_id = request.POST.get('project_id', 0)
+    try:
+        project_id = int(request.POST.get('project_id', ''))
+    except:
+        result = {'result': 0, 'message': '参数格式错误!'}
+        return JsonResponse(result)
 
     diagram = Diagram.objects.create(diagram_name=str(project_id) + '-' + '未命名')
 
