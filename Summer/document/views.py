@@ -159,7 +159,8 @@ def create_token(request):
     try:
         document = Document.objects.get(document_title=str(project_id) + '-' + document_title)
     except Exception:
-        document = Document.objects.create(document_title=str(project_id) + '-' + document_title, document_content='')
+        document = Document.objects.create(document_title=str(project_id) + '-' + document_title, document_content='',
+                                           creator_id=user_id)
         ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
