@@ -35,7 +35,6 @@ def create_token(request):
         result = {'result': 0, 'message': '参数格式错误!'}
         return JsonResponse(result)
 
-
     diagram_list = Diagram.objects.filter(diagram_name=diagram_name)
     diagram_id_list = [x.id for x in diagram_list]
     project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=project_id, diagram_id__in=diagram_id_list)
