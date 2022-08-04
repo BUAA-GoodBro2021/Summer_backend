@@ -117,8 +117,9 @@ def delete_document(request):
 
     document_list = []
     for every_project_to_document in project_to_document_list:
-        document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
-        document_list.append(document_dict)
+        if every_project_to_document.document_id != document_id:
+            document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
+            document_list.append(document_dict)
     # 同步mysql
     celery_delete_document.delay(document_id)
 
