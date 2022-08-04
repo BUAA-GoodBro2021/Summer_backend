@@ -199,6 +199,16 @@ def edit_save(request):
     page_dict['num'] = num
     cache.set(page_key, page_dict)
 
+    # 获取缓存
+    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    # 同步缓存
+    page_dict['page_name'] = page_name
+    page_dict['page_height'] = page_height
+    page_dict['page_width'] = page_width
+    page_dict['element_list'] = element_list
+    page_dict['num'] = num
+    cache.set(page_key, page_dict)
+    
     # 同步mysql(celery好像不支持3个参数以上)
     # celery_save_page.delay(page_id, page_name, page_height, page_width, element_list, num)
     page = Page.objects.get(id=page_id)

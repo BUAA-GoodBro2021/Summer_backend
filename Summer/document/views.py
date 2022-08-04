@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 
 from django.core.cache import cache
@@ -187,7 +186,7 @@ def create_token(request):
     try:
         project_id = int(request.POST.get('project_id', ''))
         document_title = request.POST.get('document_title', '')
-    except:
+    except Exception:
         result = {'result': 0, 'message': '参数格式错误!'}
         return JsonResponse(result)
 
