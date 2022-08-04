@@ -110,12 +110,19 @@ def rename_document(request):
 @login_checker
 def delete_document(request):
     # 获取表单信息
+    project_id = request.POST.get('project_id', '')
     document_id = request.POST.get('document_id', '')
 
+    project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
+
+    document_list = []
+    for every_project_to_document in project_to_document_list:
+        document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
+        document_list.append(document_dict)
     # 同步mysql
     celery_delete_document.delay(document_id)
 
-    result = {'result': 1, 'message': r'删除文档成功!'}
+    result = {'result': 1, 'message': r'删除文档成功!', 'document_list': document_list}
     return JsonResponse(result)
 
 
