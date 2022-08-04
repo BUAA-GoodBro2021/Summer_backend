@@ -111,7 +111,6 @@ def list_page_detail(request):
 
     # 获取缓存
     page_key, result = cache_get_by_id_detail('page', 'page', page_id)
-    print(result['element_list'])
     result['element_list'] = result['element_list'].split("|")
     result['result'] = 0
     result['message'] = '成功获取某个页面的详细元素'

@@ -27,7 +27,7 @@ class Page(models.Model):
     def to_dic_detail(self):
         return {
             'element_list': self.element_list,
-            'num': self.num,
+            'num': int(self.num),
 
             'created_time': self.created_time,
             'updated_time': self.updated_time,
@@ -42,7 +42,7 @@ class Page(models.Model):
             'page_width': self.page_width,
 
             'element_list': self.element_list,
-            'num': self.num,
+            'num': int(self.num),
 
             'created_time': self.created_time,
             'updated_time': self.updated_time,
