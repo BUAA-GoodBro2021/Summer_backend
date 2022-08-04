@@ -99,7 +99,7 @@ def login(request):
             'user_id': user.id,
         }
         # 签发登录令牌
-        token = sign_token(payload, exp=3600 * 24 * 600)
+        token = sign_token(payload, exp=3600 * 24)
 
         # 获取缓存信息
         user_key, user_dict = cache_get_by_id('user', 'user', user.id)
