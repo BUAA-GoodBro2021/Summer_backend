@@ -11,8 +11,9 @@ def celery_create_page(project_id):
 
 
 @app.task
-def celery_save_page(page_id, page_height, page_width, element_list, num):
+def celery_save_page(page_id, page_name, page_height, page_width, element_list, num):
     page = Page.objects.get(id=page_id)
+    page.page_name = page_name
     page.page_height = page_height
     page.page_width = page_width
     page.element_list = element_list

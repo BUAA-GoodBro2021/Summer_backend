@@ -9,5 +9,4 @@ urlpatterns = [
     path('edit/request', views.edit_request),
     path('edit/save', views.edit_save),
     path('img', views.upload_img),
-    path('rename', views.rename_page),
 ]
