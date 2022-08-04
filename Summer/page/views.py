@@ -1,5 +1,3 @@
-from ast import literal_eval
-
 from Summer.settings import BASE_DIR
 from page.models import *
 from project.models import *
@@ -161,7 +159,7 @@ def edit_save(request):
     project_id = request.POST.get('project_id', 0)
     page_id = request.POST.get('page_id', 0)
     element_list = request.POST.get('element_list', '')
-    num = request.POST.get('num', 0)
+    num = int(request.POST.get('num', 0))
 
     # 判断权限
     check_authority(user_id, team_id, project_id, page_id)
