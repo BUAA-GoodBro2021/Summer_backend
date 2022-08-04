@@ -25,6 +25,10 @@ def create_team(request):
         result = {'result': 0, 'message': r'团队名称不允许为空!'}
         return JsonResponse(result)
 
+    if len(team_name) > 100:
+        result = {'result': 0, 'message': r'团队名称太长啦!'}
+        return JsonResponse(result)
+
     # 获取团队随机头像
     avatar_url = default_cover_1_url_match + str(random.choice(range(1, 31))) + '.svg'
 

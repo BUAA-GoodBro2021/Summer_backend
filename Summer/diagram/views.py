@@ -20,6 +20,10 @@ def create_diagram(request):
         result = {'result': 0, 'message': r'绘图标题不允许为空!'}
         return JsonResponse(result)
 
+    if len(diagram_name) > 100:
+        result = {'result': 0, 'message': r'绘图标题太长啦!'}
+        return JsonResponse(result)
+
     # 创建实体
     diagram = Diagram.objects.create(diagram_name=diagram_name)
     ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
@@ -76,6 +80,10 @@ def rename_diagram(request):
         result = {'result': 0, 'message': r'不存在此绘图!', 'diagram_name': diagram_old_name}
         return JsonResponse(result)
 
+    if len(diagram_new_name) > 100:
+        result = {'result': 0, 'message': r'绘图标题太长啦!'}
+        return JsonResponse(result)
+
     diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram.id)
 
     # 修改信息，同步缓存
@@ -98,10 +106,6 @@ def delete_diagram(request):
     except Exception:
         result = {'result': 0, 'message': r'不存在此绘图!', 'diagram_name': diagram_name}
         return JsonResponse(result)
-
-    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram.id)
-
-    cache.delete(diagram_key)
 
     # 同步mysql
     celery_delete_diagram.delay(diagram.id)

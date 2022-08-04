@@ -30,6 +30,14 @@ def create_project(request):
         result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
         return JsonResponse(result)
 
+    if len(project_name) == 0:
+        result = {'result': 0, 'message': r'项目名称不能为空!'}
+        return JsonResponse(result)
+
+    if len(project_name) > 100:
+        result = {'result': 0, 'message': r'项目名称太长啦!'}
+        return JsonResponse(result)
+
     # 获取项目随机头像
     avatar_url = default_cover_2_url_match + str(random.choice(range(0, 31))) + '.svg'
 
@@ -68,6 +76,10 @@ def rename_project(request):
 
     if len(project_name) == 0:
         result = {'result': 0, 'message': r'项目名称不允许为空!'}
+        return JsonResponse(result)
+
+    if len(project_name) > 100:
+        result = {'result': 0, 'message': r'项目名称太长啦!'}
         return JsonResponse(result)
 
     # 判断权限

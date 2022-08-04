@@ -26,6 +26,9 @@ def create_document(request):
         result = {'result': 0, 'message': r'文档标题不允许为空!'}
         return JsonResponse(result)
 
+    if len(document_title) > 100:
+        result = {'result': 0, 'message': r'文档标题太长啦!'}
+        return JsonResponse(result)
     # 创建实体
     document = Document.objects.create(creator_id=user_id, document_title=document_title)
     ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
@@ -83,6 +86,9 @@ def rename_document(request):
         result = {'result': 0, 'message': r'文档标题不允许为空!'}
         return JsonResponse(result)
 
+    if len(document_title) > 100:
+        result = {'result': 0, 'message': r'文档标题太长啦!'}
+        return JsonResponse(result)
     # 获取缓存信息
     document_key, document_dict = cache_get_by_id('document', 'document', document_id)
 
@@ -105,11 +111,6 @@ def rename_document(request):
 def delete_document(request):
     # 获取表单信息
     document_id = request.POST.get('document_id', '')
-
-    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
-
-    # 移除缓存中内容
-    cache.delete(document_key)
 
     # 同步mysql
     celery_delete_document.delay(document_id)

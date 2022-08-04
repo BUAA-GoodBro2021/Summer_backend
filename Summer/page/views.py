@@ -49,6 +49,10 @@ def create_page(request):
         result = {'result': 0, 'message': r'原型设计页面名称不能为空!'}
         return JsonResponse(result)
 
+    if len(page_name) > 100:
+        result = {'result': 0, 'message': r'原型设计页面名称太长啦!'}
+        return JsonResponse(result)
+
     # 创建实体
     page = Page.objects.create(page_name=page_name, page_height=page_height, page_width=page_width)
 
@@ -176,6 +180,15 @@ def edit_save(request):
     except Exception:
         result = {'result': 0, 'message': r'你好像暂时不处于编辑状态哦~'}
         return JsonResponse(result)
+
+    if len(page_name) == 0:
+        result = {'result': 0, 'message': r'原型设计页面名称不能为空!'}
+        return JsonResponse(result)
+
+    if len(page_name) > 100:
+        result = {'result': 0, 'message': r'原型设计页面名称太长啦!'}
+        return JsonResponse(result)
+
     # 获取缓存
     page_key, page_dict = cache_get_by_id_detail('page', 'page', page_id)
     # 同步缓存
@@ -262,12 +275,6 @@ def delete_page(request):
 
     # 判断权限
     check_authority(user_id, team_id, project_id, page_id)
-
-    # 删除缓存
-    page_key, page_dict = cache_get_by_id_simple('page', 'page', page_id)
-    cache.delete(page_key)
-    page_key, page_dict = cache_get_by_id_detail('page', 'page', page_id)
-    cache.delete(page_key)
 
     # 删除项目与页面直接的关系
     ProjectToPage.objects.get(project_id=project_id, page_id=page_id).delete()
