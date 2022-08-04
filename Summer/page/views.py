@@ -157,6 +157,8 @@ def edit_save(request):
     team_id = request.POST.get('team_id', 0)
     project_id = request.POST.get('project_id', 0)
     page_id = request.POST.get('page_id', 0)
+    page_height = request.POST.get('page_height', 0.0)
+    page_width = request.POST.get('page_width', 0.0)
     element_list = request.POST.get('element_list', '')
     num = int(request.POST.get('num', 0))
 
@@ -171,13 +173,16 @@ def edit_save(request):
     # 获取缓存
     page_key, page_dict = cache_get_by_id_detail('page', 'page', page_id)
     # 同步缓存
+    page_dict['page_height'] = page_height
+    page_dict['page_width'] = page_width
     page_dict['element_list'] = element_list
     page_dict['num'] = num
     cache.set(page_key, page_dict)
 
     # 同步mysql(celery好像不支持3个参数以上)
     page = Page.objects.get(id=page_id)
-    page.element_list = element_list
+    page.page_height = page_height
+    page.page_width = page_width
     page.num = num
     page.save()
 
@@ -196,7 +201,6 @@ def upload_img(request):
     suffix = '.' + (image.name.split("."))[-1]
     image.name = str(int(time.time() * 1000000)) + suffix
 
-    print(image.name)
     # 保存至media
     user = User.objects.get(id=user_id)
     user.avatar = image
@@ -234,3 +238,13 @@ def upload_img(request):
     # 上传成功并返回图片路径
     result = {'result': 1, 'message': r"上传成功！", 'image_url': image_url}
     return JsonResponse(result)
+
+# 重命名某个页面
+# @login_checker
+# def rename_page(request):
+#     # 获取用户信息
+#     user_id = request.user_id
+#     # 获取表单信息
+#     team_id = request.POST.get('team_id', 0)
+#     project_id = request.POST.get('project_id', 0)
+#     page_id = request.POST.get('page_id', 0)
