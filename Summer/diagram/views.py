@@ -8,24 +8,14 @@ from django.core.cache import cache
 # 创建绘图
 def create_diagram(request):
     # 获取表单信息
-    diagram_name = request.POST.get('diagram_name', '')
     project_id = request.POST.get('project_id', 0)
 
-    diagram = Diagram.objects.filter(diagram_name=diagram_name)
-    if len(diagram) != 0:
-        result = {'result': 0, 'message': r'绘图名称重复!'}
-        return JsonResponse(result)
-
-    if len(diagram_name) == 0:
-        result = {'result': 0, 'message': r'绘图标题不允许为空!'}
-        return JsonResponse(result)
-
-    if len(diagram_name) > 100:
-        result = {'result': 0, 'message': r'绘图标题太长啦!'}
+    if len(ProjectToDiagram.objects.filter(project_id=project_id)) != 0:
+        result = {'result': 0, 'message': r'该项目已经有绘图了!'}
         return JsonResponse(result)
 
     # 创建实体
-    diagram = Diagram.objects.create(diagram_name=diagram_name)
+    diagram = Diagram.objects.create()
     ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
 
     # 获取缓存信息
@@ -39,22 +29,28 @@ def create_diagram(request):
 def create_token(request):
     # 获取表单信息
     try:
-        project_id = int(request.POST.get('project_id', ''))
+        project_id = request.POST.get('project_id', '')
+        diagram_name = request.POST.get('diagram_name', '')
     except Exception:
         result = {'result': 0, 'message': '参数格式错误!'}
         return JsonResponse(result)
 
-    try:
-        diagram = Diagram.objects.get(diagram_name=str(project_id) + '-' + '未命名')
-    except Exception:
-        diagram = Diagram.objects.create(diagram_name=str(project_id) + '-' + '未命名')
+
+    diagram_list = Diagram.objects.filter(diagram_name=diagram_name)
+    diagram_id_list = [x.id for x in diagram_list]
+    project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=project_id, diagram_id__in=diagram_id_list)
+    if len(project_to_diagram_list) == 0:
+        diagram = Diagram.objects.create(diagram_name=diagram_name, diagram_content=None)
         ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
+    else:
+        diagram = Diagram.objects.get(id=project_to_diagram_list[0].diagram_id)
 
     # 签发令牌
     diagram_token = sign_token({
-        'project_id': project_id,
+        'project_id': int(project_id),
         'diagram_id': diagram.id,
-        'diagram_name': diagram.diagram_name
+        'diagram_name': diagram.diagram_name,
+        'diagram_content': diagram.diagram_content
     })
     result = {'result': 1, 'message': '获取绘图token成功!', 'diagram_token': diagram_token}
     return JsonResponse(result)
@@ -68,49 +64,47 @@ def parse_token(request):
     return JsonResponse(result)
 
 
-# 重命名绘图
-def rename_diagram(request):
-    # 获取表单信息
-    diagram_old_name = request.POST.get('diagram_old_name', '')
-    diagram_new_name = request.POST.get('diagram_new_name', '')
-
-    try:
-        diagram = Diagram.objects.get(diagram_name=diagram_old_name)
-    except Exception:
-        result = {'result': 0, 'message': r'不存在此绘图!', 'diagram_name': diagram_old_name}
-        return JsonResponse(result)
-
-    if len(diagram_new_name) > 100:
-        result = {'result': 0, 'message': r'绘图标题太长啦!'}
-        return JsonResponse(result)
-
-    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram.id)
-
-    # 修改信息，同步缓存
-    diagram_dict['diagram_name'] = diagram_new_name
-    cache.set(diagram_key, diagram_dict)
-
-    # 同步mysql
-    celery_rename_diagram.delay(diagram.id, diagram_new_name)
-    result = {'result': 1, 'message': r'重命名绘图成功!', 'diagram': diagram_dict}
-    return JsonResponse(result)
-
-
+@login_checker
 # 删除绘图
 def delete_diagram(request):
     # 获取表单信息
-    diagram_name = request.POST.get('diagram_name', '')
+    diagram_id = request.POST.get('project_id', '')
 
-    try:
-        diagram = Diagram.objects.get(diagram_name=diagram_name)
-    except Exception:
-        result = {'result': 0, 'message': r'不存在此绘图!', 'diagram_name': diagram_name}
-        return JsonResponse(result)
+    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
+
+    cache.delete(diagram_key)
 
     # 同步mysql
-    celery_delete_diagram.delay(diagram.id)
+    celery_delete_diagram.delay(diagram_id)
 
     result = {'result': 1, 'message': r'删除绘图成功!'}
+    return JsonResponse(result)
+
+
+@login_checker
+# 重命名绘图
+def rename_diagram(request):
+    # 获取表单信息
+    diagram_id = request.POST.get('diagram_id', '')
+    diagram_name = request.POST.get('diagram_name', '')
+
+    if len(diagram_name) == 0:
+        result = {'result': 0, 'message': r'绘图标题为空!'}
+        return JsonResponse(result)
+
+    if len(diagram_name) > 100:
+        result = {'result': 0, 'message': r'绘图标题太长啦!'}
+        return JsonResponse(result)
+
+    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
+
+    # 修改信息，同步缓存
+    diagram_dict['diagram_name'] = diagram_name
+    cache.set(diagram_key, diagram_dict)
+
+    # 同步mysql
+    celery_rename_diagram.delay(diagram_id, diagram_name)
+    result = {'result': 1, 'message': r'重命名绘图成功!', 'diagram': diagram_dict}
     return JsonResponse(result)
 
 
@@ -126,5 +120,20 @@ def list_diagram(request):
     for every_project_to_diagram in project_to_diagram_list:
         diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', every_project_to_diagram.diagram_id)
         diagram_list.append(diagram_dict)
-    result = {'result': 1, 'message': '获取文档列表成功!', 'diagram_list': diagram_list}
+    result = {'result': 1, 'message': '获取绘图列表成功!', 'diagram_list': diagram_list}
+    return JsonResponse(result)
+
+
+def update_diagram(request):
+    # 获取表单信息
+    diagram_id = request.POST.get('diagram_id', '')
+    diagram_content = request.POST.get('diagram_content', '')
+
+    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
+
+    diagram_dict['diagram_content'] = diagram_content
+    cache.set(diagram_key, diagram_dict)
+
+    celery_update_diagram.delay(diagram_id, diagram_content)
+    result = {'result': 1, 'message': '绘图内容更新成功!', 'diagram_dict': diagram_dict}
     return JsonResponse(result)

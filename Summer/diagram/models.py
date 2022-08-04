@@ -3,6 +3,7 @@ from django.db import models
 
 # 绘图实体
 class Diagram(models.Model):
+    diagram_name = models.CharField('绘图名称', max_length=100, default='')
     diagram_content = models.TextField('绘图内容', null=True)
 
     # 实体属性
@@ -12,6 +13,8 @@ class Diagram(models.Model):
     def to_dic(self):
         return {
             'diagram_id': self.id,
+
+            'diagram_name': self.diagram_name,
             'diagram_content': self.diagram_content,
 
             'created_time': self.created_time,
