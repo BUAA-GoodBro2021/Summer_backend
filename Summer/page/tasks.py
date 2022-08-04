@@ -27,3 +27,12 @@ def celery_rename_page(page_id, page_name):
     page.page_name = page_name
     page.save()
     return page.to_dic()
+
+
+@app.task
+def celery_delete_page(project_id, page_id):
+    project = Project.objects.get(id=project_id)
+    project.del_file_num()
+    page = Page.objects.get(id=page_id)
+    page.delete()
+    return project.to_dic()
