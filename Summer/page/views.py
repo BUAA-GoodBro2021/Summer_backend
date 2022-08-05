@@ -68,7 +68,7 @@ def create_page(request):
     celery_create_page.delay(project_id)
 
     # 获取缓存
-    page_key, page_dict = cache_get_by_id_simple('page', 'page', page.id)
+    page_key, page_dict = cache_get_by_id('page', 'page', page.id)
 
     result = {'result': 1, 'message': r'创建页面成功!', 'page': page_dict}
     return JsonResponse(result)
@@ -98,7 +98,7 @@ def list_project_all(request):
 
     for every_project_to_page in project_to_page_list:
         # 获取缓存
-        page_key, page_dict = cache_get_by_id_simple('page', 'page', every_project_to_page.page_id)
+        page_key, page_dict = cache_get_by_id('page', 'page', every_project_to_page.page_id)
         page_list.append(page_dict)
 
     result = {'result': 1, 'message': r'获取项目的所有页面属性成功!', 'page': page_list}
@@ -119,10 +119,9 @@ def list_page_detail(request):
     check_authority(user_id, team_id, project_id, page_id)
 
     # 获取缓存
-    page_key, result = cache_get_by_id('page', 'page', page_id)
-    result['element_list'] = result['element_list'].split("|")
-    result['result'] = 1
-    result['message'] = '成功获取某个页面的详细元素'
+    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    page_dict['element_list'] = page_dict['element_list'].split("|")
+    result = {'result': 1, 'message': r'成功获取某个页面的详细元素', 'page': page_dict}
 
     return JsonResponse(result)
 
@@ -190,16 +189,6 @@ def edit_save(request):
         return JsonResponse(result)
 
     # 获取缓存
-    page_key, page_dict = cache_get_by_id_detail('page', 'page', page_id)
-    # 同步缓存
-    page_dict['page_name'] = page_name
-    page_dict['page_height'] = page_height
-    page_dict['page_width'] = page_width
-    page_dict['element_list'] = element_list
-    page_dict['num'] = num
-    cache.set(page_key, page_dict)
-
-    # 获取缓存
     page_key, page_dict = cache_get_by_id('page', 'page', page_id)
     # 同步缓存
     page_dict['page_name'] = page_name
@@ -208,7 +197,7 @@ def edit_save(request):
     page_dict['element_list'] = element_list
     page_dict['num'] = num
     cache.set(page_key, page_dict)
-    
+
     # 同步mysql(celery好像不支持3个参数以上)
     # celery_save_page.delay(page_id, page_name, page_height, page_width, element_list, num)
     page = Page.objects.get(id=page_id)
