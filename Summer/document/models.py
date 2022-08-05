@@ -4,7 +4,7 @@ from django.db import models
 # 文档实体
 class Document(models.Model):
     creator_id = models.IntegerField('创建者id', default=0)
-
+    creator_name = models.CharField('创建者名称', max_length=100, default='')
     document_title = models.CharField('文档标题', max_length=100, default='')
     document_content = models.TextField('文档内容', default='')
 
@@ -16,6 +16,7 @@ class Document(models.Model):
         return {
             'document_id': self.id,
             'creator_id': self.creator_id,
+            'creator_name': self.creator_name,
 
             'document_title': self.document_title,
             'document_content': self.document_content,

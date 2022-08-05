@@ -190,14 +190,15 @@ def create_token(request):
         result = {'result': 0, 'message': '参数格式错误!'}
         return JsonResponse(result)
 
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
     try:
         document = Document.objects.get(document_title=str(project_id) + '-' + document_title)
     except Exception:
         document = Document.objects.create(document_title=str(project_id) + '-' + document_title, document_content='',
-                                           creator_id=user_id)
+                                           creator_id=user_id, creator_name=user_dict['username'])
         ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 
-    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     # 签发令牌
     document_token = sign_token_forever({
         'project_id': int(project_id),
