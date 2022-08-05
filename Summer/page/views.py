@@ -70,7 +70,18 @@ def create_page(request):
     # 获取缓存
     page_key, page_dict = cache_get_by_id('page', 'page', page.id)
 
-    result = {'result': 1, 'message': r'创建页面成功!', 'page': page_dict}
+    # 获取得到该项目的所有页面信息
+    project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
+
+    page_list = []
+
+    for every_project_to_page in project_to_page_list:
+        # 获取缓存
+        page_key, page_dict = cache_get_by_id('page', 'page', every_project_to_page.page_id)
+        page_dict['element_list'] = page_dict['element_list'].split("|")
+        page_list.append(page_dict)
+
+    result = {'result': 1, 'message': r'创建页面成功!', 'page': page_dict, 'page_list': page_list}
     return JsonResponse(result)
 
 
@@ -99,9 +110,10 @@ def list_project_all(request):
     for every_project_to_page in project_to_page_list:
         # 获取缓存
         page_key, page_dict = cache_get_by_id('page', 'page', every_project_to_page.page_id)
+        page_dict['element_list'] = page_dict['element_list'].split("|")
         page_list.append(page_dict)
 
-    result = {'result': 1, 'message': r'获取项目的所有页面属性成功!', 'page': page_list}
+    result = {'result': 1, 'message': r'获取项目的所有页面属性成功!', 'page_list': page_list}
     return JsonResponse(result)
 
 
@@ -208,7 +220,18 @@ def edit_save(request):
     page.num = num
     page.save()
 
-    result = {'result': 1, 'message': r'保存成功'}
+    # 获取得到该项目的所有页面信息
+    project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
+
+    page_list = []
+
+    for every_project_to_page in project_to_page_list:
+        # 获取缓存
+        page_key, page_dict = cache_get_by_id('page', 'page', every_project_to_page.page_id)
+        page_dict['element_list'] = page_dict['element_list'].split("|")
+        page_list.append(page_dict)
+
+    result = {'result': 1, 'message': r'保存成功', 'page_list': page_list}
     return JsonResponse(result)
 
 
