@@ -5,25 +5,6 @@ from diagram.tasks import *
 from django.core.cache import cache
 
 
-# 创建绘图
-def create_diagram(request):
-    # 获取表单信息
-    project_id = request.POST.get('project_id', 0)
-
-    if len(ProjectToDiagram.objects.filter(project_id=project_id)) != 0:
-        result = {'result': 0, 'message': r'该项目已经有绘图了!'}
-        return JsonResponse(result)
-
-    # 创建实体
-    diagram = Diagram.objects.create()
-    ProjectToDiagram.objects.create(project_id=project_id, diagram_id=diagram.id)
-
-    # 获取缓存信息
-    diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram.id)
-    result = {'result': 1, 'message': r'创建绘图成功!', 'diagram': diagram_dict}
-    return JsonResponse(result)
-
-
 # 获取绘图token
 @login_checker
 def create_token(request):
