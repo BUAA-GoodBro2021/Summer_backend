@@ -47,7 +47,7 @@ def parse_token(request):
 # 删除绘图
 def delete_diagram(request):
     # 获取表单信息
-    diagram_id = request.POST.get('project_id', '')
+    diagram_id = request.POST.get('diagram_id', '')
 
     diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
 
