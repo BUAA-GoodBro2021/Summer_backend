@@ -39,60 +39,60 @@ def cache_get_by_id(app_label, model_name, model_id):
     return key, model_dict
 
 
-def cache_get_by_id_simple(app_label, model_name, model_id):
-    """
-    :param app_label:   APP名
-    :param model_name:  类名
-    :param model_id:    类id
-    :return:            缓存键和信息字典
-    """
-    # 加载所有类
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
-    django.setup()
-
-    # 生成缓存键
-    key = app_label + ":" + model_name + ":" + str(model_id) + ":simple"
-
-    # 得到需要进行操作的类
-    model = apps.get_model(app_label=app_label, model_name=model_name)
-
-    # 获取缓存
-    model_dict = cache.get(key)
-
-    # 缓存中没有
-    if model_dict is None:
-        model_dict = model.objects.get(id=model_id).to_dic_simple()
-        cache.set(key, model_dict)
-
-    return key, model_dict
-
-
-def cache_get_by_id_detail(app_label, model_name, model_id):
-    """
-    :param app_label:   APP名
-    :param model_name:  类名
-    :param model_id:    类id
-    :return:            缓存键和信息字典
-    """
-    # 加载所有类
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
-    django.setup()
-
-    # 生成缓存键
-    key = app_label + ":" + model_name + ":" + str(model_id) + ":detail"
-
-    # 得到需要进行操作的类
-    model = apps.get_model(app_label=app_label, model_name=model_name)
-
-    # 获取缓存
-    model_dict = cache.get(key)
-
-    # 缓存中没有
-    if model_dict is None:
-        model_dict = model.objects.get(id=model_id).to_dic_detail()
-        cache.set(key, model_dict)
-
-    return key, model_dict
+# def cache_get_by_id_simple(app_label, model_name, model_id):
+#     """
+#     :param app_label:   APP名
+#     :param model_name:  类名
+#     :param model_id:    类id
+#     :return:            缓存键和信息字典
+#     """
+#     # 加载所有类
+#     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
+#     django.setup()
+#
+#     # 生成缓存键
+#     key = app_label + ":" + model_name + ":" + str(model_id) + ":simple"
+#
+#     # 得到需要进行操作的类
+#     model = apps.get_model(app_label=app_label, model_name=model_name)
+#
+#     # 获取缓存
+#     model_dict = cache.get(key)
+#
+#     # 缓存中没有
+#     if model_dict is None:
+#         model_dict = model.objects.get(id=model_id).to_dic_simple()
+#         cache.set(key, model_dict)
+#
+#     return key, model_dict
+#
+#
+# def cache_get_by_id_detail(app_label, model_name, model_id):
+#     """
+#     :param app_label:   APP名
+#     :param model_name:  类名
+#     :param model_id:    类id
+#     :return:            缓存键和信息字典
+#     """
+#     # 加载所有类
+#     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
+#     django.setup()
+#
+#     # 生成缓存键
+#     key = app_label + ":" + model_name + ":" + str(model_id) + ":detail"
+#
+#     # 得到需要进行操作的类
+#     model = apps.get_model(app_label=app_label, model_name=model_name)
+#
+#     # 获取缓存
+#     model_dict = cache.get(key)
+#
+#     # 缓存中没有
+#     if model_dict is None:
+#         model_dict = model.objects.get(id=model_id).to_dic_detail()
+#         cache.set(key, model_dict)
+#
+#     return key, model_dict
 
 
 # 删除某个类的所有缓存缓存
