@@ -54,7 +54,7 @@ def delete_diagram(request):
     cache.delete(diagram_key)
 
     # 同步mysql
-    celery_delete_diagram.delay(diagram_id)
+    celery_delete_diagram(diagram_id)
 
     result = {'result': 1, 'message': r'删除绘图成功!'}
     return JsonResponse(result)
@@ -82,7 +82,7 @@ def rename_diagram(request):
     cache.set(diagram_key, diagram_dict)
 
     # 同步mysql
-    celery_rename_diagram.delay(diagram_id, diagram_name)
+    celery_rename_diagram(diagram_id, diagram_name)
     result = {'result': 1, 'message': r'重命名绘图成功!', 'diagram': diagram_dict}
     return JsonResponse(result)
 
