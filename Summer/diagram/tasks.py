@@ -12,9 +12,6 @@ def celery_rename_diagram(diagram_id, diagram_name):
 
 @app.task
 def celery_delete_diagram(diagram_id):
-    project_to_diagram_list = ProjectToDiagram.objects.filter(diagram_id=diagram_id)
-    for every_project_to_diagram in project_to_diagram_list:
-        every_project_to_diagram.delete()
     diagram = Diagram.objects.get(id=diagram_id)
     diagram.delete()
     return diagram.to_dic()
