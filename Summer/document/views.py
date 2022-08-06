@@ -132,6 +132,13 @@ def delete_document(request):
             document_key, document_dict = cache_get_by_id('document', 'document', every_project_to_document.document_id)
             document_list.append(document_dict)
 
+    user_to_document_list = UserToDocument.objects.filter(document_id=document_id)
+    for every_user_to_document in user_to_document_list:
+        every_user_to_document.delete()
+    project_to_document_list = ProjectToDocument.objects.filter(document_id=document_id)
+    for every_project_to_document in project_to_document_list:
+        every_project_to_document.delete()
+
     # 同步mysql
     celery_delete_document.delay(document_id)
     result = {'result': 1, 'message': r'删除文档成功!', 'document_list': document_list}
