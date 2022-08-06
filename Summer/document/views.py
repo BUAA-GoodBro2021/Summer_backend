@@ -94,9 +94,9 @@ def rename_document(request):
     # 获取缓存信息
     document_key, document_dict = cache_get_by_id('document', 'document', document_id)
 
-    if user_id != document_dict['creator_id']:
-        result = {'result': 0, 'message': r'您不是此文档创建者'}
-        return JsonResponse(result)
+    # if user_id != document_dict['creator_id']:
+    #     result = {'result': 0, 'message': r'您不是此文档创建者'}
+    #     return JsonResponse(result)
 
     # 修改信息，同步缓存
     document_dict['document_title'] = document_title
@@ -200,9 +200,9 @@ def create_token(request):
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
 
     try:
-        document = Document.objects.get(document_title=str(project_id) + '-' + document_title)
+        document = Document.objects.get(document_title=document_title)
     except Exception:
-        document = Document.objects.create(document_title=str(project_id) + '-' + document_title, document_content='',
+        document = Document.objects.create(document_title=document_title, document_content='',
                                            creator_id=user_id, creator_name=user_dict['username'])
         ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 

@@ -3,7 +3,7 @@
 """
 from django.core.cache import cache
 from django.shortcuts import render
-
+from django.http import HttpResponseRedirect
 from user.models import *
 from user.tasks import *
 from utils.File_utils import *
@@ -18,10 +18,7 @@ def register(request):
 
     请求体包含包含 username，password1，password2，email
     """
-
-    # 邮件信息
-    content = {'url': production_base_url, "title": "非常抱歉", "message": "墨书平台暂时不开放注册哟！"}
-    return render(request, 'EmailContent-check.html', content)
+    return JsonResponse({'result': 0, 'message': '暂时不开放注册哟~'})
 
     # if request.method == 'POST':
     #
