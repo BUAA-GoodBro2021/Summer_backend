@@ -11,7 +11,8 @@
 
 <script>
     {#握手socket#}
-    socket = new WebSocket("wss://summer.super2021.com/wss/{{ page_id }}/");
+    {#socket = new WebSocket("wss://summer.super2021.com/wss/{{ page_id }}/");#}
+    socket = new WebSocket("ws://127.0.0.1:8000/wss/{{ page_id }}/");
     {#获取对应文本框#}
     let tag = document.getElementById("txt");
     socket.onmessage = function (event) {
@@ -20,7 +21,7 @@
         let page_name = JSON.parse(page_dict)['page_name'];
         console.log(page_name);
     }
-    let dict = {"page_id": 206, "page_name": "\u65b0\u5efa\u9875\u97621", "page_height": 400.0, "page_width": 400.0, "element_list": "", "num": 0, "created_time": "2022-08-07 10:38:56.333834", "updated_time": "2022-08-07 10:38:56.333877"};
+    let dict = {"page_id": 206, "page_name": "哈哈哈", "page_height": 400.0, "page_width": 400.0, "element_list": "", "num": 0, "created_time": "2022-08-07 10:38:56.333834", "updated_time": "2022-08-07 10:38:56.333877"};
     setTimeout(function (){
         socket.send(JSON.stringify(dict))
     }, 200);
