@@ -59,13 +59,6 @@ def create_page(request):
     # 创建项目与页面直接的关系
     ProjectToPage.objects.create(project_id=project_id, page_id=page.id)
 
-    # 获取缓存
-    project_key, project_dict = cache_get_by_id('project', 'project', project_id)
-    project_dict['file_num'] += 1
-    cache.set(project_key, project_dict)
-
-    # 项目的文件数量+1
-    celery_create_page.delay(project_id)
 
     # 获取缓存
     page_key, page_dict = cache_get_by_id('page', 'page', page.id)
@@ -300,14 +293,6 @@ def delete_page(request):
 
     # 删除项目与页面直接的关系
     ProjectToPage.objects.get(project_id=project_id, page_id=page_id).delete()
-
-    # 获取缓存
-    project_key, project_dict = cache_get_by_id('project', 'project', project_id)
-    project_dict['file_num'] -= 1
-    cache.set(project_key, project_dict)
-
-    # 同步mysql
-    celery_delete_page.delay(project_id, page_id)
 
     result = {'result': 1, 'message': r'删除页面成功!'}
     return JsonResponse(result)

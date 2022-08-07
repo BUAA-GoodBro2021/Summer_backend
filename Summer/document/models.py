@@ -7,6 +7,7 @@ class Document(models.Model):
     creator_name = models.CharField('创建者名称', max_length=100, default='')
     document_title = models.CharField('文档标题', max_length=100, default='')
     document_content = models.TextField('文档内容', default='')
+    project_id = models.IntegerField('项目id', default=0)
 
     # 实体属性
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
@@ -17,6 +18,7 @@ class Document(models.Model):
             'document_id': self.id,
             'creator_id': self.creator_id,
             'creator_name': self.creator_name,
+            'project_id': self.project_id,
 
             'document_title': self.document_title,
             'document_content': self.document_content,

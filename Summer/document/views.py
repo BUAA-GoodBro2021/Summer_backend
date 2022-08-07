@@ -12,38 +12,6 @@ def example(request):
     return render(request, 'Websocket-example.html', {"page_id": page_id})
 
 
-# 创建文档
-@login_checker
-def create_document(request):
-    # 获取用户信息
-    user_id = request.user_id
-
-    # 获取表单信息
-    document_title = request.POST.get('document_title', '')
-    project_id = request.POST.get('project_id', '')
-
-    if len(document_title) == 0:
-        result = {'result': 0, 'message': r'文档标题不允许为空!'}
-        return JsonResponse(result)
-
-    if len(document_title) > 100:
-        result = {'result': 0, 'message': r'文档标题太长啦!'}
-        return JsonResponse(result)
-    # 创建实体
-    document = Document.objects.create(creator_id=user_id, document_title=document_title)
-    ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
-
-    # 获取缓存信息
-    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
-    document_key, document_dict = cache_get_by_id('document', 'document', document.id)
-
-    # 创建user与document的关系
-    UserToDocument.objects.create(user_id=user_id, document_id=document.id)
-
-    result = {'result': 1, 'message': r'创建文档成功!', 'user': user_dict, 'document': document_dict}
-    return JsonResponse(result)
-
-
 # 查看文档编辑者
 @login_checker
 def list_document_user(request):
@@ -203,7 +171,8 @@ def create_token(request):
         document = Document.objects.get(document_title=document_title)
     except Exception:
         document = Document.objects.create(document_title=document_title, document_content='',
-                                           creator_id=user_id, creator_name=user_dict['username'])
+                                           creator_id=user_id, creator_name=user_dict['username'],
+                                           project_id=project_id)
         ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
 
     # 签发令牌
