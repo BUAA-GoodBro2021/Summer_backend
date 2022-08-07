@@ -43,6 +43,11 @@ class Consumer(WebsocketConsumer):
     def websocket_receive(self, message):
         # 获取url中的原型id，以此为键
         page_id = self.scope['url_route']['kwargs'].get('page_id')
+        # 如果是关闭请求，让移除所有用户
+        if message.get('text') == 'DELETE!':
+            async_to_sync(self.channel_layer.group_send)(page_id, {
+                'type': 'remove.user', 'message': message
+            })
         async_to_sync(self.channel_layer.group_send)(page_id, {
             'type': 'content.update', 'message': message
         })
@@ -68,14 +73,6 @@ class Consumer(WebsocketConsumer):
         page.element_list = page_dict['element_list']
         page.num = page_dict['num']
         page.save()
-        # celery_save_page(
-        #     page_id,
-        #     page_dict['page_name'],
-        #     page_dict['page_height'],
-        #     page_dict['page_width'],
-        #     page_dict['element_list'],
-        #     page_dict['num']
-        # )
 
     def websocket_disconnect(self, message):
         # 获取url中的文档id，以此为键
@@ -88,6 +85,10 @@ class Consumer(WebsocketConsumer):
         # 获取发送信息，更新其他客户端
         text = event.get('message').get('text')
         self.send(text)
+
+    def remove_user(self, event):
+        # 移除组内全部成员
+        self.close()
 
     @staticmethod
     def json_dumps(obj):

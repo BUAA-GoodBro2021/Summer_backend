@@ -29,6 +29,11 @@
 
         socket.send(JSON.stringify(page_dict));
     }
+    socket.onclose = function () {
+        console.log('ssss')
+    }
+
+    socket.close()
 
     {#设置同步#}
 {#    let mutex = 0;#}
