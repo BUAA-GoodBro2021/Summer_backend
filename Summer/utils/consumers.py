@@ -5,9 +5,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from channels.exceptions import StopConsumer
 from asgiref.sync import async_to_sync
-
 import os
-
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
@@ -15,9 +13,6 @@ django.setup()
 
 from page.tasks import *
 from utils.Redis_utils import *
-
-
-
 
 
 class NEWEncoder(json.JSONEncoder):
@@ -69,7 +64,7 @@ class Consumer(WebsocketConsumer):
         page = Page.objects.get(id=page_id)
         page.page_name = page_dict['page_name']
         page.page_width = page_dict['page_width']
-        page.page_height = page.page_dict['page_height']
+        page.page_height = page_dict['page_height']
         page.element_list = page_dict['element_list']
         page.num = page_dict['num']
         page.save()
