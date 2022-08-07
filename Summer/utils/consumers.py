@@ -42,6 +42,7 @@ class Consumer(WebsocketConsumer):
             'type': 'content.update', 'message': message
         })
         page_new_dict = self.json_loads(message.get('text'))
+        print(page_new_dict)
         # 优先更新缓存
         try:
             page_key, page_dict = cache_get_by_id('page', 'page', page_id)
@@ -55,14 +56,21 @@ class Consumer(WebsocketConsumer):
 
         cache.set(page_key, page_dict)
         # 异步更新数据库
-        celery_save_page(
-            page_id,
-            page_dict['page_name'],
-            page_dict['page_height'],
-            page_dict['page_width'],
-            page_dict['element_list'],
-            page_dict['num']
-        )
+        page = Page.objects.get(id=page_id)
+        page.page_name = page_dict['page_name']
+        page.page_width = page_dict['page_width']
+        page.page_height = page.page_dict['page_height']
+        page.element_list = page_dict['element_list']
+        page.num = page_dict['num']
+        page.save()
+        # celery_save_page(
+        #     page_id,
+        #     page_dict['page_name'],
+        #     page_dict['page_height'],
+        #     page_dict['page_width'],
+        #     page_dict['element_list'],
+        #     page_dict['num']
+        # )
 
     def websocket_disconnect(self, message):
         # 获取url中的文档id，以此为键
