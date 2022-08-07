@@ -11,7 +11,7 @@
 
 <script>
     {#握手socket#}
-    socket = new WebSocket("ws://127.0.0.1:8000/wss/{{ page_id }}/");
+    socket = new WebSocket("wss://101.42.224.73:8003/wss/{{ page_id }}/");
     {#获取对应文本框#}
     let tag = document.getElementById("txt");
     socket.onmessage = function (event) {
