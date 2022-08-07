@@ -7,6 +7,7 @@ class Page(models.Model):
     page_width = models.DecimalField('页面宽度', max_digits=10, decimal_places=2, default=0.0)
     element_list = models.TextField('页面样式', default='')
     num = models.IntegerField('页面特征值', default=0)
+    is_preview = models.BooleanField('是否预览', default=False)
 
     # 实体属性
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
