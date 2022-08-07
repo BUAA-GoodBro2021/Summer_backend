@@ -201,3 +201,181 @@ def list_document(request):
         document_list.append(document_dict)
     result = {'result': 1, 'message': '获取文档列表成功!', 'document_list': document_list}
     return JsonResponse(result)
+
+
+# 展示树结构
+def depart_tree(project_id):
+    project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
+    document_id_list = [x.document_id for x in project_to_document_list]
+    # 核心是filter(parent=None) 查到最顶层的那个parent节点
+    departs = Document.objects.filter(parent=None, id__in=document_id_list)
+    data = recurse_display(departs)
+    return data
+
+
+# 展示树结构中所有id列表
+def depart_tree_id(project_id, document_id=0):
+    # 核心是filter(parent=None) 查到最顶层的那个parent节点
+    if document_id == 0:
+        departs = Document.objects.filter(parent=None)
+    else:
+        departs = Document.objects.filter(parent_id=document_id)
+    data = recurse_display_id(departs)
+    return data
+
+
+# 列出树形结构列表
+@login_checker
+def list_tree_document(request):
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+    result = {'result': 1, 'message': '查询树形结构列表成功', 'tree_project_list': depart_tree(project_id)}
+    return JsonResponse(result)
+
+
+# 创建文件夹
+@login_checker
+def create_tree_folder(request):
+    # 获取用户信息
+    user_id = request.user_id
+
+    # 获取表单信息
+    folder_title = request.POST.get('folder_title', '')
+    project_id = request.POST.get('project_id', '')
+    parent_id = int(request.POST.get('parent_id', 0))
+
+    # 获取父级文件夹
+    try:
+        parent_folder = Document.objects.get(id=parent_id)
+    except Exception:
+        parent_folder = None
+
+    if len(folder_title) == 0:
+        result = {'result': 0, 'message': r'文件夹标题不允许为空!'}
+        return JsonResponse(result)
+
+    if len(folder_title) > 100:
+        result = {'result': 0, 'message': r'文件夹标题太长啦!'}
+        return JsonResponse(result)
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
+    # 创建实体
+    folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'], project_id=project_id,
+                                     document_title=folder_title, is_folder_or_file=1, parent=parent_folder)
+
+    ProjectToDocument.objects.create(project_id=project_id, document_id=folder.id)
+
+    # 获取缓存信息
+    folder_key, folder_dict = cache_get_by_id('document', 'document', folder.id)
+
+    result = {'result': 1, 'message': r'创建文件夹成功!', 'folder': folder_dict}
+    return JsonResponse(result)
+
+
+# 获取文档token
+@login_checker
+def create_tree_token(request):
+    # 获取用户信息
+    user_id = request.user_id
+
+    # 获取表单信息
+    try:
+        project_id = int(request.POST.get('project_id', ''))
+        parent_id = int(request.POST.get('parent_id', ''))
+        document_title = request.POST.get('document_title', '')
+    except Exception:
+        result = {'result': 0, 'message': '参数格式错误!'}
+        return JsonResponse(result)
+
+    # 判断标题长度
+    if len(document_title) == 0:
+        result = {'result': 0, 'message': r'文档标题不允许为空!'}
+        return JsonResponse(result)
+
+    if len(document_title) > 100:
+        result = {'result': 0, 'message': r'文档标题太长啦!'}
+        return JsonResponse(result)
+
+    # 获取父级文件夹
+    try:
+        parent_folder = Document.objects.get(id=parent_id)
+    except Exception:
+        parent_folder = None
+
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
+    document = Document.objects.create(document_title=document_title, document_content='',
+                                       creator_id=user_id, creator_name=user_dict['username'],
+                                       project_id=project_id, parent=parent_folder)
+    ProjectToDocument.objects.create(project_id=project_id, document_id=document.id)
+
+    # 签发令牌
+    document_token = sign_token_forever({
+        'project_id': int(project_id),
+        'document_id': int(document.id),
+        'document_title': document.document_title,
+        'username': user_dict['username']
+    })
+    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': document_token}
+    return JsonResponse(result)
+
+
+# 删除文件夹或者文件
+@login_checker
+def delete_tree_document(request):
+    # 获取表单信息
+    project_id = int(request.POST.get('project_id', 0))
+    document_id = int(request.POST.get('document_id', 0))
+
+    # 获取到该目录的子集id列表(包含自身id)
+    document_id_list = depart_tree_id(project_id, document_id)
+    document_id_list.append(document_id)
+    print(depart_tree_id(project_id, document_id), type(depart_tree_id(project_id, document_id)))
+    print(document_id_list)
+    # 获取文件夹或者文件的关联表(自身与子集)
+    project_to_document_list = ProjectToDocument.objects.filter(document_id__in=document_id_list)
+
+    # 删除实体
+    Document.objects.filter(id__in=document_id_list).delete()
+
+    # 删除关系(用户)
+    UserToDocument.objects.filter(document_id__in=document_id_list).delete()
+
+    # 删除关系(项目)
+    project_to_document_list.delete()
+
+    result = {'result': 1, 'message': r'删除文档成功!', 'document_list': depart_tree(project_id)}
+    return JsonResponse(result)
+
+
+# 重命名文档或者文件夹
+@login_checker
+def rename_tree_document(request):
+    # 获取用户信息
+    user_id = request.user_id
+
+    # 获取表单信息
+    project_id = request.POST.get('project_id', '')
+    document_id = request.POST.get('document_id', '')
+    document_title = request.POST.get('document_title', '')
+
+    if len(document_title) == 0:
+        result = {'result': 0, 'message': r'文档标题不允许为空!'}
+        return JsonResponse(result)
+
+    if len(document_title) > 100:
+        result = {'result': 0, 'message': r'文档标题太长啦!'}
+        return JsonResponse(result)
+    # 获取缓存信息
+    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
+
+    # 修改信息，同步缓存
+    document_dict['document_title'] = document_title
+    cache.set(document_key, document_dict)
+
+    # 同步mysql
+    celery_rename_document.delay(document_id, document_title)
+
+    result = {'result': 1, 'message': r'重命名文档成功!', 'document_list': depart_tree(project_id)}
+    return JsonResponse(result)
