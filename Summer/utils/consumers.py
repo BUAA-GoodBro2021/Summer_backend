@@ -32,6 +32,7 @@ class Consumer(WebsocketConsumer):
         self.accept()
         # 同步添加组
         async_to_sync(self.channel_layer.group_add)(page_id, self.channel_name)
+        page_dict['element_list'] = page_dict['element_list'].split('|')
         # 向客户端更新之前写好的内容
         self.send(self.json_dumps(page_dict))
 
@@ -50,7 +51,7 @@ class Consumer(WebsocketConsumer):
         page_dict['page_name'] = page_new_dict['page_name']
         page_dict['page_height'] = page_new_dict['page_height']
         page_dict['page_width'] = page_new_dict['page_width']
-        page_dict['element_list'] = page_new_dict['element_list']
+        page_dict['element_list'] = page_new_dict['element_list'].split('|')
         page_dict['num'] = page_new_dict['num']
 
         cache.set(page_key, page_dict)
