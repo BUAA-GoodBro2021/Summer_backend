@@ -8,8 +8,6 @@ class Project(models.Model):
     # 头像系列
     avatar_url = models.CharField('项目头像路径', max_length=128, default='')
 
-    # 数量系列
-    file_num = models.IntegerField('文件的数量', default=0)
 
     # 判断是否删除
     is_delete = models.IntegerField('是否删除', default=0)  # 0-未删除   1-伪删除
@@ -26,8 +24,6 @@ class Project(models.Model):
 
             'avatar_url': self.avatar_url,
 
-            'file_num': self.file_num,
-
             'is_delete': self.is_delete,
 
             'created_time': self.created_time,
@@ -35,15 +31,6 @@ class Project(models.Model):
 
         }
 
-    # 项目中文件的数量+1
-    def add_file_num(self):
-        self.file_num += 1
-        self.save(update_fields=['file_num'])
-
-    # 项目中文件的数量-1
-    def del_file_num(self):
-        self.file_num -= 1
-        self.save(update_fields=['file_num'])
 
 
 # 项目与页面的关联表

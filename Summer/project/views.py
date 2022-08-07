@@ -2,7 +2,6 @@ import random
 
 from django.core.cache import cache
 
-
 from diagram.models import *
 from document.models import *
 from page.models import *
@@ -237,6 +236,7 @@ def delete_project(request):
         result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
+    # TODO 此处不包括文件夹
     # 列出三大文档信息
     project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
     project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
@@ -264,7 +264,7 @@ def delete_project(request):
     # 删除关系(用户)
     UserToPage.objects.filter(page_id__in=page_id_list).delete()
     UserToDocument.objects.filter(document_id__in=document_id_list).delete()
-    UserToProjectStar.objects.filter(project_id=project_id).delete()
+    # UserToProjectStar.objects.filter(project_id=project_id).delete()
 
     # 删除关系(项目)
     project_to_page_list.delete()
@@ -280,4 +280,85 @@ def delete_project(request):
     team_to_project.delete()
 
     result = {'result': 1, 'message': r'删除项目成功!'}
+    return JsonResponse(result)
+
+
+# 复制项目
+@login_checker
+def copy_project(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    team_id = request.POST.get('team_id', '')
+    old_project_id = request.POST.get('old_project_id', '')
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
+        result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
+        return JsonResponse(result)
+
+    if not TeamToProject.objects.filter(team_id=team_id, project_id=old_project_id).exists():
+        result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
+        return JsonResponse(result)
+
+    # 列出三大文档信息
+    project_to_page_list = ProjectToPage.objects.filter(project_id=old_project_id)
+    project_to_document_list = ProjectToDocument.objects.filter(project_id=old_project_id)
+    project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=old_project_id)
+
+    page_id_list = [x.page_id for x in project_to_page_list]
+    document_id_list = [x.document_id for x in project_to_document_list]
+    diagram_id_list = [x.diagram_id for x in project_to_diagram_list]
+
+    old_project_key, old_project_dict = cache_get_by_id('project', 'project', old_project_id)
+
+    # 创建一个项目对象
+    new_project = Project.objects.create(project_name=old_project_dict['project_name'] + '-副本',
+                                         project_description=old_project_dict['project_name'],
+                                         avatar_url=old_project_dict['project_name'])
+    # 创建团队与项目的关系
+    TeamToProject.objects.create(team_id=team_id, project_id=new_project.id)
+
+    # TODO 此处不包括文件夹
+    # 创建副本与三大文档的信息
+    for every_page_id in page_id_list:
+        # 获取旧实体
+        old_page_key, old_page_dict = cache_get_by_id('page', 'page', every_page_id)
+        # 创建副本实体
+        new_page = Page.objects.create(page_name=old_page_dict['page_name'],
+                                       page_height=old_page_dict['page_height'],
+                                       page_width=old_page_dict['page_width'],
+                                       element_list=old_page_dict['element_list'], num=old_page_dict['num'])
+        # 创建关系
+        ProjectToPage.objects.create(project_id=new_project.id, page_id=new_page.id)
+
+    for every_document_id in document_id_list:
+        # 获取旧实体
+        old_document_key, old_document_dict = cache_get_by_id('document', 'document', every_document_id)
+        # 创建副本实体
+        new_document = Document.objects.create(creator_id=old_document_dict['creator_id'],
+                                               creator_name=old_document_dict['creator_name'],
+                                               document_title=old_document_dict['document_title'],
+                                               document_content=old_document_dict['document_content'],
+                                               project_id=old_document_dict['project_id'])
+        # 创建关系
+        ProjectToDocument.objects.create(project_id=new_project.id, document_id=new_document.id)
+
+    '''
+        diagram_name = models.CharField('绘图名称', max_length=100, default='')
+        diagram_content = models.TextField('绘图内容', null=True)
+    '''
+
+    for every_diagram_id in diagram_id_list:
+        # 获取旧实体
+        old_diagram_key, old_diagram_dict = cache_get_by_id('diagram', 'diagram', every_diagram_id)
+        # 创建副本实体
+        new_diagram = Diagram.objects.create(diagram_name=old_diagram_dict['diagram_name'],
+                                             diagram_content=old_diagram_dict['diagram_content'])
+
+        # 创建关系
+        ProjectToDiagram.objects.create(project_id=new_project.id, diagram_id=new_diagram.id)
+
+    new_project_key, new_project_dict = cache_get_by_id('project', 'project', new_project.id)
+    result = {'result': 1, 'message': r'复制项目成功!', 'new_project': new_project_dict}
     return JsonResponse(result)

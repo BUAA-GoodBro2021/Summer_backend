@@ -12,27 +12,6 @@ class Page(models.Model):
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     updated_time = models.DateTimeField('更新时间', auto_now=True)
 
-    def to_dic_simple(self):
-        return {
-            'page_id': self.id,
-            'page_name': self.page_name,
-            'page_height': self.page_height,
-            'page_width': self.page_width,
-
-            'created_time': self.created_time,
-            'updated_time': self.updated_time,
-
-        }
-
-    def to_dic_detail(self):
-        return {
-            'element_list': self.element_list,
-            'num': int(self.num),
-
-            'created_time': self.created_time,
-            'updated_time': self.updated_time,
-
-        }
 
     def to_dic(self):
         return {
