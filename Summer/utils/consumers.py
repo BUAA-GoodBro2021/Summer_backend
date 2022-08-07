@@ -6,7 +6,7 @@ from channels.generic.websocket import WebsocketConsumer
 from channels.exceptions import StopConsumer
 from asgiref.sync import async_to_sync
 
-from page.tasks import *
+# from page.tasks import *
 from utils.Redis_utils import *
 
 
@@ -54,15 +54,15 @@ class Consumer(WebsocketConsumer):
         page_dict['num'] = page_new_dict['num']
 
         cache.set(page_key, page_dict)
-        # 异步更新数据库
-        celery_save_page.delay(
-            page_id,
-            page_dict['page_name'],
-            page_dict['page_height'],
-            page_dict['page_width'],
-            page_dict['element_list'],
-            page_dict['num']
-        )
+        # # 异步更新数据库
+        # celery_save_page.delay(
+        #     page_id,
+        #     page_dict['page_name'],
+        #     page_dict['page_height'],
+        #     page_dict['page_width'],
+        #     page_dict['element_list'],
+        #     page_dict['num']
+        # )
 
     def websocket_disconnect(self, message):
         # 获取url中的文档id，以此为键
