@@ -2,6 +2,8 @@ from django.db import models
 
 
 class Project(models.Model):
+    create_id = models.IntegerField('项目创建者id', default=0)
+    create_name = models.CharField('项目创建者姓名', max_length=1000, default='')
     project_name = models.CharField('项目名称', max_length=100, default='')
     project_description = models.CharField('项目简介', max_length=1000, default='')
 
@@ -17,7 +19,10 @@ class Project(models.Model):
 
     def to_dic(self):
         return {
+
             'project_id': self.id,
+            'create_id': self.create_id,
+            'create_name': self.create_name,
             'project_name': self.project_name,
             'project_description': self.project_description,
 

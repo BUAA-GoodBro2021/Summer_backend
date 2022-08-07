@@ -4,10 +4,10 @@ from django.db import models
 # 文档实体
 class Document(models.Model):
     creator_id = models.IntegerField('创建者id', default=0)
+    project_id = models.IntegerField('项目id', default=0)
     creator_name = models.CharField('创建者名称', max_length=100, default='')
     document_title = models.CharField('文档标题', max_length=100, default='')
     document_content = models.TextField('文档内容', default='')
-    project_id = models.IntegerField('项目id', default=0)
 
     # 实体属性
     created_time = models.DateTimeField('创建时间', auto_now_add=True)

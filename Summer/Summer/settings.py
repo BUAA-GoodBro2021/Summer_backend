@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'corsheaders',  # 跨域请求
     'channels',  # websocket支持
+    'mptt',     # 树形控件
     'utils',
     'user',
     'team',

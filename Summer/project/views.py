@@ -40,14 +40,15 @@ def create_project(request):
     # 获取项目随机头像
     avatar_url = default_cover_2_url_match + str(random.choice(range(0, 31))) + '.svg'
 
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
     # 创建一个项目对象
     project = Project.objects.create(project_name=project_name, project_description=project_description,
-                                     avatar_url=avatar_url)
+                                     avatar_url=avatar_url, create_id=user_id, create_name=user_dict['username'])
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=project.id)
 
-    # 获取缓存信息
-    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     team_key, team_dict = cache_get_by_id('team', 'team', team_id)
     project_key, project_dict = cache_get_by_id('project', 'project', project.id)
 
@@ -315,10 +316,13 @@ def copy_project(request):
     # 获取项目随机头像
     avatar_url = default_cover_2_url_match + str(random.choice(range(0, 31))) + '.svg'
 
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
     # 创建一个项目对象
     new_project = Project.objects.create(project_name=old_project_dict['project_name'] + '-副本',
                                          project_description=old_project_dict['project_name'],
-                                         avatar_url=avatar_url)
+                                         avatar_url=avatar_url, create_id=user_id, create_name=user_dict['username'])
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=new_project.id)
 
