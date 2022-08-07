@@ -8,8 +8,8 @@ from document.models import *
 
 
 def example(request):
-    document_id = request.GET.get('id')
-    return render(request, 'Websocket-example.html', {"document_id": document_id})
+    page_id = request.GET.get('id')
+    return render(request, 'Websocket-example.html', {"page_id": page_id})
 
 
 # 创建文档
