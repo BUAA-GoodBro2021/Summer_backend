@@ -37,11 +37,8 @@ def list_document_user(request):
 # 重命名文档
 @login_checker
 def rename_document(request):
-    # 获取用户信息
-    user_id = request.user_id
-
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
+    project_id = int(request.POST.get('project_id', 0))
     document_id = request.POST.get('document_id', '')
     document_title = request.POST.get('document_title', '')
 
@@ -82,7 +79,7 @@ def rename_document(request):
 @login_checker
 def delete_document(request):
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
+    project_id = int(request.POST.get('project_id', 0))
     document_id = request.POST.get('document_id', '')
 
     project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
@@ -127,7 +124,7 @@ def edit_document(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
+    project_id = int(request.POST.get('project_id', 0))
     document_id = request.POST.get('document_id', '')
 
     document_key, document_dict = cache_get_by_id('document', 'document', document_id)
@@ -152,7 +149,7 @@ def create_token(request):
 
     # 获取表单信息
     try:
-        project_id = int(request.POST.get('project_id', ''))
+        project_id = int(request.POST.get('project_id', 0))
         document_title = request.POST.get('document_title', '')
     except Exception:
         result = {'result': 0, 'message': '参数格式错误!'}
@@ -191,7 +188,7 @@ def parse_token(request):
 @login_checker
 def list_document(request):
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
+    project_id = int(request.POST.get('project_id', 0))
 
     project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
 
@@ -204,7 +201,7 @@ def list_document(request):
 
 
 # 展示树结构
-def depart_tree(project_id):
+def show_tree(project_id):
     project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
     document_id_list = [x.document_id for x in project_to_document_list]
     # 核心是filter(parent=None) 查到最顶层的那个parent节点
@@ -214,13 +211,24 @@ def depart_tree(project_id):
 
 
 # 展示树结构中所有id列表
-def depart_tree_id(project_id, document_id=0):
+def show_tree_id(project_id, document_id=0):
     # 核心是filter(parent=None) 查到最顶层的那个parent节点
     if document_id == 0:
-        departs = Document.objects.filter(parent=None)
+        departs = Document.objects.filter(parent=None, project_id=project_id)
     else:
-        departs = Document.objects.filter(parent_id=document_id)
+        departs = Document.objects.filter(parent_id=document_id, project_id=project_id)
     data = recurse_display_id(departs)
+    return data
+
+
+# 复制文件树
+def copy_tree(creator_id, old_project_id, new_project_id, document_id=0):
+    # 核心是filter(parent=None) 查到最顶层的那个parent节点
+    if document_id == 0:
+        departs = Document.objects.filter(parent=None, project_id=old_project_id)
+    else:
+        departs = Document.objects.filter(parent_id=document_id, project_id=old_project_id)
+    data = recurse_display_copy(creator_id, new_project_id, document_id, departs)
     return data
 
 
@@ -228,8 +236,8 @@ def depart_tree_id(project_id, document_id=0):
 @login_checker
 def list_tree_document(request):
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
-    result = {'result': 1, 'message': '查询树形结构列表成功', 'tree_project_list': depart_tree(project_id)}
+    project_id = int(request.POST.get('project_id', 0))
+    result = {'result': 1, 'message': '查询树形结构列表成功', 'tree_project_list': show_tree(project_id)}
     return JsonResponse(result)
 
 
@@ -241,7 +249,7 @@ def create_tree_folder(request):
 
     # 获取表单信息
     folder_title = request.POST.get('folder_title', '')
-    project_id = request.POST.get('project_id', '')
+    project_id = int(request.POST.get('project_id', 0))
     parent_id = int(request.POST.get('parent_id', 0))
 
     # 获取父级文件夹
@@ -281,8 +289,8 @@ def create_tree_token(request):
 
     # 获取表单信息
     try:
-        project_id = int(request.POST.get('project_id', ''))
-        parent_id = int(request.POST.get('parent_id', ''))
+        project_id = int(request.POST.get('project_id', 0))
+        parent_id = int(request.POST.get('parent_id', 0))
         document_title = request.POST.get('document_title', '')
     except Exception:
         result = {'result': 0, 'message': '参数格式错误!'}
@@ -329,10 +337,9 @@ def delete_tree_document(request):
     document_id = int(request.POST.get('document_id', 0))
 
     # 获取到该目录的子集id列表(包含自身id)
-    document_id_list = depart_tree_id(project_id, document_id)
+    document_id_list = show_tree_id(project_id, document_id)
     document_id_list.append(document_id)
-    print(depart_tree_id(project_id, document_id), type(depart_tree_id(project_id, document_id)))
-    print(document_id_list)
+
     # 获取文件夹或者文件的关联表(自身与子集)
     project_to_document_list = ProjectToDocument.objects.filter(document_id__in=document_id_list)
 
@@ -345,19 +352,16 @@ def delete_tree_document(request):
     # 删除关系(项目)
     project_to_document_list.delete()
 
-    result = {'result': 1, 'message': r'删除文档成功!', 'document_list': depart_tree(project_id)}
+    result = {'result': 1, 'message': r'删除文档成功!', 'document_list': show_tree(project_id)}
     return JsonResponse(result)
 
 
 # 重命名文档或者文件夹
 @login_checker
 def rename_tree_document(request):
-    # 获取用户信息
-    user_id = request.user_id
-
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
-    document_id = request.POST.get('document_id', '')
+    project_id = int(request.POST.get('project_id', 0))
+    document_id = request.POST.get('document_id', 0)
     document_title = request.POST.get('document_title', '')
 
     if len(document_title) == 0:
@@ -377,5 +381,5 @@ def rename_tree_document(request):
     # 同步mysql
     celery_rename_document.delay(document_id, document_title)
 
-    result = {'result': 1, 'message': r'重命名文档成功!', 'document_list': depart_tree(project_id)}
+    result = {'result': 1, 'message': r'重命名文档成功!', 'document_list': show_tree(project_id)}
     return JsonResponse(result)

@@ -1,6 +1,5 @@
 from django.db import models
 
-
 # 文档实体
 from utils.Redis_utils import cache_get_by_id
 
@@ -49,7 +48,6 @@ def recurse_display(data):
     for item in data:
         # 本身字典信息
         item_key, item_dict = cache_get_by_id('document', 'document', item.id)
-        # item_dict = item.to_dic()
         # 孩子信息
         children = item.children.all()
         if len(children) > 0:
@@ -58,6 +56,35 @@ def recurse_display(data):
             item_dict.update({'children': []})
         display_list.append(item_dict)
     return display_list
+
+
+def recurse_display_copy(creator_id, project_id, parent_id, old_document_query_set):
+    """递归复制树"""
+    # 创建新项目与新文件之间的关系
+    for every_old_document_query_set in old_document_query_set:
+        # 获取旧实体
+        old_document_key, old_document_dict = cache_get_by_id('document', 'document', every_old_document_query_set.id)
+
+        # 创建副本实体
+        new_document = Document.objects.create(creator_id=creator_id,
+                                               creator_name=old_document_dict['creator_name'],
+                                               document_title=old_document_dict['document_title'],
+                                               document_content=old_document_dict['document_content'],
+                                               is_folder_or_file=old_document_dict['is_folder_or_file'],
+                                               project_id=project_id)
+        if parent_id == 0:
+            new_document.parent = None
+        else:
+            new_document.parent_id = parent_id
+        new_document.save()
+
+        # 创建关系
+        ProjectToDocument.objects.create(project_id=project_id, document_id=new_document.id)
+
+        # 孩子信息
+        children = every_old_document_query_set.children.all()
+        if len(children) > 0:
+            recurse_display_copy(creator_id, project_id, new_document.id, children)
 
 
 def recurse_display_id(data):

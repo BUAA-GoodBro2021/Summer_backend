@@ -10,7 +10,7 @@ from django.core.cache import cache
 def create_token(request):
     # 获取表单信息
     try:
-        project_id = request.POST.get('project_id', '')
+        project_id = int(request.POST.get('project_id', 0))
         diagram_name = request.POST.get('diagram_name', '')
     except Exception:
         result = {'result': 0, 'message': '参数格式错误!'}
@@ -95,7 +95,7 @@ def rename_diagram(request):
 @login_checker
 def list_diagram(request):
     # 获取表单信息
-    project_id = request.POST.get('project_id', '')
+    project_id = int(request.POST.get('project_id', 0))
 
     project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=project_id)
 
