@@ -6,12 +6,18 @@ from channels.generic.websocket import WebsocketConsumer
 from channels.exceptions import StopConsumer
 from asgiref.sync import async_to_sync
 
+import os
+
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
+django.setup()
+
 from page.tasks import *
 from utils.Redis_utils import *
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
-django.setup()
+
 
 
 class NEWEncoder(json.JSONEncoder):
