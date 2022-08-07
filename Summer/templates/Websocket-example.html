@@ -6,7 +6,8 @@
 </head>
 <body>
 <div>
-    <input type="text" placeholder="请输入" id="txt" oninput="tagChange()">
+    <input type="text" placeholder="请输入" id="txt">
+    <button value="刷新" onclick="tagChange()"></button>
 </div>
 
 <script>
@@ -15,16 +16,25 @@
     socket = new WebSocket("ws://127.0.0.1:8000/wss/{{ page_id }}/");
     {#获取对应文本框#}
     let tag = document.getElementById("txt");
+    let page_dict;
     socket.onmessage = function (event) {
         console.log(event.data);
-        let page_dict = event.data;
+        page_dict = event.data;
         let page_name = JSON.parse(page_dict)['page_name'];
         console.log(page_name);
     }
-    let dict = {"page_id": 206, "page_name": "哈哈哈", "page_height": 400.0, "page_width": 400.0, "element_list": "", "num": 0, "created_time": "2022-08-07 10:38:56.333834", "updated_time": "2022-08-07 10:38:56.333877"};
-    setTimeout(function (){
-        socket.send(JSON.stringify(dict))
-    }, 200);
+
+    tagChange = function () {
+        page_dict = {"page_height":240,"page_width":120,"page_name":"测试","page_id":240,"element_list":"xxx","project_id":122,"num":4}
+
+        socket.send(JSON.stringify(page_dict));
+    }
+    socket.onclose = function () {
+        console.log('ssss')
+    }
+
+    {#socket.close()#}
+
     {#设置同步#}
 {#    let mutex = 0;#}
     {#当每半秒写完时，接收发送信息#}
