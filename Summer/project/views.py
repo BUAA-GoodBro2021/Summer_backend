@@ -312,12 +312,18 @@ def copy_project(request):
 
     old_project_key, old_project_dict = cache_get_by_id('project', 'project', old_project_id)
 
+    # 获取项目随机头像
+    avatar_url = default_cover_2_url_match + str(random.choice(range(0, 31))) + '.svg'
+
     # 创建一个项目对象
     new_project = Project.objects.create(project_name=old_project_dict['project_name'] + '-副本',
                                          project_description=old_project_dict['project_name'],
-                                         avatar_url=old_project_dict['project_name'])
+                                         avatar_url=avatar_url)
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=new_project.id)
+
+    # 团队项目输+1
+    celery_create_project.delay(team_id)
 
     # TODO 此处不包括文件夹
     # 创建副本与三大文档的信息

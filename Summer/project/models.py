@@ -8,7 +8,6 @@ class Project(models.Model):
     # 头像系列
     avatar_url = models.CharField('项目头像路径', max_length=128, default='')
 
-
     # 判断是否删除
     is_delete = models.IntegerField('是否删除', default=0)  # 0-未删除   1-伪删除
 
@@ -30,7 +29,6 @@ class Project(models.Model):
             'updated_time': self.updated_time,
 
         }
-
 
 
 # 项目与页面的关联表
