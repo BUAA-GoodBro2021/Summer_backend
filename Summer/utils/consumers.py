@@ -55,7 +55,7 @@ class Consumer(WebsocketConsumer):
 
         cache.set(page_key, page_dict)
         # 异步更新数据库
-        celery_save_page.delay(
+        celery_save_page(
             page_id,
             page_dict['page_name'],
             page_dict['page_height'],
