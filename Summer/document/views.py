@@ -1,15 +1,8 @@
-from django.shortcuts import render
-
 from django.core.cache import cache
 
 from document.tasks import *
 from utils.Login_utils import *
 from document.models import *
-
-
-def example(request):
-    document_id = request.GET.get('id')
-    return render(request, 'Websocket-example.html', {"document_id": document_id})
 
 
 # 查看文档编辑者
