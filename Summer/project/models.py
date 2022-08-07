@@ -7,6 +7,7 @@ class Project(models.Model):
     project_name = models.CharField('项目名称', max_length=100, default='')
     project_description = models.CharField('项目简介', max_length=1000, default='')
 
+    project_folder_id = models.IntegerField('项目文件夹id', default=0)
     # 头像系列
     avatar_url = models.CharField('项目头像路径', max_length=128, default='')
 
@@ -25,6 +26,7 @@ class Project(models.Model):
             'create_name': self.create_name,
             'project_name': self.project_name,
             'project_description': self.project_description,
+            'project_folder_id': self.project_folder_id,
 
             'avatar_url': self.avatar_url,
 

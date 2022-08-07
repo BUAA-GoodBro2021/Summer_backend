@@ -5,6 +5,8 @@ from django.db import models
 class Team(models.Model):
     team_name = models.CharField('团队名称', max_length=100, default='')
 
+    team_folder_id = models.IntegerField('团队文件夹', default=0)
+
     # 数量系列
     user_num = models.IntegerField('成员的数量', default=1)
     project_num = models.IntegerField('项目的数量', default=0)
@@ -20,6 +22,7 @@ class Team(models.Model):
         return {
             'team_id': self.id,
             'team_name': self.team_name,
+            'team_folder_id': self.team_folder_id,
 
             'user_num': self.user_num,
             'project_num': self.project_num,

@@ -4,7 +4,7 @@ from django.core.cache import cache
 
 from diagram.models import *
 from document.models import *
-from document.views import copy_tree
+from document.views import copy_project_tree
 from page.models import *
 from project.tasks import *
 
@@ -355,7 +355,7 @@ def copy_project(request):
     #     # 创建关系
     #     ProjectToDocument.objects.create(project_id=new_project.id, document_id=new_document.id)
 
-    copy_tree(user_id, old_project_id, new_project.id, document_id=0)
+    copy_project_tree(user_id, old_project_id, new_project.id, document_id=0)
 
     for every_diagram_id in diagram_id_list:
         # 获取旧实体
@@ -380,6 +380,6 @@ def copy_project_tree_document(request):
     old_project_id = int(request.POST.get('old_project_id', 0))
     new_project = Project.objects.create(create_id=user_id)
 
-    copy_tree(user_id, old_project_id, new_project.id, document_id=0)
+    copy_project_tree(user_id, old_project_id, new_project.id, document_id=0)
 
     return JsonResponse({'result': 1, 'message': r'OK'})

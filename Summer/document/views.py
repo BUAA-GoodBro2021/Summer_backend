@@ -201,7 +201,7 @@ def list_document(request):
 
 
 # 展示树结构
-def show_tree(project_id):
+def show_project_tree(project_id):
     project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
     document_id_list = [x.document_id for x in project_to_document_list]
     # 核心是filter(parent=None) 查到最顶层的那个parent节点
@@ -211,7 +211,7 @@ def show_tree(project_id):
 
 
 # 展示树结构中所有id列表
-def show_tree_id(project_id, document_id=0):
+def show_project_tree_id(project_id, document_id=0):
     # 核心是filter(parent=None) 查到最顶层的那个parent节点
     if document_id == 0:
         departs = Document.objects.filter(parent=None, project_id=project_id)
@@ -222,7 +222,7 @@ def show_tree_id(project_id, document_id=0):
 
 
 # 复制文件树
-def copy_tree(creator_id, old_project_id, new_project_id, document_id=0):
+def copy_project_tree(creator_id, old_project_id, new_project_id, document_id=0):
     # 核心是filter(parent=None) 查到最顶层的那个parent节点
     if document_id == 0:
         departs = Document.objects.filter(parent=None, project_id=old_project_id)
@@ -237,7 +237,7 @@ def copy_tree(creator_id, old_project_id, new_project_id, document_id=0):
 def list_tree_document(request):
     # 获取表单信息
     project_id = int(request.POST.get('project_id', 0))
-    result = {'result': 1, 'message': '查询树形结构列表成功', 'tree_project_list': show_tree(project_id)}
+    result = {'result': 1, 'message': '查询树形结构列表成功', 'tree_project_list': show_project_tree(project_id)}
     return JsonResponse(result)
 
 
@@ -337,7 +337,7 @@ def delete_tree_document(request):
     document_id = int(request.POST.get('document_id', 0))
 
     # 获取到该目录的子集id列表(包含自身id)
-    document_id_list = show_tree_id(project_id, document_id)
+    document_id_list = show_project_tree_id(project_id, document_id)
     document_id_list.append(document_id)
 
     # 获取文件夹或者文件的关联表(自身与子集)
@@ -352,7 +352,7 @@ def delete_tree_document(request):
     # 删除关系(项目)
     project_to_document_list.delete()
 
-    result = {'result': 1, 'message': r'删除文档成功!', 'document_list': show_tree(project_id)}
+    result = {'result': 1, 'message': r'删除文档成功!', 'document_list': show_project_tree(project_id)}
     return JsonResponse(result)
 
 
@@ -381,5 +381,5 @@ def rename_tree_document(request):
     # 同步mysql
     celery_rename_document.delay(document_id, document_title)
 
-    result = {'result': 1, 'message': r'重命名文档成功!', 'document_list': show_tree(project_id)}
+    result = {'result': 1, 'message': r'重命名文档成功!', 'document_list': show_project_tree(project_id)}
     return JsonResponse(result)
