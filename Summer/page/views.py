@@ -7,6 +7,12 @@ from utils.Bucket_utils import Bucket
 from utils.Login_utils import *
 from utils.Redis_utils import *
 from page.tasks import *
+from django.shortcuts import render
+
+
+def example(request):
+    page_id = request.GET.get('id')
+    return render(request, 'Websocket-example.html', {"page_id": page_id})
 
 
 # 权限判断
