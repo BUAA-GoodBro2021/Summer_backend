@@ -10,6 +10,10 @@ from page.tasks import *
 from utils.Redis_utils import *
 
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Summer.settings')
+django.setup()
+
+
 class NEWEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
