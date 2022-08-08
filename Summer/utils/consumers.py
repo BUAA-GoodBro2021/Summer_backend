@@ -68,7 +68,7 @@ class Consumer(WebsocketConsumer):
             async_to_sync(self.channel_layer.group_send)(self.page_id, {
                 'type': 'remove.send', 'message': message
             })
-            time.sleep(1)
+            time.sleep(5)
             async_to_sync(self.channel_layer.group_send)(self.page_id, {
                 'type': 'remove.user', 'message': message
             })
