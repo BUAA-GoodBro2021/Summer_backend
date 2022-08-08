@@ -68,7 +68,7 @@ class Consumer(WebsocketConsumer):
             async_to_sync(self.channel_layer.group_send)(self.page_id, {
                 'type': 'remove.send', 'message': message
             })
-            time.sleep(5)
+            time.sleep(1)
             async_to_sync(self.channel_layer.group_send)(self.page_id, {
                 'type': 'remove.user', 'message': message
             })
@@ -119,7 +119,7 @@ class Consumer(WebsocketConsumer):
 
     def remove_send(self, event):
         # 发送移除广播
-        self.send(self.json_loads({"delete_flag": True}))
+        self.send(self.json_dumps({"delete_flag": True}))
 
     def remove_user(self, event):
         # 移除组内全部成员
