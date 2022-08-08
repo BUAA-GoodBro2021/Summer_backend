@@ -101,3 +101,11 @@ def upload_image(image, bucket_name, model_id, is_audit=False, image_size=1024 *
     # 上传成功并返回图片路径
     result = {'result': 1, 'message': r"上传成功！", 'image_url': image_url}
     return result
+
+
+# 获取文件内容
+def read_file(model_type):
+    f = open(os.getcwd() + '/document_models/model' + str(model_type) + '.txt', encoding="utf-8")
+    txt = f.read()
+    f.close()
+    return txt

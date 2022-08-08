@@ -2,6 +2,7 @@ from django.core.cache import cache
 
 from document.tasks import *
 from project.models import Project
+from utils.File_utils import read_file
 from utils.Login_utils import *
 from document.models import *
 
@@ -181,6 +182,7 @@ def create_tree_token(request):
 
     # 获取表单信息
     try:
+        model_type = request.POST.get('model_type', '')
         parent_id = int(request.POST.get('parent_id', 0))
         document_title = request.POST.get('document_title', '')
     except Exception:
@@ -204,7 +206,12 @@ def create_tree_token(request):
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
 
-    document = Document.objects.create(document_title=document_title, document_content='',
+    if model_type == '':
+        document_content = ''
+    else:
+        document_content = read_file(int(model_type))
+
+    document = Document.objects.create(document_title=document_title, document_content=document_content,
                                        creator_id=user_id, creator_name=user_dict['username'],
                                        parent=parent_folder)
 
@@ -212,7 +219,8 @@ def create_tree_token(request):
     document_token = sign_token_forever({
         'document_id': int(document.id),
         'document_title': document.document_title,
-        'username': user_dict['username']
+        'username': user_dict['username'],
+        'document_content': document_content
     })
 
     # 获取缓存信息
