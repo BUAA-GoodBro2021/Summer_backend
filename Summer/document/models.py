@@ -42,7 +42,7 @@ class Document(models.Model):
         }
 
 
-def recurse_display(data):
+def recurse_display(data, exc=None):
     """递归展示"""
     display_list = []
     for item in data:
@@ -50,8 +50,11 @@ def recurse_display(data):
         item_key, item_dict = cache_get_by_id('document', 'document', item.id)
         # 孩子信息
         children = item.children.all()
+        # 是否需要去除节点
+        if exc:
+            children.exclude(parent_id__in=exc)
         if len(children) > 0:
-            item_dict.update({'children': recurse_display(children)})
+            item_dict.update({'children': recurse_display(children, exc)})
         else:
             item_dict.update({'children': []})
         display_list.append(item_dict)
