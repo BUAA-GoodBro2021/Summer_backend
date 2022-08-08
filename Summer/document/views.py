@@ -261,7 +261,10 @@ def rename_tree_document(request):
     cache.set(document_key, document_dict)
 
     # 同步mysql
-    celery_rename_document.delay(document_id, document_title)
+    # celery_rename_document.delay(document_id, document_title)
+    document = Document.objects.get(id=document_id)
+    document.document_title = document_title
+    document.save()
 
     result = {'result': 1, 'message': r'重命名文档成功!'}
     return JsonResponse(result)
