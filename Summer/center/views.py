@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 
 from document.views import show_tree
-from team.models import TeamToProject, Team
+from team.models import TeamToProject
 from user.models import UserToTeam
 from utils.Login_utils import login_checker
 from utils.Redis_utils import cache_get_by_id
@@ -30,5 +30,5 @@ def list_team_document(request):
         if project_dict['is_delete'] == 1:
             project_folder_id_list.append(project_dict['project_folder_id'])
 
-    result = {'result': 1, 'message': r'查询成功!', 'document_list': show_tree(team_id=team_id)}
+    result = {'result': 1, 'message': r'查询成功!', 'document_list': show_tree(team_id=team_id, exc=project_folder_id_list)}
     return JsonResponse(result)

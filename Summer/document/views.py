@@ -89,9 +89,8 @@ def show_tree(parent_id=0, team_id=0, exc=None):
         document_queryset = Document.objects.filter(parent_id=parent_id)
 
     # 是否需要去除节点
-    # if exc:
-    #     document_queryset.exclude(id__in=exc)if exc:
-    #     document_queryset.exclude(id__in=exc)
+    if exc:
+        document_queryset.exclude(id__in=exc)
 
     document_id_list = [x.id for x in document_queryset]
     # 核心是filter(parent=None) 查到最顶层的那个parent节点

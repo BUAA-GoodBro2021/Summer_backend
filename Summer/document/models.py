@@ -1,6 +1,8 @@
 from django.db import models
 
 # 文档实体
+from django.db.models import Q
+
 from utils.Redis_utils import cache_get_by_id
 
 
@@ -49,14 +51,10 @@ def recurse_display(data, exc=None):
         # 本身字典信息
         item_key, item_dict = cache_get_by_id('document', 'document', item.id)
         # 孩子信息
-        children = item.children.all()
-        # print('***************')
-        # print([x.id for x in children])
-        # # 是否需要去除节点
-        # if exc:
-        #     children.exclude(id__in=exc)
-        # print([x.id for x in children], len(children), exc)
-        # print('***************')
+        if exc:
+            children = item.children.exclude(id__in=exc)
+        else:
+            children = item.children.all()
         if len(children) > 0:
             item_dict.update({'children': recurse_display(children, exc)})
         else:
