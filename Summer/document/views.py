@@ -182,7 +182,7 @@ def create_tree_token(request):
 
     # 获取表单信息
     try:
-        model_type = request.POST.get('model_type', '')
+        model_type = int(request.POST.get('model_type', 0))
         parent_id = int(request.POST.get('parent_id', 0))
         document_title = request.POST.get('document_title', '')
     except Exception:
@@ -206,7 +206,7 @@ def create_tree_token(request):
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
 
-    if model_type == '':
+    if model_type == 0:
         document_content = ''
     else:
         try:
@@ -293,6 +293,10 @@ def move_tree_document(request):
     except Exception:
         result = {'result': 0, 'message': r'该文档不存在!'}
         return JsonResponse(result)
+    if document.parent_id == new_parent_id:
+        result = {'result': 0, 'message': r'同级目录的文件就不用移动啦!'}
+        return JsonResponse(result)
+
     document.parent_id = new_parent_id
     document.save()
 
