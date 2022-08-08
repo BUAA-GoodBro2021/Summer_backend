@@ -52,6 +52,7 @@ class Consumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(self.page_id, self.channel_name)
         print(self.groups)
         # 向客户端更新之前写好的内容
+        page_dict['getWholePage'] = True
         self.send(self.json_dumps(page_dict))
         async_to_sync(self.channel_layer.group_send)(self.page_id, {
             'type': 'user.update', 'message': message
