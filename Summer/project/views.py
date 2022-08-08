@@ -1,10 +1,8 @@
 import random
 
-from django.core.cache import cache
-
 from diagram.models import *
-from document.models import *
-from document.views import copy_project_tree
+
+from document.views import *
 from page.models import *
 from project.tasks import *
 
@@ -44,9 +42,17 @@ def create_project(request):
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
 
+    # 创建项目文件夹
+    team = Team.objects.get(id=team_id)
+    folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
+                                     document_title=project_name,
+                                     document_type=1, parent_id=team.team_project_folder_id)
+
     # 创建一个项目对象
     project = Project.objects.create(project_name=project_name, project_description=project_description,
-                                     avatar_url=avatar_url, create_id=user_id, create_name=user_dict['username'])
+                                     avatar_url=avatar_url, create_id=user_id, create_name=user_dict['username'],
+                                     project_folder_id=folder.id)
+
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=project.id)
 
@@ -92,19 +98,27 @@ def rename_project(request):
         result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
-    # 修改信息，同步缓存
-    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
-    project_key, project_dict = cache_get_by_id('project', 'project', project_id)
-
-    project_dict['project_name'] = project_name
-    project_dict['project_description'] = project_description
-    cache.set(project_key, project_dict)
-
     # 同步mysql(celery好像不支持三个参数)
     project = Project.objects.get(id=project_id)
     project.project_name = project_name
-    project.project_description = project_name
+    project.project_description = project_description
     project.save()
+    # 项目文件夹名称修改
+    folder_id = project.project_folder_id
+    folder = Document.objects.get(id=folder_id)
+    folder.document_title = project_name
+    folder.save()
+
+    # 修改信息，同步缓存
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    project_key, project_dict = cache_get_by_id('project', 'project', project_id)
+    folder_key, folder_dict = cache_get_by_id('document', 'document', folder_id)
+    # 项目缓存
+    project_dict['project_name'] = project_name
+    project_dict['project_description'] = project_description
+    # 文件夹缓存
+    folder_dict['document_title'] = project_name
+    cache.set(folder_key, folder_dict)
 
     result = {'result': 1, 'message': r'修改项目信息成功!', 'user': user_dict, 'project': project_dict}
     return JsonResponse(result)
@@ -238,24 +252,21 @@ def delete_project(request):
         result = {'result': 0, 'message': r'你没有权限编辑该项目，请申请加入该文档对应的团队!'}
         return JsonResponse(result)
 
-    # 该函数实现了文件夹级别的删除
+    project = Project.objects.get(id=project_id)
+
+    # 该函数实现了文件夹级别的删除 TODO 需要再次确认该函数是否正确
     # 列出三大文档信息
     project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
-    project_to_document_list = ProjectToDocument.objects.filter(project_id=project_id)
     project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=project_id)
 
     page_id_list = [x.page_id for x in project_to_page_list]
-    document_id_list = [x.document_id for x in project_to_document_list]
+    document_id_list = show_tree_id(project.project_folder_id)
+    document_id_list.append(project.project_folder_id)
     diagram_id_list = [x.diagram_id for x in project_to_diagram_list]
 
-    # 如果有人正在编辑页面, 不允许删除
+    # 如果有人正在编辑页面, 不允许删除 TODO 是否需要加锁控制
     if UserToPage.objects.filter(page_id__in=page_id_list).exists():
         result = {'result': 0, 'message': r'有人正在编辑界面，不允许删除!'}
-        return JsonResponse(result)
-
-    # 如果有人正在编辑文档, 不允许删除
-    if UserToDocument.objects.filter(document_id__in=document_id_list).exists():
-        result = {'result': 0, 'message': r'有人正在编辑文档，不允许删除!'}
         return JsonResponse(result)
 
     # 删除实体
@@ -263,14 +274,8 @@ def delete_project(request):
     Document.objects.filter(id__in=document_id_list).delete()
     Diagram.objects.filter(id__in=diagram_id_list).delete()
 
-    # 删除关系(用户)
-    UserToPage.objects.filter(page_id__in=page_id_list).delete()
-    UserToDocument.objects.filter(document_id__in=document_id_list).delete()
-    # UserToProjectStar.objects.filter(project_id=project_id).delete()
-
     # 删除关系(项目)
     project_to_page_list.delete()
-    project_to_document_list.delete()
     project_to_diagram_list.delete()
 
     # 删除实体
@@ -305,13 +310,12 @@ def copy_project(request):
 
     # 列出三大文档信息
     project_to_page_list = ProjectToPage.objects.filter(project_id=old_project_id)
-    # project_to_document_list = ProjectToDocument.objects.filter(project_id=old_project_id)
     project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=old_project_id)
 
     page_id_list = [x.page_id for x in project_to_page_list]
-    # document_id_list = [x.document_id for x in project_to_document_list]
     diagram_id_list = [x.diagram_id for x in project_to_diagram_list]
 
+    # 获取缓存
     old_project_key, old_project_dict = cache_get_by_id('project', 'project', old_project_id)
 
     # 获取项目随机头像
@@ -320,14 +324,22 @@ def copy_project(request):
     # 获取缓存信息
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
 
+    # 创建一个新的文件夹
+    team = Team.objects.get(id=team_id)
+    folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
+                                     document_title=old_project_dict['project_name'] + '-副本',
+                                     document_type=1, parent_id=team.team_project_folder_id)
+
     # 创建一个项目对象
     new_project = Project.objects.create(project_name=old_project_dict['project_name'] + '-副本',
-                                         project_description=old_project_dict['project_name'],
-                                         avatar_url=avatar_url, create_id=user_id, create_name=user_dict['username'])
+                                         project_description=old_project_dict['project_description'],
+                                         avatar_url=avatar_url, create_id=user_id, create_name=user_dict['username'],
+                                         project_folder_id=folder.id)
+
     # 创建团队与项目的关系
     TeamToProject.objects.create(team_id=team_id, project_id=new_project.id)
 
-    # 团队项目输+1
+    # 团队项目数量+1
     celery_create_project.delay(team_id)
 
     # 支持文件夹操作
@@ -343,19 +355,8 @@ def copy_project(request):
         # 创建关系
         ProjectToPage.objects.create(project_id=new_project.id, page_id=new_page.id)
 
-    # for every_document_id in document_id_list:
-    #     # 获取旧实体
-    #     old_document_key, old_document_dict = cache_get_by_id('document', 'document', every_document_id)
-    #     # 创建副本实体
-    #     new_document = Document.objects.create(creator_id=old_document_dict['creator_id'],
-    #                                            creator_name=old_document_dict['creator_name'],
-    #                                            document_title=old_document_dict['document_title'],
-    #                                            document_content=old_document_dict['document_content'],
-    #                                            project_id=old_document_dict['project_id'])
-    #     # 创建关系
-    #     ProjectToDocument.objects.create(project_id=new_project.id, document_id=new_document.id)
-
-    copy_project_tree(user_id, old_project_id, new_project.id, document_id=0)
+    # 拷贝文档信息
+    copy_tree(user_id, old_project_dict['project_folder_id'], folder.id)
 
     for every_diagram_id in diagram_id_list:
         # 获取旧实体
@@ -372,14 +373,3 @@ def copy_project(request):
     return JsonResponse(result)
 
 
-# 复制文件中的项目信息
-@login_checker
-def copy_project_tree_document(request):
-    # 获取用户信息
-    user_id = request.user_id
-    old_project_id = int(request.POST.get('old_project_id', 0))
-    new_project = Project.objects.create(create_id=user_id)
-
-    copy_project_tree(user_id, old_project_id, new_project.id, document_id=0)
-
-    return JsonResponse({'result': 1, 'message': r'OK'})

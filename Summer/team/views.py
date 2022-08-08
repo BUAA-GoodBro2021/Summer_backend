@@ -1,9 +1,11 @@
 import random
 
 from django.core.cache import cache
+
+from document.models import *
 from team.tasks import *
 from properties import *
-from team.models import Team, TeamToProject
+from team.models import *
 from user.models import *
 from utils.Login_utils import *
 
@@ -13,6 +15,8 @@ from utils.Login_utils import *
 def create_team(request):
     # 获取用户信息
     user_id = request.user_id
+    # 获取用户缓存
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
 
     # 获取表单信息
     team_name = request.POST.get('team_name', '')
@@ -32,11 +36,25 @@ def create_team(request):
     # 获取团队随机头像
     avatar_url = default_cover_1_url_match + str(random.choice(range(1, 31))) + '.svg'
 
+    # 创建团队文件夹
+    folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'], document_title='文档中心',
+                                     document_type=1)
+
+    # 创建文档中心
+    child_folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
+                                           document_title='项目文档区',
+                                           document_type=1, parent_id=folder.id)
+
     # 创建团队实体
-    team = Team.objects.create(team_name=team_name, avatar_url=avatar_url)
+    team = Team.objects.create(team_name=team_name, avatar_url=avatar_url, team_folder_id=folder.id,
+                               team_project_folder_id=child_folder.id)
+
+    # 确认团队目录的根节点
+    folder.team_id = team.id
+    folder.save()
 
     # 获取缓存信息
-    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+
     team_key, team_dict = cache_get_by_id('team', 'team', team.id)
 
     # 创建user与team的关系(创建者默认管理员)
