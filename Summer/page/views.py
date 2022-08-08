@@ -299,7 +299,7 @@ def delete_page(request):
 
     # 删除项目与页面直接的关系
     ProjectToPage.objects.get(project_id=project_id, page_id=page_id).delete()
-
+    celery_delete_page.delay(page_id)
     result = {'result': 1, 'message': r'删除页面成功!'}
     return JsonResponse(result)
 

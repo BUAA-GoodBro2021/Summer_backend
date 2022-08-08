@@ -30,3 +30,10 @@ def celery_change_preview(page_id, is_preview):
     page.save()
     return page.to_dic()
 
+
+@app.task
+def celery_delete_page(page_id):
+    page = Page.objects.get(id=page_id)
+    page.delete()
+    return page.to_dic()
+
