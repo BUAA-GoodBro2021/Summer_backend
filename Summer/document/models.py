@@ -50,9 +50,13 @@ def recurse_display(data, exc=None):
         item_key, item_dict = cache_get_by_id('document', 'document', item.id)
         # 孩子信息
         children = item.children.all()
-        # 是否需要去除节点
-        if exc:
-            children.exclude(parent_id__in=exc)
+        # print('***************')
+        # print([x.id for x in children])
+        # # 是否需要去除节点
+        # if exc:
+        #     children.exclude(id__in=exc)
+        # print([x.id for x in children], len(children), exc)
+        # print('***************')
         if len(children) > 0:
             item_dict.update({'children': recurse_display(children, exc)})
         else:
