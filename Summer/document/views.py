@@ -302,3 +302,18 @@ def move_tree_document(request):
 
     result = {'result': 1, 'message': r'移动成功!'}
     return JsonResponse(result)
+
+
+# 获取该文件夹的目录内容
+@login_checker
+def list_folder_document(request):
+    folder_id = request.POST.get('folder_id', 0)
+    document_queryset = Document.objects.filter(parent_id=folder_id)
+
+    document_list = []
+    for every_document_queryset in document_queryset:
+        # 获取缓存信息
+        document_key, document_dict = cache_get_by_id('document', 'document', every_document_queryset.id)
+        document_list.append(document_dict)
+    result = {'result': 1, 'message': r'获取文件夹的目录内容成功!', 'document_list': document_list}
+    return JsonResponse(result)

@@ -13,4 +13,5 @@ urlpatterns = [
     path('delete_tree_document', views.delete_tree_document),
     path('rename_tree_document', views.rename_tree_document),
     path('move_tree_document', views.move_tree_document),
+    path('list_folder_document', views.list_folder_document),
 ]
