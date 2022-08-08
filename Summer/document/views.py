@@ -90,7 +90,7 @@ def show_tree(parent_id=0, team_id=0, exc=None):
 
     # 是否需要去除节点
     if exc:
-        document_queryset.exclude(parent_id__in=exc)
+        document_queryset.exclude(id__in=exc)
 
     document_id_list = [x.id for x in document_queryset]
     # 核心是filter(parent=None) 查到最顶层的那个parent节点
@@ -214,7 +214,11 @@ def create_tree_token(request):
         'document_title': document.document_title,
         'username': user_dict['username']
     })
-    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': document_token}
+
+    # 获取缓存信息
+    document_key, document_dict = cache_get_by_id('document', 'document', document.id)
+
+    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': document_token, 'document': document_dict}
     return JsonResponse(result)
 
 
@@ -257,7 +261,10 @@ def rename_tree_document(request):
     cache.set(document_key, document_dict)
 
     # 同步mysql
-    celery_rename_document.delay(document_id, document_title)
+    # celery_rename_document.delay(document_id, document_title)
+    document = Document.objects.get(id=document_id)
+    document.document_title = document_title
+    document.save()
 
     result = {'result': 1, 'message': r'重命名文档成功!'}
     return JsonResponse(result)

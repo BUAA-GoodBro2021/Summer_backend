@@ -154,7 +154,10 @@ def remove_project_to_bin(request):
     cache.set(project_key, project_dict)
 
     # 同步mysql
-    celery_remove_project_to_bin.delay(project_id)
+    # celery_remove_project_to_bin.delay(project_id)
+    project = Project.objects.get(id=project_id)
+    project.is_delete = 1
+    project.save()
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'将项目放入回收站成功!', 'user': user_dict}
@@ -191,7 +194,10 @@ def recover_project_from_bin(request):
     cache.set(project_key, project_dict)
 
     # 同步mysql
-    celery_recover_project_from_bin.delay(project_id)
+    # celery_recover_project_from_bin.delay(project_id)
+    project = Project.objects.get(id=project_id)
+    project.is_delete = 0
+    project.save()
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
     result = {'result': 1, 'message': r'将回收站恢复成功!', 'user': user_dict}
