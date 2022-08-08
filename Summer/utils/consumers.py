@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import json
+import time
 
 from channels.generic.websocket import WebsocketConsumer
 from channels.exceptions import StopConsumer
@@ -67,6 +68,7 @@ class Consumer(WebsocketConsumer):
             async_to_sync(self.channel_layer.group_send)(self.page_id, {
                 'type': 'remove.send', 'message': message
             })
+            time.sleep(1)
             async_to_sync(self.channel_layer.group_send)(self.page_id, {
                 'type': 'remove.user', 'message': message
             })
