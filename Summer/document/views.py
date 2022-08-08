@@ -209,7 +209,10 @@ def create_tree_token(request):
     if model_type == '':
         document_content = ''
     else:
-        document_content = read_file(int(model_type))
+        try:
+            document_content = read_file(int(model_type))
+        except Exception:
+            document_content = ""
 
     document = Document.objects.create(document_title=document_title, document_content=document_content,
                                        creator_id=user_id, creator_name=user_dict['username'],
