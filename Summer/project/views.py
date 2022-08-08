@@ -254,7 +254,7 @@ def delete_project(request):
 
     project = Project.objects.get(id=project_id)
 
-    # 该函数实现了文件夹级别的删除 TODO 需要再次确认该函数是否正确
+    # 该函数实现了文件夹级别的删除
     # 列出三大文档信息
     project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
     project_to_diagram_list = ProjectToDiagram.objects.filter(project_id=project_id)
