@@ -313,3 +313,20 @@ def get_current(request):
     page_key, page_dict = cache_get_by_id('page', 'page', page_id)
     result = {'result': 1, 'message': r'获取页面成功!', 'page': page_dict}
     return JsonResponse(result)
+
+
+# 更改页面预览状态
+@login_checker
+def change_preview(request):
+    # 获取表单信息
+    page_id = request.POST.get('page_id', 0)
+    is_preview = request.POST.get('is_preview', False)
+
+    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    page_dict['is_preview'] = is_preview
+    cache.set(page_key, page_dict)
+
+    celery_change_preview.delay(page_id, is_preview)
+
+    result = {'result': 1, 'message': r'修改页面预览状态成功!', 'page': page_dict}
+    return JsonResponse(result)

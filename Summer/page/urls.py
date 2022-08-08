@@ -12,4 +12,5 @@ urlpatterns = [
     path('img', views.upload_img),
     path('delete', views.delete_page),
     path('get_current', views.get_current),
+    path('change_preview', views.change_preview),
 ]
