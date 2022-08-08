@@ -11,7 +11,7 @@ class Document(models.Model):
     document_title = models.CharField('文档标题', max_length=100, default='')
     document_content = models.TextField('文档内容', default='')
 
-    is_folder_or_file = models.IntegerField('文件或者文件夹', default=0)  # 0-文件 1-文件
+    document_type = models.IntegerField('文件或者文件夹', default=0)  # 0-文件 1-文件
 
     parent = models.ForeignKey('Document',
                                on_delete=models.CASCADE,
@@ -34,7 +34,7 @@ class Document(models.Model):
             'document_title': self.document_title,
             'document_content': self.document_content,
 
-            'is_folder_or_file': self.is_folder_or_file,
+            'document_type': self.document_type,
             'parent_id': self.parent_id,
 
             'created_time': self.created_time,
@@ -70,7 +70,7 @@ def recurse_display_copy(creator_id, old_document_query_set, parent_id, new_fold
                                                creator_name=old_document_dict['creator_name'],
                                                document_title=old_document_dict['document_title'],
                                                document_content=old_document_dict['document_content'],
-                                               is_folder_or_file=old_document_dict['is_folder_or_file'],
+                                               document_type=old_document_dict['document_type'],
                                                )
 
         # 第一层项目项目的父亲节点需要更新修正

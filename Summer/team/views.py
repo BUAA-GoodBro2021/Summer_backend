@@ -38,12 +38,12 @@ def create_team(request):
 
     # 创建团队文件夹
     folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'], document_title='文档中心',
-                                     is_folder_or_file=1)
+                                     document_type=1)
 
     # 创建文档中心
     child_folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
                                            document_title='项目文档区',
-                                           is_folder_or_file=1, parent_id=folder.id)
+                                           document_type=1, parent_id=folder.id)
 
     # 创建团队实体
     team = Team.objects.create(team_name=team_name, avatar_url=avatar_url, team_folder_id=folder.id,

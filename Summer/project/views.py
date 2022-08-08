@@ -46,7 +46,7 @@ def create_project(request):
     team = Team.objects.get(id=team_id)
     folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
                                      document_title=project_name,
-                                     is_folder_or_file=1, parent_id=team.team_project_folder_id)
+                                     document_type=1, parent_id=team.team_project_folder_id)
 
     # 创建一个项目对象
     project = Project.objects.create(project_name=project_name, project_description=project_description,
@@ -328,7 +328,7 @@ def copy_project(request):
     team = Team.objects.get(id=team_id)
     folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
                                      document_title=old_project_dict['project_name'] + '-副本',
-                                     is_folder_or_file=1, parent_id=team.team_project_folder_id)
+                                     document_type=1, parent_id=team.team_project_folder_id)
 
     # 创建一个项目对象
     new_project = Project.objects.create(project_name=old_project_dict['project_name'] + '-副本',

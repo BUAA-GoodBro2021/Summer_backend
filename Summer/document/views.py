@@ -159,7 +159,7 @@ def create_tree_folder(request):
 
     # 创建实体
     folder = Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
-                                     document_title=folder_title, is_folder_or_file=1, parent=parent_folder)
+                                     document_title=folder_title, document_type=1, parent=parent_folder)
 
     # 获取缓存信息
     folder_key, folder_dict = cache_get_by_id('document', 'document', folder.id)
@@ -255,4 +255,23 @@ def rename_tree_document(request):
     celery_rename_document.delay(document_id, document_title)
 
     result = {'result': 1, 'message': r'重命名文档成功!'}
+    return JsonResponse(result)
+
+
+# 移动文档或者文件夹
+@login_checker
+def move_tree_document(request):
+    # 获取表单信息
+    document_id = request.POST.get('document_id', 0)
+    new_parent_id = request.POST.get('new_parent_id', 0)
+
+    try:
+        document = Document.objects.get(id=document_id)
+    except Exception:
+        result = {'result': 0, 'message': r'该文档不存在!'}
+        return JsonResponse(result)
+    document.parent_id = new_parent_id
+    document.save()
+
+    result = {'result': 1, 'message': r'移动成功!'}
     return JsonResponse(result)
