@@ -65,6 +65,9 @@ class Consumer(WebsocketConsumer):
         # 如果是关闭请求，让移除所有用户
         if message.get('text') == 'DELETE!':
             async_to_sync(self.channel_layer.group_send)(self.page_id, {
+                'type': 'remove.send', 'message': message
+            })
+            async_to_sync(self.channel_layer.group_send)(self.page_id, {
                 'type': 'remove.user', 'message': message
             })
         else:
@@ -111,6 +114,10 @@ class Consumer(WebsocketConsumer):
         # 获取发送信息，更新其他客户端
         text = event.get('message').get('text')
         self.send(text)
+
+    def remove_send(self, event):
+        # 发送移除广播
+        self.send(self.json_loads({"delete_flag": True}))
 
     def remove_user(self, event):
         # 移除组内全部成员
