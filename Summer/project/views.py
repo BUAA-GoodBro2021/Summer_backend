@@ -332,7 +332,7 @@ def copy_project(request):
 
     # 创建一个项目对象
     new_project = Project.objects.create(project_name=old_project_dict['project_name'] + '-副本',
-                                         project_description=old_project_dict['project_name'],
+                                         project_description=old_project_dict['project_description'],
                                          avatar_url=avatar_url, create_id=user_id, create_name=user_dict['username'],
                                          project_folder_id=folder.id)
 
