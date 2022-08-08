@@ -82,7 +82,7 @@ class Consumer(WebsocketConsumer):
             page_dict['page_width'] = page_new_dict['page_width']
             page_dict['element_list'] = page_new_dict['element_list']
             page_dict['num'] = page_new_dict['num']
-            page_dict['is_preview'] = page_new_dict['isPreview']
+            page_dict['is_preview'] = page_new_dict['is_preview']
             cache.set(page_key, page_dict)
             # 异步更新数据库
             page = Page.objects.get(id=self.page_id)
