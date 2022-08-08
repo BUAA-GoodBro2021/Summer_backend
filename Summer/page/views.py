@@ -302,3 +302,21 @@ def delete_page(request):
 
     result = {'result': 1, 'message': r'删除页面成功!'}
     return JsonResponse(result)
+
+
+# 获取当前页面内容
+@login_checker
+def get_current(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    team_id = request.POST.get('team_id', 0)
+    project_id = request.POST.get('project_id', 0)
+    page_id = request.POST.get('page_id', 0)
+
+    # 判断权限
+    check_authority(user_id, team_id, project_id, page_id)
+
+    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    result = {'result': 1, 'message': r'获取页面成功!', 'page': page_dict}
+    return JsonResponse(result)

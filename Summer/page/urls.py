@@ -11,4 +11,5 @@ urlpatterns = [
     path('edit/save', views.edit_save),
     path('img', views.upload_img),
     path('delete', views.delete_page),
+    path('get_current', views.get_current),
 ]
