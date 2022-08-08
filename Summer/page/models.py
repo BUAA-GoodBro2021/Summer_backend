@@ -13,7 +13,6 @@ class Page(models.Model):
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     updated_time = models.DateTimeField('更新时间', auto_now=True)
 
-
     def to_dic(self):
         return {
             'page_id': self.id,
@@ -23,7 +22,7 @@ class Page(models.Model):
 
             'element_list': self.element_list,
             'num': int(self.num),
-
+            'is_preview': self.is_preview,
             'created_time': self.created_time,
             'updated_time': self.updated_time,
         }
