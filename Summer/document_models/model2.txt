@@ -1,6 +1,6 @@
 <h1><strong>需求调研报告</strong></h1>
 <p><br class="ProseMirror-trailingBreak"></p>
-<p>🌟 <mark>荧光笔标注的位置务必要修改为实际情况，模板只提供预设情况的形式</mark></p>
+<p><mark>荧光笔标注的位置务必要修改为实际情况，模板只提供预设情况的形式</mark></p>
 <p><br class="ProseMirror-trailingBreak"></p>
 <h2>版本变更历史</h2>
 <div class="tableWrapper">

@@ -282,7 +282,6 @@ def rename_tree_document(request):
     project_list = Project.objects.all()
     no_rename_document_id_list.extend([x.project_folder_id for x in project_list])
 
-    print(no_rename_document_id_list)
     if document_id in no_rename_document_id_list:
         result = {'result': 0, 'message': r'该文件夹不允许重命名!'}
         return JsonResponse(result)
