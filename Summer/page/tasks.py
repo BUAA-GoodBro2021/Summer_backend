@@ -27,6 +27,7 @@ def celery_rename_page(page_id, page_name):
 def celery_change_preview(page_id_list, is_preview):
     for page_id in page_id_list:
         Page.objects.filter(id=page_id).update(is_preview=int(is_preview))
+        print(page_id)
     return page_id_list
 
 

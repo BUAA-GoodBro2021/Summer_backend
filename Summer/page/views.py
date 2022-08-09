@@ -334,6 +334,7 @@ def change_preview(request):
         page_dict['is_preview'] = int(is_preview)
         cache.set(page_key, page_dict)
         page_id_list.append(page_id)
+        print(page_id_list)
     celery_change_preview.delay(page_id_list, is_preview)
 
     result = {'result': 1, 'message': r'修改页面预览状态成功!'}
