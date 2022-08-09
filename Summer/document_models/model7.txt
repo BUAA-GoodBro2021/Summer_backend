@@ -1,0 +1,186 @@
+<h1><strong>长期项目方案与执行</strong></h1>
+<p></p>
+<p><mark>在一个崇高的目标支持下，不停地工作，即使慢，也一定会获得成功。 —— 爱因斯坦</mark></p>
+<p></p>
+<h2><strong>一、项目介绍</strong></h2>
+<p><code>此模板适用于规划以季度、年度为时间维度的中长期项目</code></p>
+<h3><strong>项目背景</strong></h3>
+<p><strong>核心成员与项目群组</strong></p>
+<table>
+    <tbody>
+        <tr>
+            <th colspan="1" rowspan="1">
+                <p>核心成员</p>
+            </th>
+            <th colspan="1" rowspan="1">
+                <p>部门</p>
+            </th>
+            <th colspan="1" rowspan="1">
+                <p>项目角色与负责事项</p>
+            </th>
+        </tr>
+        <tr>
+            <td colspan="1" rowspan="1">
+                <p>周申申</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>研发部门</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>...</p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="1" rowspan="1">
+                <p>...</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>...</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>...</p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p><strong>项目群组</strong></p>
+<p><code>添加群组信息表格</code></p>
+<p></p>
+<h3><strong>背景资料</strong></h3>
+<p><code>引用别的文档信息</code></p>
+<p></p>
+<h2><strong>二、项目目标</strong></h2>
+<p><code>项目目标指在项目规划之初设定的项目总体目标。项目目标应该是被清晰定义的、可实现的且可测量的项目成功标准</code></p>
+<ul data-type="taskList">
+    <li data-checked="true" data-type="taskItem"><label><input type="checkbox" checked="checked"><span></span></label>
+        <div>
+            <p><strong>目标一</strong></p>
+        </div>
+    </li>
+</ul>
+<ol>
+    <li>
+        <p></p>
+    </li>
+    <li>
+        <p></p>
+    </li>
+</ol>
+<p></p>
+<ul data-type="taskList">
+    <li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span></span></label>
+        <div>
+            <p><strong>目标二</strong></p>
+        </div>
+    </li>
+</ul>
+<ol>
+    <li>
+        <p></p>
+    </li>
+    <li>
+        <p></p>
+    </li>
+</ol>
+<p></p>
+<h2><strong>三、月度里程碑</strong></h2>
+<p><code>里程碑在项目管理过程中的定义为一个状态点，代表在此时间点能够达到此状态。</code></p>
+<p><code>你可以将项目关键节点需要完成的事项设为里程碑，并在此看板中追踪完成状态。</code></p>
+<p></p>
+<h2><strong>四、任务拆解</strong></h2>
+<p><code>将项目任务进行细化拆解是项目管理中的重要一环，你可将项目任务拆解至下方表格，并提及负责人与设定起止时间</code></p>
+<table>
+    <tbody>
+        <tr>
+            <th colspan="1" rowspan="1">
+                <p>任务</p>
+            </th>
+            <th colspan="1" rowspan="1">
+                <p>负责人</p>
+            </th>
+            <th colspan="1" rowspan="1">
+                <p>附件</p>
+            </th>
+            <th colspan="1" rowspan="1">
+                <p>状态</p>
+            </th>
+            <th colspan="1" rowspan="1">
+                <p>开始时间</p>
+            </th>
+            <th colspan="1" rowspan="1">
+                <p>截止时间</p>
+            </th>
+        </tr>
+        <tr>
+            <td colspan="1" rowspan="1">
+                <p>描述任务</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>周申申</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>暂无</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>已完成</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>2022/8/8</p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p>2022/8/9</p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="1" rowspan="1">
+                <p></p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p></p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p></p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p></p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p></p>
+            </td>
+            <td colspan="1" rowspan="1">
+                <p></p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p></p>
+<h2><strong>五、项目例会、</strong></h2>
+<p></p>
+<h3><strong>例会 1：写下会议日期</strong></h3>
+<p><strong>会议记录</strong></p>
+<ul>
+    <li>
+        <p>写下关键结论</p>
+    </li>
+    <li>
+        <p>......</p>
+    </li>
+</ul>
+<p></p>
+<p><strong>行动方案</strong></p>
+<p><code>创建任务列表，附上执行者姓名</code></p>
+<ul data-type="taskList">
+    <li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span></span></label>
+        <div>
+            <p>填写具体的执行计划，候豆豆负责</p>
+        </div>
+    </li>
+    <li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span></span></label>
+        <div>
+            <p>填写具体的执行计划，闫桥桥负责</p>
+        </div>
+    </li>
+</ul>
+<p></p>
+<p></p>
+<p></p>

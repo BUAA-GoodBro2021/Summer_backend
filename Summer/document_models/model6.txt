@@ -1,0 +1,43 @@
+<h1><strong>工作清单</strong></h1>
+<p></p>
+<ul>
+    <li>
+        <p><mark>勤学如春起之苗，不见其增，日有所长。 —— 陶渊明</mark></p>
+    </li>
+</ul>
+<p></p>
+<ul>
+    <li>
+        <p><strong>10月8日 - 10月9日</strong></p>
+        <ul>
+            <li>
+                <p>填写你本周的重点任务 # 紧急且重要</p>
+                <ul data-type="taskList">
+                    <li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span></span></label>
+                        <div>
+                            <p><em>子任务1</em> # 今天</p>
+                        </div>
+                    </li>
+                    <li data-checked="true" data-type="taskItem"><label><input type="checkbox"
+                                checked="checked"><span></span></label>
+                        <div>
+                            <p><em>子任务2</em></p>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <p><s>做完的任务可以标记为完成 #紧急且重要</s></p>
+            </li>
+            <li>
+                <p><s>过去的工作清单可以折叠起来</s></p>
+            </li>
+        </ul>
+    </li>
+</ul>
+<hr>
+<ul>
+    <li>
+        <p><strong>10月11日 - 10月15日</strong></p>
+    </li>
+</ul>

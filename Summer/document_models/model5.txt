@@ -1,0 +1,58 @@
+<h1><strong>项目规划</strong></h1>
+<p></p>
+<ul>
+    <li>
+        <p><strong>项目背景</strong></p>
+        <ul>
+            <li>
+                <p>介绍项目成立的背景，输入 @ 插入相关云文档</p>
+            </li>
+            <li>
+                <p>......</p>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>项目目标</strong></p>
+        <ul>
+            <li>
+                <p>目标 1：具体、细化、可拆解</p>
+            </li>
+            <li>
+                <p>目标 2：......</p>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>项目成员</strong></p>
+        <ul>
+            <li>
+                <p>项目负责人：输入“@+人名”提及相关人员</p>
+            </li>
+            <li>
+                <p>设计负责人：......</p>
+            </li>
+            <li>
+                <p>开发负责人：......</p>
+            </li>
+            <li>
+                <p>......</p>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>项目拆解与分工</strong></p>
+    </li>
+</ul>
+<ul data-type="taskList">
+    <li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span></span></label>
+        <div>
+            <p>任务 1：描述任务内容，输入“@+人名”提及相关人员</p>
+        </div>
+    </li>
+    <li data-checked="false" data-type="taskItem"><label><input type="checkbox"><span></span></label>
+        <div>
+            <p>任务 2：......</p>
+        </div>
+    </li>
+</ul>

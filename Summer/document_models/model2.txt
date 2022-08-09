@@ -1,0 +1,278 @@
+<h1><strong>需求调研报告</strong></h1>
+<p><br class="ProseMirror-trailingBreak"></p>
+<p><mark>荧光笔标注的位置务必要修改为实际情况，模板只提供预设情况的形式</mark></p>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h2>版本变更历史</h2>
+<div class="tableWrapper">
+    <table style="min-width: 125px;">
+        <colgroup>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+        </colgroup>
+        <tbody>
+            <tr>
+                <th colspan="1" rowspan="1">
+                    <p>版本</p>
+                </th>
+                <th colspan="1" rowspan="1">
+                    <p>提交日期</p>
+                </th>
+                <th colspan="1" rowspan="1">
+                    <p>主要编制人</p>
+                </th>
+                <th colspan="1" rowspan="1">
+                    <p>审核人</p>
+                </th>
+                <th colspan="1" rowspan="1">
+                    <p>版本说明</p>
+                </th>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1">
+                    <p>1.0</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>2022/8/8</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>候豆豆</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>李睿睿</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>整理调研的基本过程</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1">
+                    <p>1.1</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>2022/8/9</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>候豆豆</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>李睿睿</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>归纳总结所有子文档</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1">
+                    <p>...</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>...</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>...</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>...</p>
+                </td>
+                <td colspan="1" rowspan="1">
+                    <p>...</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h2>1.引言</h2>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>1.1 背景</h3>
+<p>本文以<mark>xxxxxx平台</mark>的开发需求为中心展开描述。从<mark>xxxxxx平台</mark>的背景陈述出发，团队采用了竞品分析、问卷调查、访谈、开展研讨会等方式，对平台的目标群体、软件定位进行分析，并依据初步明确的需求方向，完成了平台的原型图设计。在本文档中，将陈述团队在本次调研中采取的调研方式和过程，总结调研结果，并初步确定软件系统的需求方向。
+</p>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>1.3 调研目标</h3>
+<p>本次调研的目标如下：</p>
+<ol>
+    <li>
+        <p>分析行业现状，找到我们可以立足的产品定位。即明确<mark>xxxxxx平台</mark>必备的需求框架，并确定我们在市场中可以发展的独特价值，以在竞争中生存。</p>
+    </li>
+    <li>
+        <p> 确定系统的用户范围。即确定我们系统需要服务的对象，以便进一步展开需求分析。</p>
+    </li>
+    <li>
+        <p>确定系统的功能需求范围。即把握我们系统将要包含的需求方向。</p>
+    </li>
+    <li>
+        <p>.......</p>
+    </li>
+</ol>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>1.4 调研过程概览</h3>
+<p>获得基本的需求指示后，我们团队开展了<mark>第xxx次组内会议</mark>，对客户给出的项目背景陈述进行探讨分析，提取出了重要的需求建设方向。根据初步设定的方向，我们将调研过程分为<mark>xxxxxx阶段</mark>进行开展。
+</p>
+<ul data-type="taskList">
+    <li data-checked="true"><label contenteditable="false"><input type="checkbox"
+                checked="checked"><span></span></label>
+        <div>
+            <p>第一阶段：为初步把握<mark>xxxxxx平台</mark>的需求方向和基础框架，我们同时采用竞品分析、问卷调查、访谈的方式并行展开调研，并设计基本的原型图。</p>
+        </div>
+    </li>
+    <li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label>
+        <div>
+            <p>第二阶段：汇总了目前从各个调研途径得到的调研结果。为验证前期结果和解决目前存在的较大疑惑，我们发布<mark>第xxx次问卷调查</mark>和访谈，与第一阶段相比，细化了调研方向。并根据调研结果，继续完善原型效果图。
+            </p>
+        </div>
+    </li>
+    <li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label>
+        <div>
+            <p>第三阶段：....</p>
+        </div>
+    </li>
+    <li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label>
+        <div>
+            <p>.....</p>
+        </div>
+    </li>
+</ul>
+<p>最终，总结各个调研方式和结果，编写本文档。</p>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h2>2. 需求分析</h2>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>2.1 背景需求总结</h3>
+<p>通过开展第一次组内研讨会，团队分析了<mark>xxxxxx平台</mark>背景陈述，将平台划分为<mark>多个模块</mark>，并总结出各个模块的需求方向要点，并在后续展开对各要点的调研。</p>
+<p>相关模块和要点总结如下：</p>
+<ul>
+    <li>
+        <p>数据模块</p>
+        <ul>
+            <li>
+                <p>.....</p>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p>内容展示模块</p>
+        <ul>
+            <li>
+                <p>......</p>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p>.......</p>
+    </li>
+</ul>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>2.2 竞品分析总结</h3>
+<p>为了了解当前市场状况，并进一步完善需求，我们对市面上已有的产品进行竞品分析，期望找到我们产品可以学习借鉴的地方，并找到我们产品在当前市场中可以立足的定位。</p>
+<p>竞品分析中我们分析了<mark>xxx, xxx, xxx, xxx
+        等多个产品平台</mark>。选择前几个平台进行分析，是因为这些平台是<mark>xxxx</mark>常用的主流平台，而<mark>xxxxx</mark>我们重点关注的是其<mark>xxxx功能</mark>。我们分别调研了<mark>每个xxxx平台</mark>各自的优点和缺点，旨在研究可以学习的优点，以及需要避开的缺陷。并将各个产品在功能性进行纵向对比，研究各个功能各平台的突出特点，以便学习参考。
+</p>
+<p>通过竞品分析，我们得到以下系统期望：</p>
+<ul>
+    <li>
+        <p>xxxxx</p>
+        <ul>
+            <li>
+                <p>xxxx</p>
+            </li>
+            <li>
+                <p>...</p>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p>xxxxx</p>
+    </li>
+    <li>
+        <p>.....</p>
+    </li>
+</ul>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>2.3 问卷调查总结</h3>
+<p>我们一共进行了<mark>xxxx期</mark>问卷调查。</p>
+<ul data-type="taskList">
+    <li data-checked="true"><label contenteditable="false"><input type="checkbox"
+                checked="checked"><span></span></label>
+        <div>
+            <p>第一期旨在.....</p>
+        </div>
+    </li>
+    <li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label>
+        <div>
+            <p>第二期旨在......</p>
+        </div>
+    </li>
+    <li data-checked="false"><label contenteditable="false"><input type="checkbox"><span></span></label>
+        <div>
+            <p>.....</p>
+        </div>
+    </li>
+</ul>
+<p><br class="ProseMirror-trailingBreak"></p>
+<p><mark>xxxx次</mark>问卷收到的反馈总结如下：</p>
+<ul>
+    <li>
+        <p>xxxx</p>
+    </li>
+    <li>
+        <p>.......</p>
+    </li>
+</ul>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>2.4 访谈总结</h3>
+<p>为了针对需求得到更具体的反馈，比如用户对需求的看法及其原因等，并期望在交流中发散讨论到一些我们之前没有考虑到的点，我们选取了一些典型的<mark>xxxx平台</mark>的用户进行了访谈。</p>
+<p><br class="ProseMirror-trailingBreak"></p>
+<p>在此次调研中，我们选取了一共<mark>xxxx名</mark>来自不同学校与专业的对象进行访谈，包括<mark>xxxxxx</mark>。访谈的问题主要包括：<mark>xxxxxxx</mark>。在访谈中，我们获取了大量的对<mark>xxxx平台</mark>的想法和意见。访谈结果总结如下：
+</p>
+<ul>
+    <li>
+        <p>xxxx</p>
+    </li>
+    <li>
+        <p>.....</p>
+    </li>
+</ul>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h2>调研总结</h2>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>3.1 产品定位</h3>
+<p>产品一期的目标是<mark>xxxxx</mark>。在完成一期所有目标后，可能会增加一些诸如<mark>xxxxx</mark>等高级服务。</p>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>3.2 需求方向</h3>
+<p>经过本次调研，我们初步确定了产品的功能和模块：</p>
+<ul>
+    <li>
+        <p>xxxx模块</p>
+        <ul>
+            <li>
+                <p>xxx功能</p>
+            </li>
+            <li>
+                <p>...</p>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <p>.....</p>
+    </li>
+</ul>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>3.3 需求优先级</h3>
+<p>我们将3.2所讲的功能模块分成<mark>xxxx个优先级</mark>，优先顺序为：</p>
+<p>原因如下：</p>
+<ul>
+    <li>
+        <p>xxxx</p>
+    </li>
+    <li>
+        <p>.....</p>
+    </li>
+</ul>
+<p><br class="ProseMirror-trailingBreak"></p>
+<h3>3.4 原型设计</h3>
+<p>我们将平台页面开发分为以下<mark>xxxx个阶段</mark>：<mark>原型图设计、UI设计、代码开发等xxxx方面</mark>。原型图设计阶段以需求方向为核心开展，设计效果应基本满足产品需求；UI设计阶段追求界面美观，尽可能提高用户体验度；代码开发使用前端框架代码，实现UI效果图的界面和功能。
+</p>
+<p>本阶段为原型图设计阶段。我们依据初步调研总结的需求方向，以简洁美观、用户体验度高为目标，设计了<mark>xxxxx平台</mark>的原型效果图（含<mark>xxxxx等页面</mark>）。</p>
+<p>原型图与相关说明详见原型设计报告子文档。</p>
