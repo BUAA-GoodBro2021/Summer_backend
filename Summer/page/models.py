@@ -26,3 +26,9 @@ class Page(models.Model):
             'created_time': self.created_time,
             'updated_time': self.updated_time,
         }
+
+
+# 用户的素材库
+class UserToPage(models.Model):
+    user_id = models.IntegerField('用户id', default=0)
+    page_id = models.IntegerField('页面id', default=0)
