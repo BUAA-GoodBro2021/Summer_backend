@@ -269,7 +269,7 @@ def delete_tree_document(request):
 @login_checker
 def rename_tree_document(request):
     # 获取表单信息
-    document_id = request.POST.get('document_id', 0)
+    document_id = int(request.POST.get('document_id', 0))
     document_title = request.POST.get('document_title', '')
 
     # 如果是文档中心或者是项目文档区或者是项目文件夹，不允许重命名
@@ -282,6 +282,7 @@ def rename_tree_document(request):
     project_list = Project.objects.all()
     no_rename_document_id_list.extend([x.project_folder_id for x in project_list])
 
+    print(no_rename_document_id_list)
     if document_id in no_rename_document_id_list:
         result = {'result': 0, 'message': r'该文件夹不允许重命名!'}
         return JsonResponse(result)
