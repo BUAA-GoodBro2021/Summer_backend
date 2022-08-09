@@ -270,11 +270,6 @@ def delete_project(request):
     document_id_list.append(project.project_folder_id)
     diagram_id_list = [x.diagram_id for x in project_to_diagram_list]
 
-    # 如果有人正在编辑页面, 不允许删除 TODO 是否需要加锁控制
-    if UserToPage.objects.filter(page_id__in=page_id_list).exists():
-        result = {'result': 0, 'message': r'有人正在编辑界面，不允许删除!'}
-        return JsonResponse(result)
-
     # 删除实体
     Page.objects.filter(id__in=page_id_list).delete()
     Document.objects.filter(id__in=document_id_list).delete()

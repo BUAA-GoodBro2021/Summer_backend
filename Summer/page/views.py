@@ -137,36 +137,6 @@ def list_page_detail(request):
     return JsonResponse(result)
 
 
-# 请求编辑页面
-@login_checker
-def edit_request(request):
-    # 获取用户信息
-    user_id = request.user_id
-    # 获取表单信息
-    team_id = request.POST.get('team_id', 0)
-    project_id = request.POST.get('project_id', 0)
-    page_id = request.POST.get('page_id', 0)
-
-    # 判断权限
-    check_authority(user_id, team_id, project_id, page_id)
-
-    # TODO 仅仅支持单人编辑
-    try:
-        user_to_page = UserToPage.objects.get(page_id=page_id)
-    except Exception:
-        # 如果没有人在编辑
-        # 创建编辑关系(加锁)
-        UserToPage.objects.create(user_id=user_id, page_id=page_id)
-        result = {'result': 1, 'message': r'没有人在编辑, 快去编辑叭!', 'free': 0, 'editor': None}
-        return JsonResponse(result)
-
-    # 如果有人在编辑
-    # 查询是谁在编辑
-    user_key, user_dict = cache_get_by_id('user', 'user', user_to_page.user_id)
-    result = {'result': 0, 'message': r'有人在编辑, 稍等一下叭!', 'free': 1, 'editor': user_dict['username']}
-    return JsonResponse(result)
-
-
 # 请求保存页面  后端记得判断解锁
 @login_checker
 def edit_save(request):
@@ -184,12 +154,6 @@ def edit_save(request):
 
     # 判断权限
     check_authority(user_id, team_id, project_id, page_id)
-    # 释放锁
-    try:
-        UserToPage.objects.get(page_id=page_id).delete()
-    except Exception:
-        result = {'result': 0, 'message': r'你好像暂时不处于编辑状态哦~'}
-        return JsonResponse(result)
 
     if len(page_name) == 0:
         result = {'result': 0, 'message': r'原型设计页面名称不能为空!'}

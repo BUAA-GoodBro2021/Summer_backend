@@ -26,9 +26,3 @@ class Page(models.Model):
             'created_time': self.created_time,
             'updated_time': self.updated_time,
         }
-
-
-# 用户与页面的关联表
-class UserToPage(models.Model):
-    user_id = models.IntegerField('人员id', default=0)
-    page_id = models.IntegerField('页面id', default=0)
