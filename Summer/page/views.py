@@ -408,7 +408,6 @@ def get_material_list(request):
     return JsonResponse(result)
 
 
-@login_checker
 def add_model(request):
     try:
         # 获取body信息
