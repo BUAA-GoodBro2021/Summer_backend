@@ -70,7 +70,9 @@ def edit_document(request):
         'document_title': document_dict['document_title'],
         'username': user_dict['username']
     })
-    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': document_token}
+    sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
+    cache.set("sha1:" + sha1, document_token)
+    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': sha1}
     return JsonResponse(result)
 
 
