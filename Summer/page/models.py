@@ -39,6 +39,13 @@ class ProjectModel(models.Model):
     project_id = models.IntegerField('项目id', default=0)
     model_name = models.CharField('页面名称', max_length=100, default='')
 
+    def to_dic(self):
+        return {
+            'model_id': self.id,
+            'project_id': self.project_id,
+            'model_name': self.model_name
+        }
+
 
 # 模板对页面
 class ModelToPage(models.Model):

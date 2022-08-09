@@ -412,13 +412,14 @@ def add_model(request):
     try:
         # 获取body信息
         post_body = json.loads(request.body)
+        print(post_body)
         project_id = post_body['project_id']
         model_name = post_body['model_name']
-        page_id_list = post_body['page_is_list']
+        page_id_list = post_body['page_id_list']
     except Exception:
         result = {'result': 1, 'message': '参数不正确!'}
         return JsonResponse(result)
-    project_to_model = ProjectModel.objects.create(model_name=model_name, project_id=project_id)
+    project_model = ProjectModel.objects.create(model_name=model_name, project_id=project_id)
     for page_id in page_id_list:
         try:
             page_key, page_dict = cache_get_by_id('page', 'page', page_id)
@@ -434,16 +435,16 @@ def add_model(request):
             num=page_dict['num']
         )
 
-        ModelToPage.objects.create(model_id=project_to_model.id, page_id=model.id)
+        ModelToPage.objects.create(model_id=project_model.id, page_id=model.id)
 
-    result = {'result': 1, 'message': '模板添加成功!', 'page': project_to_model.to_dic()}
+    result = {'result': 1, 'message': '模板添加成功!', 'page': project_model.to_dic()}
     return JsonResponse(result)
 
 
 @login_checker
 def delete_model(request):
     # 获取表单信息
-    model_id = request.POST.get('page_id', 0)
+    model_id = request.POST.get('model_id', 0)
     try:
         project_model = ProjectModel.objects.get(id=model_id)
     except Exception:
@@ -452,6 +453,7 @@ def delete_model(request):
     model_to_page_list = ModelToPage.objects.filter(model_id=model_id)
     for every_model_to_page in model_to_page_list:
         Page.objects.get(id=every_model_to_page.page_id).delete()
+        every_model_to_page.delete()
     project_model.delete()
     result = {'result': 1, 'message': '模板删除成功!'}
     return JsonResponse(result)
@@ -462,5 +464,8 @@ def get_model_list(request):
     project_id = request.POST.get('project_id', 0)
 
     project_model_list = ProjectModel.objects.filter(project_id=project_id)
-    result = {'result': 1, 'message': '模板获取成功!', 'model_list': project_model_list}
+    model_list = []
+    for project_model in project_model_list:
+        model_list.append(project_model.to_dic())
+    result = {'result': 1, 'message': '模板获取成功!', 'model_list': model_list}
     return JsonResponse(result)
