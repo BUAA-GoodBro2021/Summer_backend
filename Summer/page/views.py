@@ -345,7 +345,7 @@ def add_material(request):
     user_id = request.user_id
     # 获取表单信息
     page_id = request.POST.get('page_id', 0)
-    material_name = request.POST.get('material_name', '')
+    material_name = request.POST.get('page_name', '')
 
     try:
         page_key, page_dict = cache_get_by_id('page', 'page', page_id)
@@ -372,7 +372,7 @@ def delete_material(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
-    material_id = request.POST.get('material_id', 0)
+    material_id = request.POST.get('page_id', 0)
     try:
         material = Page.objects.get(id=material_id)
     except Exception:
