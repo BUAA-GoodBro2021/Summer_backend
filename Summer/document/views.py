@@ -80,7 +80,7 @@ def parse_token(request):
     try:
         post_body = json.loads(request.body)
         sha1 = post_body['document_token']
-        document_token = cache.get(sha1)
+        document_token = cache.get('sha1:' + sha1)
     except Exception:
         result = {'result': 0, 'message': '传参格式不正确!'}
         return JsonResponse(result)
