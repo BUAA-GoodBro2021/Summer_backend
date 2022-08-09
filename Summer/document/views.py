@@ -2,6 +2,7 @@ from django.core.cache import cache
 
 from document.tasks import *
 from project.models import Project
+from team.models import Team
 from utils.File_utils import read_file
 from utils.Login_utils import *
 from document.models import *
@@ -238,6 +239,20 @@ def create_tree_token(request):
 def delete_tree_document(request):
     # 获取表单信息
     document_id = int(request.POST.get('document_id', 0))
+
+    # 如果是文档中心或者是项目文档区或者是项目文件夹，不允许删除
+    no_del_document_id_list = []
+
+    team_list = Team.objects.all()
+    no_del_document_id_list.extend([x.team_folder_id for x in team_list])
+    no_del_document_id_list.extend([x.team_project_folder_id for x in team_list])
+
+    project_list = Project.objects.all()
+    no_del_document_id_list.extend([x.project_folder_id for x in project_list])
+
+    if document_id in no_del_document_id_list:
+        result = {'result': 0, 'message': r'该文件夹不允许删除!'}
+        return JsonResponse(result)
 
     # 获取到该目录的子集id列表(包含自身id)
     document_id_list = show_tree_id(parent_id=document_id)
