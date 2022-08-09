@@ -184,6 +184,7 @@ def edit_save(request):
     page_height = request.POST.get('page_height', 0.0)
     page_width = request.POST.get('page_width', 0.0)
     element_list = request.POST.get('element_list', '')
+    is_preview = int(request.POST.get('is_preview', 0))
     num = int(request.POST.get('num', 0))
 
     # 判断权限
@@ -204,6 +205,7 @@ def edit_save(request):
     page_dict['page_height'] = page_height
     page_dict['page_width'] = page_width
     page_dict['element_list'] = element_list
+    page_dict['is_preview'] = is_preview
     page_dict['num'] = num
     cache.set(page_key, page_dict)
 
@@ -214,6 +216,7 @@ def edit_save(request):
     page.page_height = page_height
     page.page_width = page_width
     page.element_list = element_list
+    page.is_preview = is_preview
     page.num = num
     page.save()
 
@@ -411,6 +414,8 @@ def add_model(request):
         # 获取body信息
         post_body = json.loads(request.body)
         project_id = post_body['project_id']
+        model_name = post_body['model_name']
+
         # 获取表单信息
         page_id = request.POST.get('page_id', 0)
         project_id = request.POST.get('project_id', 0)
