@@ -321,18 +321,20 @@ def change_preview(request):
     is_preview = request.POST.get('is_preview', 0)
 
     try:
-        project_to_page = ProjectToPage.objects.get(id = page_id)
+        project_to_page = ProjectToPage.objects.get(id=page_id)
     except Exception:
         result = {'result': 1, 'message': '没有此页面!'}
         return JsonResponse(result)
 
     project_to_page_list = ProjectToPage.objects.filter(project_id=project_to_page.project_id)
+    page_id_list = []
     for every_project_to_page in project_to_page_list:
         page_id = every_project_to_page.page_id
         page_key, page_dict = cache_get_by_id('page', 'page', page_id)
         page_dict['is_preview'] = int(is_preview)
         cache.set(page_key, page_dict)
-        celery_change_preview.delay(page_id, is_preview)
+        page_id_list.append(page_id)
+    celery_change_preview.delay(page_id_list, is_preview)
 
     result = {'result': 1, 'message': r'修改页面预览状态成功!'}
     return JsonResponse(result)

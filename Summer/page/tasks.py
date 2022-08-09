@@ -24,11 +24,10 @@ def celery_rename_page(page_id, page_name):
 
 
 @app.task
-def celery_change_preview(page_id, is_preview):
-    page = Page.objects.get(id=page_id)
-    page.is_preview = int(is_preview)
-    page.save()
-    return page.to_dic()
+def celery_change_preview(page_id_list, is_preview):
+    for page_id in page_id_list:
+        Page.objects.filter(id=page_id).update(is_preview=int(is_preview))
+    return page_id_list
 
 
 @app.task
