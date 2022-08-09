@@ -337,3 +337,67 @@ def change_preview(request):
 
     result = {'result': 1, 'message': r'修改页面预览状态成功!'}
     return JsonResponse(result)
+
+
+@login_checker
+def add_material(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    page_id = request.POST.get('page_id', 0)
+    material_name = request.POST.get('material_name', '')
+
+    try:
+        page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    except Exception:
+        result = {'result': 0, 'message': '页面不存在!'}
+        return JsonResponse(result)
+
+    material = Page.objects.create(
+        page_name=material_name,
+        page_height=page_dict['page_height'],
+        page_width=page_dict['page_width'],
+        element_list=page_dict['element_list'],
+        num=page_dict['num']
+    )
+
+    UserToPage.objects.create(user_id=user_id, page_id=material.id)
+
+    result = {'result': 1, 'message': '素材添加成功!', 'material': material.to_dic()}
+    return JsonResponse(result)
+
+
+@login_checker
+def delete_material(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    material_id = request.POST.get('material_id', 0)
+    try:
+        material = Page.objects.get(id=material_id)
+    except Exception:
+        result = {'result': 0, 'message': '素材不存在!'}
+        return JsonResponse(result)
+    try:
+        user_to_page = UserToPage.objects.get(user_id=user_id, page_id=material_id)
+    except Exception:
+        result = {'result': 0, 'message': '关系不存在!'}
+        return JsonResponse(result)
+    user_to_page.delete()
+    material.delete()
+    result = {'result': 1, 'message': '素材删除成功!'}
+    return JsonResponse(result)
+
+
+@login_checker
+def get_material_list(request):
+    # 获取用户信息
+    user_id = request.user_id
+
+    user_to_page_list = UserToPage.objects.filter(user_id=user_id)
+    material_list = []
+    for every_user_to_page in user_to_page_list:
+        page_key, page_dict = cache_get_by_id('page', 'page', every_user_to_page.page_id)
+        material_list.append(page_dict)
+    result = {'result': 1, 'message': '素材获取成功!', 'material_list': material_list}
+    return JsonResponse(result)

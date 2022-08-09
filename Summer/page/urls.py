@@ -14,4 +14,7 @@ urlpatterns = [
     path('change_preview', views.change_preview),
     path('preview/all', views.list_preview_all),
     path('preview/detail', views.list_preview_detail),
+    path('add_material', views.add_material),
+    path('delete_material', views.delete_material),
+    path('get_material_list', views.get_material_list),
 ]
