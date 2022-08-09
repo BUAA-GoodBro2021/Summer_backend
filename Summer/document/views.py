@@ -325,10 +325,15 @@ def list_folder_document(request):
     folder_id = request.POST.get('folder_id', 0)
     document_queryset = Document.objects.filter(parent_id=folder_id)
 
+    folder_list = []
     document_list = []
     for every_document_queryset in document_queryset:
         # 获取缓存信息
         document_key, document_dict = cache_get_by_id('document', 'document', every_document_queryset.id)
-        document_list.append(document_dict)
-    result = {'result': 1, 'message': r'获取文件夹的目录内容成功!', 'document_list': document_list}
+        if document_dict['document_type'] == 0:
+            document_list.append(document_dict)
+        if document_dict['document_type'] == 1:
+            folder_list.append(document_dict)
+    folder_list.extend(document_list)
+    result = {'result': 1, 'message': r'获取文件夹的目录内容成功!', 'document_list': folder_list}
     return JsonResponse(result)

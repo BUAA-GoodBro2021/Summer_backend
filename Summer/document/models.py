@@ -13,7 +13,7 @@ class Document(models.Model):
     document_title = models.CharField('文档标题', max_length=100, default='')
     document_content = models.TextField('文档内容', default='')
 
-    document_type = models.IntegerField('文件或者文件夹', default=0)  # 0-文件 1-文件
+    document_type = models.IntegerField('文件或者文件夹', default=0)  # 0-文件 1-文件夹
 
     parent = models.ForeignKey('Document',
                                on_delete=models.CASCADE,
