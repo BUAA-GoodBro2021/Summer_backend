@@ -415,11 +415,7 @@ def add_model(request):
         post_body = json.loads(request.body)
         project_id = post_body['project_id']
         model_name = post_body['model_name']
-
-        # 获取表单信息
-        page_id = request.POST.get('page_id', 0)
-        project_id = request.POST.get('project_id', 0)
-        model_name = request.POST.get('page_name', '')
+        page_id_list = post_body['page_is_list']
     except Exception:
         result = {'result': 1, 'message': '参数不正确!'}
         return JsonResponse(result)

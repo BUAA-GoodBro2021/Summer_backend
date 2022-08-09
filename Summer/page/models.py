@@ -35,7 +35,12 @@ class UserToPage(models.Model):
 
 
 # 项目的模板
-class ModelToPage(models.Model):
+class ProjectModel(models.Model):
     project_id = models.IntegerField('项目id', default=0)
-    page_id = models.IntegerField('页面id', default=0)
     model_name = models.CharField('页面名称', max_length=100, default='')
+
+
+# 模板对页面
+class ModelToPage(models.Model):
+    model_id = models.IntegerField('模板id', default=0)
+    page_id = models.IntegerField('页面id', default=0)
