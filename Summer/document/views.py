@@ -1,5 +1,4 @@
 import json
-
 from django.core.cache import cache
 
 from document.tasks import *
@@ -80,7 +79,8 @@ def parse_token(request):
     # 获取表单信息
     try:
         post_body = json.loads(request.body)
-        document_token = post_body['document_token']
+        sha1 = post_body['document_token']
+        document_token = cache.get(sha1)
     except Exception:
         result = {'result': 0, 'message': '传参格式不正确!'}
         return JsonResponse(result)
@@ -236,8 +236,9 @@ def create_tree_token(request):
 
     # 获取缓存信息
     document_key, document_dict = cache_get_by_id('document', 'document', document.id)
-
-    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': document_token, 'document': document_dict}
+    sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
+    cache.set("sha1:" + sha1, document_token)
+    result = {'result': 1, 'message': '获取文档token成功!', 'document_token': sha1, 'document': document_dict}
     return JsonResponse(result)
 
 
