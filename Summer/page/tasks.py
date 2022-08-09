@@ -1,6 +1,5 @@
 from Summer.celery import app
 from page.models import Page
-from project.models import Project
 
 
 @app.task
