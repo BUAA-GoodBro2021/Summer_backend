@@ -118,20 +118,8 @@ def list_project_all(request):
 
 @login_checker
 def list_preview_all(request):
-    # 获取用户信息
-    user_id = request.user_id
     # 获取表单信息
-    team_id = request.POST.get('team_id', 0)
     project_id = request.POST.get('project_id', 0)
-
-    # 判断权限
-    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
-        result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
-        return JsonResponse(result)
-
-    if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
-        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
-        return JsonResponse(result)
 
     project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
 
@@ -154,23 +142,6 @@ def list_page_detail(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
-    project_id = request.POST.get('project_id', 0)
-    page_id = request.POST.get('page_id', 0)
-
-    # 获取缓存
-    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
-    page_dict['element_list'] = page_dict['element_list'].split("|")
-    result = {'result': 1, 'message': r'成功获取某个页面的详细元素', 'page': page_dict}
-
-    return JsonResponse(result)
-
-
-# 获取预览页面详细元素
-@login_checker
-def list_preview_detail(request):
-    # 获取用户信息
-    user_id = request.user_id
-    # 获取表单信息
     team_id = request.POST.get('team_id', 0)
     project_id = request.POST.get('project_id', 0)
     page_id = request.POST.get('page_id', 0)
@@ -186,7 +157,21 @@ def list_preview_detail(request):
     return JsonResponse(result)
 
 
-# 请求保存页面
+# 获取预览页面详细元素
+@login_checker
+def list_preview_detail(request):
+    # 获取表单信息
+    page_id = request.POST.get('page_id', 0)
+
+    # 获取缓存
+    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    page_dict['element_list'] = page_dict['element_list'].split("|")
+    result = {'result': 1, 'message': r'成功获取某个页面的详细元素', 'page': page_dict}
+
+    return JsonResponse(result)
+
+
+# 请求保存页面  后端记得判断解锁
 @login_checker
 def edit_save(request):
     # 获取用户信息
