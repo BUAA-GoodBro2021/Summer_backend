@@ -1,3 +1,5 @@
+import json
+
 from Summer.settings import BASE_DIR
 from page.models import *
 from project.models import *
@@ -405,11 +407,17 @@ def get_material_list(request):
 
 @login_checker
 def add_model(request):
-    # 获取表单信息
-    page_id = request.POST.get('page_id', 0)
-    project_id = request.POST.get('project_id', 0)
-    model_name = request.POST.get('page_name', '')
-
+    try:
+        # 获取body信息
+        post_body = json.loads(request.body)
+        project_id = post_body['project_id']
+        # 获取表单信息
+        page_id = request.POST.get('page_id', 0)
+        project_id = request.POST.get('project_id', 0)
+        model_name = request.POST.get('page_name', '')
+    except Exception:
+        result = {'result': 1, 'message': '参数不正确!'}
+        return JsonResponse(result)
     try:
         page_key, page_dict = cache_get_by_id('page', 'page', page_id)
     except Exception:
