@@ -272,6 +272,20 @@ def rename_tree_document(request):
     document_id = request.POST.get('document_id', 0)
     document_title = request.POST.get('document_title', '')
 
+    # 如果是文档中心或者是项目文档区或者是项目文件夹，不允许重命名
+    no_rename_document_id_list = []
+
+    team_list = Team.objects.all()
+    no_rename_document_id_list.extend([x.team_folder_id for x in team_list])
+    no_rename_document_id_list.extend([x.team_project_folder_id for x in team_list])
+
+    project_list = Project.objects.all()
+    no_rename_document_id_list.extend([x.project_folder_id for x in project_list])
+
+    if document_id in no_rename_document_id_list:
+        result = {'result': 0, 'message': r'该文件夹不允许重命名!'}
+        return JsonResponse(result)
+
     if len(document_title) == 0:
         result = {'result': 0, 'message': r'文档标题不允许为空!'}
         return JsonResponse(result)
