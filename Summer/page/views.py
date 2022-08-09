@@ -401,3 +401,64 @@ def get_material_list(request):
         material_list.append(page_dict)
     result = {'result': 1, 'message': '素材获取成功!', 'page_list': material_list}
     return JsonResponse(result)
+
+
+@login_checker
+def add_model(request):
+    # 获取表单信息
+    page_id = request.POST.get('page_id', 0)
+    project_id = request.POST.get('project_id', 0)
+    model_name = request.POST.get('page_name', '')
+
+    try:
+        page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    except Exception:
+        result = {'result': 0, 'message': '页面不存在!'}
+        return JsonResponse(result)
+
+    model = Page.objects.create(
+        page_name=model_name,
+        page_height=page_dict['page_height'],
+        page_width=page_dict['page_width'],
+        element_list=page_dict['element_list'],
+        num=page_dict['num']
+    )
+
+    ModelToPage.objects.create(project_id=project_id, page_id=model.id)
+
+    result = {'result': 1, 'message': '模板添加成功!', 'page': model.to_dic()}
+    return JsonResponse(result)
+
+
+@login_checker
+def delete_model(request):
+    # 获取表单信息
+    project_id = request.POST.get('project_id', 0)
+    model_id = request.POST.get('page_id', 0)
+    try:
+        material = Page.objects.get(id=model_id)
+    except Exception:
+        result = {'result': 0, 'message': '模板不存在!'}
+        return JsonResponse(result)
+    try:
+        model_to_page = ModelToPage.objects.get(project_id=project_id, page_id=model_id)
+    except Exception:
+        result = {'result': 0, 'message': '关系不存在!'}
+        return JsonResponse(result)
+    model_to_page.delete()
+    material.delete()
+    result = {'result': 1, 'message': '素材删除成功!'}
+    return JsonResponse(result)
+
+
+@login_checker
+def get_model_list(request):
+    project_id = request.POST.get('project_id', 0)
+
+    project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
+    model_list = []
+    for every_project_to_page in project_to_page_list:
+        page_key, page_dict = cache_get_by_id('page', 'page', every_project_to_page.page_id)
+        model_list.append(page_dict)
+    result = {'result': 1, 'message': '素材获取成功!', 'page_list': model_list}
+    return JsonResponse(result)
