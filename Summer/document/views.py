@@ -1,3 +1,5 @@
+import json
+
 from django.core.cache import cache
 
 from document.tasks import *
@@ -76,7 +78,12 @@ def edit_document(request):
 # 解析文档token
 def parse_token(request):
     # 获取表单信息
-    document_token = request.POST.get('document_token', '')
+    try:
+        post_body = json.loads(request.body)
+        document_token = post_body['document_token']
+    except Exception:
+        result = {'result': 0, 'message': '传参格式不正确!'}
+        return JsonResponse(result)
     result = {'result': 1, 'message': '解析文档token成功!', 'payload': check_token(document_token)}
     return JsonResponse(result)
 
