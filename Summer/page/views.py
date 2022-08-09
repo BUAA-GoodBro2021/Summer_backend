@@ -116,9 +116,58 @@ def list_project_all(request):
     return JsonResponse(result)
 
 
+@login_checker
+def list_preview_all(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    team_id = request.POST.get('team_id', 0)
+    project_id = request.POST.get('project_id', 0)
+
+    # 判断权限
+    if not UserToTeam.objects.filter(user_id=user_id, team_id=team_id).exists():
+        result = {'result': 0, 'message': r'你不属于该团队, 请联系该团队的管理员申请加入!'}
+        return JsonResponse(result)
+
+    if not TeamToProject.objects.filter(team_id=team_id, project_id=project_id).exists():
+        result = {'result': 0, 'message': r'你没有权限编辑该文档，请申请加入该文档对应的团队!'}
+        return JsonResponse(result)
+
+    project_to_page_list = ProjectToPage.objects.filter(project_id=project_id)
+
+    page_list = []
+
+    for every_project_to_page in project_to_page_list:
+        # 获取缓存
+        page_key, page_dict = cache_get_by_id('page', 'page', every_project_to_page.page_id)
+        if page_dict['is_preview'] == 1:
+            page_dict['element_list'] = page_dict['element_list'].split("|")
+            page_list.append(page_dict)
+
+    result = {'result': 1, 'message': r'获取项目的所有页面属性成功!', 'page_list': page_list}
+    return JsonResponse(result)
+
+
 # 获取某个页面的详细元素
 @login_checker
 def list_page_detail(request):
+    # 获取用户信息
+    user_id = request.user_id
+    # 获取表单信息
+    project_id = request.POST.get('project_id', 0)
+    page_id = request.POST.get('page_id', 0)
+
+    # 获取缓存
+    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+    page_dict['element_list'] = page_dict['element_list'].split("|")
+    result = {'result': 1, 'message': r'成功获取某个页面的详细元素', 'page': page_dict}
+
+    return JsonResponse(result)
+
+
+# 获取预览页面详细元素
+@login_checker
+def list_preview_detail(request):
     # 获取用户信息
     user_id = request.user_id
     # 获取表单信息
@@ -137,7 +186,7 @@ def list_page_detail(request):
     return JsonResponse(result)
 
 
-# 请求保存页面  后端记得判断解锁
+# 请求保存页面
 @login_checker
 def edit_save(request):
     # 获取用户信息
@@ -286,11 +335,19 @@ def change_preview(request):
     page_id = request.POST.get('page_id', 0)
     is_preview = request.POST.get('is_preview', 0)
 
-    page_key, page_dict = cache_get_by_id('page', 'page', page_id)
-    page_dict['is_preview'] = int(is_preview)
-    cache.set(page_key, page_dict)
+    try:
+        project_to_page = ProjectToPage.objects.get(id = page_id)
+    except Exception:
+        result = {'result': 1, 'message': '没有此页面!'}
+        return JsonResponse(result)
 
-    celery_change_preview.delay(page_id, is_preview)
+    project_to_page_list = ProjectToPage.objects.filter(project_id=project_to_page.project_id)
+    for every_project_to_page in project_to_page_list:
+        page_id = every_project_to_page.page_id
+        page_key, page_dict = cache_get_by_id('page', 'page', page_id)
+        page_dict['is_preview'] = int(is_preview)
+        cache.set(page_key, page_dict)
+        celery_change_preview.delay(page_id, is_preview)
 
-    result = {'result': 1, 'message': r'修改页面预览状态成功!', 'page': page_dict}
+    result = {'result': 1, 'message': r'修改页面预览状态成功!'}
     return JsonResponse(result)
