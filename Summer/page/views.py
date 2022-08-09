@@ -363,7 +363,7 @@ def add_material(request):
 
     UserToPage.objects.create(user_id=user_id, page_id=material.id)
 
-    result = {'result': 1, 'message': '素材添加成功!', 'material': material.to_dic()}
+    result = {'result': 1, 'message': '素材添加成功!', 'page': material.to_dic()}
     return JsonResponse(result)
 
 
@@ -399,5 +399,5 @@ def get_material_list(request):
     for every_user_to_page in user_to_page_list:
         page_key, page_dict = cache_get_by_id('page', 'page', every_user_to_page.page_id)
         material_list.append(page_dict)
-    result = {'result': 1, 'message': '素材获取成功!', 'material_list': material_list}
+    result = {'result': 1, 'message': '素材获取成功!', 'page_list': material_list}
     return JsonResponse(result)
