@@ -116,7 +116,6 @@ def list_project_all(request):
     return JsonResponse(result)
 
 
-@login_checker
 def list_preview_all(request):
     # 获取表单信息
     project_id = request.POST.get('project_id', 0)
@@ -158,7 +157,6 @@ def list_page_detail(request):
 
 
 # 获取预览页面详细元素
-@login_checker
 def list_preview_detail(request):
     # 获取表单信息
     page_id = request.POST.get('page_id', 0)
