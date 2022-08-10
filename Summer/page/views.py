@@ -1,5 +1,7 @@
 import json
 
+from django.db.models import Q
+
 from Summer.settings import BASE_DIR
 from page.models import *
 from project.models import *
@@ -465,7 +467,7 @@ def delete_model(request):
 def get_model_list(request):
     user_id = request.user_id
 
-    user_model_list = UserModel.objects.filter(user_id=user_id)
+    user_model_list = UserModel.objects.filter(Q(user_id=user_id) | Q(is_public=1))
     model_list = []
     for user_model in user_model_list:
         model_list.append(user_model.to_dic())
