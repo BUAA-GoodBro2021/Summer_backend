@@ -1,5 +1,5 @@
 import os
-
+import pypandoc
 from Summer.settings import BASE_DIR
 from utils.Bucket_utils import Bucket
 from utils.Sending_utils import create_code
@@ -105,7 +105,7 @@ def upload_image(image, bucket_name, model_id, is_audit=False, image_size=1024 *
 
 # 获取文件内容
 def read_model_file(model_type):
-    f = open(os.getcwd() + '/document_models/model' + str(model_type) + '.txt', encoding="utf-8")
+    f = open(os.getcwd() + '/document_models/model' + str(model_type) + '.html', encoding="utf-8")
     txt = f.read()
     f.close()
     return txt
@@ -114,9 +114,23 @@ def read_model_file(model_type):
 # 获取文件内容
 def write_html_file(document_id, document_content):
     try:
-        f = open(os.getcwd() + '/document_html/html' + str(document_id) + '.txt', encoding="utf-8")
+        os.remove(os.getcwd() + '/document_html/html' + str(document_id) + '.html')
+    except Exception:
+        pass
+    try:
+        f = open(os.getcwd() + '/document_html/html' + str(document_id) + '.html', 'w', encoding="utf-8")
         f.write(document_content)
         f.close()
+    except Exception:
+        return 0
+    return 1
+
+
+# 获取文件内容
+def change_html_to_pdf(document_id):
+    try:
+        pypandoc.convert_file(os.getcwd() + '/document_html/html' + str(document_id) + '.html', 'pdf',
+                              outputfile=os.getcwd() + '/document_html/html' + str(document_id) + '.pdf')
     except Exception:
         return 0
     return 1

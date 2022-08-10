@@ -447,10 +447,11 @@ def copy_folder(request):
 # 将文档转换为HTML
 def export_pdf(request):
     # 获取表单信息
-    document_id = request.POST.get('document_id', 0)
-    # 获取缓存信息
-    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
+    document_id = int(request.POST.get('document_id', 0))
+    print(document_id)
+    document = Document.objects.get(id=document_id)
 
-    r = write_html_file(document_id, document_dict['document_content'])
+    r = write_html_file(document_id, document.document_content)
+    r = change_html_to_pdf(document_id)
     result = {'result': r}
     return JsonResponse(result)
