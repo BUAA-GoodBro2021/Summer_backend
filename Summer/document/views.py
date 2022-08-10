@@ -68,7 +68,8 @@ def edit_document(request):
     document_token = sign_token_forever({
         'document_id': int(document_dict['document_id']),
         'document_title': document_dict['document_title'],
-        'username': user_dict['username']
+        'username': user_dict['username'],
+        'document_content': document_dict['document_content'],
     })
     sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
     cache.set("sha1:" + sha1, document_token)
@@ -392,18 +393,6 @@ def copy_document(request):
                                            creator_id=user_id, creator_name=user_dict['username'],
                                            parent_id=parent_id)
     new_document_key, new_document_dict = cache_get_by_id('document', 'document', new_document.id)
-
-    # 签发令牌
-    document_token = sign_token_forever({
-        'document_id': int(new_document.id),
-        'document_title': new_document.document_title,
-        'username': user_dict['username'],
-        'document_content': new_document.document_content
-    })
-
-    # 获取缓存信息
-    sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
-    cache.set("sha1:" + sha1, document_token)
 
     result = {'result': 1, 'message': r'拷贝文档成功!', 'document': new_document_dict}
     return JsonResponse(result)
