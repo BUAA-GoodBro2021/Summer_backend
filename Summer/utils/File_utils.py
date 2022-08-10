@@ -2,7 +2,6 @@ import os
 import pdfkit
 import html2markdown
 
-
 from Summer.settings import BASE_DIR
 from utils.Bucket_utils import Bucket
 from utils.Sending_utils import create_code
@@ -140,7 +139,8 @@ def change_html_to_pdf(document_id):
         pass
 
     try:
-        pdfkit.from_file(html_url, pdf_url)
+        pdfkit_options = {'encoding': 'UTF-8'}
+        pdfkit.from_file(html_url, pdf_url, options=pdfkit_options)
     except Exception:
         return 0
     return pdf_url
