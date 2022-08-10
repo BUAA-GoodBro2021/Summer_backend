@@ -1,5 +1,5 @@
 from Summer.celery import app
-from page.models import Page
+from page.models import Page, UserModel
 
 
 @app.task
@@ -36,4 +36,12 @@ def celery_delete_page(page_id):
     page = Page.objects.get(id=page_id)
     page.delete()
     return page.to_dic()
+
+
+@app.task
+def celery_change_public(model_id, is_public):
+    model = UserModel.objects.get(id=model_id)
+    model.is_public = int(is_public)
+    model.save()
+    return model.to_dic()
 

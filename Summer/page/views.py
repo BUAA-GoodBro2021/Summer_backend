@@ -492,3 +492,17 @@ def import_model(request):
         ProjectToPage.objects.create(project_id=project_id, page_id=page.id)
     result = {'result': 1, 'message': '导入模板成功!'}
     return JsonResponse(result)
+
+
+@login_checker
+def change_public(request):
+    # 获取表单信息
+    model_id = request.POST.get('model_id', 0)
+    is_public = request.POST.get('is_public', 0)
+
+    model_key, model_dict = cache_get_by_id('page', 'usermodel', model_id)
+    model_dict['is_public'] = int(is_public)
+    cache.set(model_key, model_dict)
+    celery_change_public.delay(model_id, is_public)
+    result = {'result': 1, 'message': '更改模板状态成功!', 'model': model_dict}
+    return JsonResponse(result)
