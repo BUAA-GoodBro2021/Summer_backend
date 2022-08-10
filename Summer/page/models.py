@@ -35,14 +35,14 @@ class UserToPage(models.Model):
 
 
 # 项目的模板
-class ProjectModel(models.Model):
-    project_id = models.IntegerField('项目id', default=0)
+class UserModel(models.Model):
+    user_id = models.IntegerField('用户id', default=0)
     model_name = models.CharField('页面名称', max_length=100, default='')
 
     def to_dic(self):
         return {
             'model_id': self.id,
-            'project_id': self.project_id,
+            'user_id': self.user_id,
             'model_name': self.model_name
         }
 

@@ -408,18 +408,18 @@ def get_material_list(request):
     return JsonResponse(result)
 
 
+@login_body_checker
 def add_model(request):
+    user_id = request.user_id
     try:
         # 获取body信息
         post_body = json.loads(request.body)
-        print(post_body)
-        project_id = post_body['project_id']
         model_name = post_body['model_name']
         page_id_list = post_body['page_id_list']
     except Exception:
         result = {'result': 1, 'message': '参数不正确!'}
         return JsonResponse(result)
-    project_model = ProjectModel.objects.create(model_name=model_name, project_id=project_id)
+    user_model = UserModel.objects.create(model_name=model_name, user_id=user_id)
     for page_id in page_id_list:
         try:
             page_key, page_dict = cache_get_by_id('page', 'page', page_id)
@@ -435,18 +435,20 @@ def add_model(request):
             num=page_dict['num']
         )
 
-        ModelToPage.objects.create(model_id=project_model.id, page_id=model.id)
+        ModelToPage.objects.create(model_id=user_model.id, page_id=model.id)
 
-    result = {'result': 1, 'message': '模板添加成功!', 'page': project_model.to_dic()}
+    result = {'result': 1, 'message': '模板添加成功!', 'page': user_model.to_dic()}
     return JsonResponse(result)
 
 
 @login_checker
 def delete_model(request):
+    # 获取用户信息
+    user_id = request.user_id
     # 获取表单信息
     model_id = request.POST.get('model_id', 0)
     try:
-        project_model = ProjectModel.objects.get(id=model_id)
+        user_model = UserModel.objects.get(id=model_id, user_id=user_id)
     except Exception:
         result = {'result': 0, 'message': '模板不存在!'}
         return JsonResponse(result)
@@ -454,18 +456,18 @@ def delete_model(request):
     for every_model_to_page in model_to_page_list:
         Page.objects.get(id=every_model_to_page.page_id).delete()
         every_model_to_page.delete()
-    project_model.delete()
+    user_model.delete()
     result = {'result': 1, 'message': '模板删除成功!'}
     return JsonResponse(result)
 
 
 @login_checker
 def get_model_list(request):
-    project_id = request.POST.get('project_id', 0)
+    user_id = request.user_id
 
-    project_model_list = ProjectModel.objects.filter(project_id=project_id)
+    user_model_list = UserModel.objects.filter(user_id=user_id)
     model_list = []
-    for project_model in project_model_list:
-        model_list.append(project_model.to_dic())
+    for user_model in user_model_list:
+        model_list.append(user_model.to_dic())
     result = {'result': 1, 'message': '模板获取成功!', 'model_list': model_list}
     return JsonResponse(result)
