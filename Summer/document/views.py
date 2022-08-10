@@ -144,7 +144,7 @@ def list_project_tree_document(request):
         folder_dict.update({'children': children})
     else:
         folder_dict.update({'children': []})
-    result = {'result': 1, 'message': '查询树形结构列表成功', 'tree_project_list': folder_dict}
+    result = {'result': 1, 'message': '查询树形结构列表成功', 'tree_project_list': [folder_dict]}
     return JsonResponse(result)
 
 
