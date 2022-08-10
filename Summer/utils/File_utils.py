@@ -132,7 +132,7 @@ def write_html_file(document_id, document_content):
 
 def change_md_to_pdf(document_id):
     md_url = os.getcwd() + '/document_md/md' + str(document_id) + '.md'
-    pdf_url = os.getcwd() + '/document_pdf/html' + str(document_id) + '.pdf'
+    pdf_url = os.getcwd() + '/document_pdf/pdf' + str(document_id) + '.pdf'
 
     try:
         os.remove(pdf_url)
@@ -140,10 +140,10 @@ def change_md_to_pdf(document_id):
         pass
 
     # try:
-    pypandoc.convert_file(md_url, 'markdown_github', pdf_url)
+    output = pypandoc.convert_file(md_url, 'docx', outputfile=pdf_url)
     # except Exception:
     #     return 0
-    return 1
+    return pdf_url
 
 
 def change_html_to_md(document_id):

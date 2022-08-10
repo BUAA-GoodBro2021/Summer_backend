@@ -445,7 +445,7 @@ def copy_folder(request):
     return JsonResponse(result)
 
 
-# 将文档转换为HTML
+# 将文档转换为pdf
 def export_pdf_get(request):
     # 获取表单信息
     document_id = int(request.GET.get('document_id', 0))
@@ -463,6 +463,7 @@ def export_pdf_get(request):
     return response
 
 
+# 将文档转换为markdown
 def export_md_get(request):
     # 获取表单信息
     document_id = int(request.GET.get('document_id', 0))
