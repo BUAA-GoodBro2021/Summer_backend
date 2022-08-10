@@ -3,7 +3,7 @@ from django.core.cache import cache
 
 from document.tasks import *
 from project.models import Project
-from team.models import Team
+from team.models import Team, TeamToProject
 from utils.File_utils import read_file
 from utils.Login_utils import *
 from document.models import *
@@ -346,8 +346,21 @@ def move_tree_document(request):
 # 获取该文件夹的目录内容
 @login_checker
 def list_folder_document(request):
-    folder_id = request.POST.get('folder_id', 0)
-    document_queryset = Document.objects.filter(parent_id=folder_id)
+    team_id = int(request.POST.get('team_id', 0))
+    folder_id = int(request.POST.get('folder_id', 0))
+
+    # 团队所有关联信息
+    team_to_project_list = TeamToProject.objects.filter(team_id=team_id)
+    # 项目的所有文件夹信息列表
+    project_folder_id_list = []
+    for every_team_to_project in team_to_project_list:
+        # 修改信息，同步缓存
+        project_key, project_dict = cache_get_by_id('project', 'project', every_team_to_project.project_id)
+        # 只展示未删除的项目
+        if project_dict['is_delete'] == 1:
+            project_folder_id_list.append(project_dict['project_folder_id'])
+
+    document_queryset = Document.objects.filter(parent_id=folder_id).exclude(id__in=project_folder_id_list)
 
     folder_list = []
     document_list = []
