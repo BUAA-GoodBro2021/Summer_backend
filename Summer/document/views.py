@@ -3,8 +3,8 @@ from django.core.cache import cache
 
 from document.tasks import *
 from project.models import Project
-from team.models import Team
-from utils.File_utils import read_file
+from team.models import Team, TeamToProject
+from utils.File_utils import *
 from utils.Login_utils import *
 from document.models import *
 
@@ -68,7 +68,8 @@ def edit_document(request):
     document_token = sign_token_forever({
         'document_id': int(document_dict['document_id']),
         'document_title': document_dict['document_title'],
-        'username': user_dict['username']
+        'username': user_dict['username'],
+        'document_content': document_dict['document_content'],
     })
     sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
     cache.set("sha1:" + sha1, document_token)
@@ -121,7 +122,7 @@ def show_tree_id(parent_id=0, team_id=0):
     return data
 
 
-# 复制项目文件树
+# 复制项目文件树(把parent_id底下的内容拷贝到new_folder_id下)
 def copy_tree(creator_id, parent_id=0, new_folder_id=0):
     departs = Document.objects.filter(parent_id=parent_id)
     recurse_display_copy(creator_id, departs, parent_id, new_folder_id)
@@ -137,7 +138,7 @@ def list_project_tree_document(request):
 
     # 获取实体
     folder_key, folder_dict = cache_get_by_id('document', 'document', folder_id)
-    children = show_tree(project.project_folder_id)
+    children = show_tree(folder_id)
     if len(children) > 0:
         folder_dict.update({'children': children})
     else:
@@ -220,7 +221,7 @@ def create_tree_token(request):
         document_content = ''
     else:
         try:
-            document_content = read_file(int(model_type))
+            document_content = read_model_file(int(model_type))
         except Exception:
             document_content = ""
 
@@ -346,8 +347,21 @@ def move_tree_document(request):
 # 获取该文件夹的目录内容
 @login_checker
 def list_folder_document(request):
-    folder_id = request.POST.get('folder_id', 0)
-    document_queryset = Document.objects.filter(parent_id=folder_id)
+    team_id = int(request.POST.get('team_id', 0))
+    folder_id = int(request.POST.get('folder_id', 0))
+
+    # 团队所有关联信息
+    team_to_project_list = TeamToProject.objects.filter(team_id=team_id)
+    # 项目的所有文件夹信息列表
+    project_folder_id_list = []
+    for every_team_to_project in team_to_project_list:
+        # 修改信息，同步缓存
+        project_key, project_dict = cache_get_by_id('project', 'project', every_team_to_project.project_id)
+        # 只展示未删除的项目
+        if project_dict['is_delete'] == 1:
+            project_folder_id_list.append(project_dict['project_folder_id'])
+
+    document_queryset = Document.objects.filter(parent_id=folder_id).exclude(id__in=project_folder_id_list)
 
     folder_list = []
     document_list = []
@@ -360,4 +374,84 @@ def list_folder_document(request):
             folder_list.append(document_dict)
     folder_list.extend(document_list)
     result = {'result': 1, 'message': r'获取文件夹的目录内容成功!', 'document_list': folder_list}
+    return JsonResponse(result)
+
+
+# 拷贝文档
+@login_checker
+def copy_document(request):
+    user_id = request.user_id
+    # 获取表单信息
+    document_id = request.POST.get('document_id', 0)
+    parent_id = request.POST.get('parent_id', 0)
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
+    # 创建一个新的文档
+    new_document = Document.objects.create(document_title=document_dict['document_title'] + '-副本',
+                                           document_content=document_dict['document_content'],
+                                           creator_id=user_id, creator_name=user_dict['username'],
+                                           parent_id=parent_id)
+    new_document_key, new_document_dict = cache_get_by_id('document', 'document', new_document.id)
+
+    result = {'result': 1, 'message': r'拷贝文档成功!', 'document': new_document_dict}
+    return JsonResponse(result)
+
+
+# 拷贝文件夹
+@login_checker
+def copy_folder(request):
+    user_id = request.user_id
+    # 获取表单信息
+    folder_id = request.POST.get('folder_id', 0)
+    parent_id = request.POST.get('parent_id', 0)
+
+    # 如果是文档中心或者是项目文档区或者是项目文件夹，不允许拷贝
+    no_copy_folder_id_list = []
+
+    team_list = Team.objects.all()
+    no_copy_folder_id_list.extend([x.team_folder_id for x in team_list])
+    no_copy_folder_id_list.extend([x.team_project_folder_id for x in team_list])
+
+    project_list = Project.objects.all()
+    no_copy_folder_id_list.extend([x.project_folder_id for x in project_list])
+
+    if folder_id in no_copy_folder_id_list:
+        result = {'result': 0, 'message': r'该文件夹不允许拷贝!'}
+        return JsonResponse(result)
+
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    folder_key, folder_dict = cache_get_by_id('document', 'document', folder_id)
+
+    # 创建一个文件夹
+    new_folder = Document.objects.create(document_title=folder_dict['document_title'] + '-副本',
+                                         document_content=folder_dict['document_content'],
+                                         creator_id=user_id, creator_name=user_dict['username'],
+                                         parent_id=parent_id, document_type=1)
+
+    # 拷贝文档信息
+    copy_tree(user_id, folder_id, new_folder.id)
+
+    # 获取实体
+    folder_key, folder_dict = cache_get_by_id('document', 'document', new_folder.id)
+    children = show_tree(new_folder.id)
+    if len(children) > 0:
+        folder_dict.update({'children': children})
+    else:
+        folder_dict.update({'children': []})
+    result = {'result': 1, 'message': '复制文件夹成功', 'tree_project_list': folder_dict}
+    return JsonResponse(result)
+
+
+# 将文档转换为HTML
+def export_pdf(request):
+    # 获取表单信息
+    document_id = int(request.POST.get('document_id', 0))
+    print(document_id)
+    document = Document.objects.get(id=document_id)
+
+    r = write_html_file(document_id, document.document_content)
+    r = change_html_to_pdf(document_id)
+    result = {'result': r}
     return JsonResponse(result)
