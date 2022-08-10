@@ -1,3 +1,5 @@
+import datetime
+
 from utils.Login_utils import *
 
 from diagram.tasks import *
@@ -113,7 +115,7 @@ def update_diagram(request):
     diagram_content = request.POST.get('diagram_content', '')
 
     diagram_key, diagram_dict = cache_get_by_id('diagram', 'diagram', diagram_id)
-
+    diagram_dict['update_time'] = str(datetime.datetime.now())
     diagram_dict['diagram_content'] = diagram_content
     cache.set(diagram_key, diagram_dict)
 
