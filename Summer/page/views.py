@@ -328,7 +328,7 @@ def change_preview(request):
     try:
         project_to_page = ProjectToPage.objects.get(id=page_id)
     except Exception:
-        result = {'result': 1, 'message': '没有此页面!'}
+        result = {'result': 0, 'message': '没有此页面!'}
         return JsonResponse(result)
 
     project_to_page_list = ProjectToPage.objects.filter(project_id=project_to_page.project_id)
