@@ -103,6 +103,7 @@ def rename_project(request):
     project.project_name = project_name
     project.project_description = project_description
     project.save()
+
     # 项目文件夹名称修改
     folder_id = project.project_folder_id
     folder = Document.objects.get(id=folder_id)
@@ -116,6 +117,7 @@ def rename_project(request):
     # 项目缓存
     project_dict['project_name'] = project_name
     project_dict['project_description'] = project_description
+    cache.set(project_key, project_dict)
     # 文件夹缓存
     folder_dict['document_title'] = project_name
     cache.set(folder_key, folder_dict)
