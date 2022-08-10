@@ -489,5 +489,5 @@ def export_md_get(request):
 
     response = FileResponse(open(md_url, "rb"))
     response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = "attachment;filename=%s.md" % document.document_title  # 注意filename不支持中文
+    response['Content-Disposition'] = 'attachment;filename={}'.format(escape_uri_path(document.document_title+'.md'))
     return response
