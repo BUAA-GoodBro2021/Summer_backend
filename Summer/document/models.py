@@ -1,11 +1,9 @@
 from django.db import models
 
-# 文档实体
-from django.db.models import Q
-
 from utils.Redis_utils import cache_get_by_id
 
 
+# 文档实体
 class Document(models.Model):
     creator_id = models.IntegerField('创建者id', default=0)
     team_id = models.IntegerField('团队id', default=0)

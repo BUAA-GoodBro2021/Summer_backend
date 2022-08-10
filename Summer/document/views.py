@@ -426,7 +426,7 @@ def copy_folder(request):
     new_folder = Document.objects.create(document_title=folder_dict['document_title'] + '-副本',
                                          document_content=folder_dict['document_content'],
                                          creator_id=user_id, creator_name=user_dict['username'],
-                                         parent_id=parent_id)
+                                         parent_id=parent_id, document_type=1)
 
     # 拷贝文档信息
     copy_tree(user_id, folder_id, new_folder.id)
@@ -443,9 +443,12 @@ def copy_folder(request):
 
 
 # 将文档转换为HTML
-@login_checker
 def export_pdf(request):
     # 获取表单信息
     document_id = request.POST.get('document_id', 0)
     # 获取缓存信息
     document_key, document_dict = cache_get_by_id('document', 'document', document_id)
+
+    r = write_html_file(document_id, document_dict['document_content'])
+    result = {'result': r}
+    return JsonResponse(result)

@@ -16,4 +16,5 @@ urlpatterns = [
     path('list_folder_document', views.list_folder_document),
     path('copy_document', views.copy_document),
     path('copy_folder', views.copy_folder),
+    path('export_pdf', views.export_pdf),
 ]

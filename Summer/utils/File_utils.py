@@ -109,3 +109,14 @@ def read_model_file(model_type):
     txt = f.read()
     f.close()
     return txt
+
+
+# 获取文件内容
+def write_html_file(document_id, document_content):
+    try:
+        f = open(os.getcwd() + '/document_html/html' + str(document_id) + '.txt', encoding="utf-8")
+        f.write(document_content)
+        f.close()
+    except Exception:
+        return 0
+    return 1
