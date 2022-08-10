@@ -428,12 +428,21 @@ def add_model(request):
         except Exception:
             result = {'result': 0, 'message': '页面不存在!'}
             return JsonResponse(result)
-
+        element_list = page_dict['element_list'].split('|')
+        new_element_list = ''
+        for element in element_list:
+            try:
+                new_element = json.loads(element)
+                new_element['lock'] = {}
+                new_element['editingUsers'] = {}
+                new_element_list += json.dumps(new_element) + '|'
+            except Exception:
+                pass
         model = Page.objects.create(
             page_name=page_dict['page_name'],
             page_height=page_dict['page_height'],
             page_width=page_dict['page_width'],
-            element_list=page_dict['element_list'],
+            element_list=new_element_list,
             num=page_dict['num']
         )
 
