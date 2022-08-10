@@ -430,12 +430,12 @@ def add_model(request):
             return JsonResponse(result)
         element_list = page_dict['element_list'].split('|')
         new_element_list = ''
-        for new_element in element_list:
+        for element in element_list:
             try:
-                element = json.loads(new_element)
-                element['lock'] = {}
-                element['editingUsers'] = {}
-                new_element_list += json.dumps(element) + '|'
+                new_element = json.loads(element)
+                new_element['lock'] = {}
+                new_element['editingUsers'] = {}
+                new_element_list += json.dumps(new_element) + '|'
             except Exception:
                 pass
         model = Page.objects.create(
