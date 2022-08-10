@@ -38,12 +38,14 @@ class UserToPage(models.Model):
 class UserModel(models.Model):
     user_id = models.IntegerField('用户id', default=0)
     model_name = models.CharField('页面名称', max_length=100, default='')
+    is_public = models.IntegerField('是否是共有的', default=0)
 
     def to_dic(self):
         return {
             'model_id': self.id,
             'user_id': self.user_id,
-            'model_name': self.model_name
+            'model_name': self.model_name,
+            'is_public': self.is_public,
         }
 
 

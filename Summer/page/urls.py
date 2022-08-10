@@ -20,4 +20,6 @@ urlpatterns = [
     path('add_model', views.add_model),
     path('delete_model', views.delete_model),
     path('get_model_list', views.get_model_list),
+    path('import_model', views.import_model),
+    path('change_public', views.change_public),
 ]

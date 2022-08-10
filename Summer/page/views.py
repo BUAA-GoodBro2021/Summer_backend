@@ -1,5 +1,7 @@
 import json
 
+from django.db.models import Q
+
 from Summer.settings import BASE_DIR
 from page.models import *
 from project.models import *
@@ -465,9 +467,44 @@ def delete_model(request):
 def get_model_list(request):
     user_id = request.user_id
 
-    user_model_list = UserModel.objects.filter(user_id=user_id)
+    user_model_list = UserModel.objects.filter(Q(user_id=user_id) | Q(is_public=1))
     model_list = []
     for user_model in user_model_list:
         model_list.append(user_model.to_dic())
     result = {'result': 1, 'message': '模板获取成功!', 'model_list': model_list}
+    return JsonResponse(result)
+
+
+@login_checker
+def import_model(request):
+    user_id = request.user_id
+    # 获取表单信息
+    model_id = request.POST.get('model_id', 0)
+    project_id = request.POST.get('project_id', 0)
+    try:
+        UserModel.objects.get(id=model_id, user_id=user_id)
+    except Exception:
+        result = {'result': 0, 'message': '模板不存在!'}
+        return JsonResponse(result)
+    model_to_page_list = ModelToPage.objects.filter(model_id=model_id)
+    for every_model_to_page in model_to_page_list:
+        page = Page.objects.get(id=every_model_to_page.page_id)
+        page.id = None
+        page.save()
+        ProjectToPage.objects.create(project_id=project_id, page_id=page.id)
+    result = {'result': 1, 'message': '导入模板成功!'}
+    return JsonResponse(result)
+
+
+@login_checker
+def change_public(request):
+    # 获取表单信息
+    model_id = request.POST.get('model_id', 0)
+    is_public = request.POST.get('is_public', 0)
+
+    model_key, model_dict = cache_get_by_id('page', 'usermodel', model_id)
+    model_dict['is_public'] = int(is_public)
+    cache.set(model_key, model_dict)
+    celery_change_public.delay(model_id, is_public)
+    result = {'result': 1, 'message': '更改模板状态成功!', 'model': model_dict}
     return JsonResponse(result)
