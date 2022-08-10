@@ -1,6 +1,4 @@
 import os
-
-import pdfkit
 import pypandoc
 from Summer.settings import BASE_DIR
 from utils.Bucket_utils import Bucket
@@ -130,9 +128,9 @@ def write_html_file(document_id, document_content):
 
 # 获取文件内容
 def change_html_to_pdf(document_id):
-    try:
-        pdfkit.from_file(os.getcwd() + '/document_html/html' + str(document_id) + '.html',
-                         os.getcwd() + '/document_html/html' + str(document_id) + '.pdf')
-    except Exception:
-        return 0
+    # try:
+    pypandoc.convert_file(os.getcwd() + '/document_html/html' + str(document_id) + '.html', 'pdf',
+                          outputfile=os.getcwd() + '/document_html/html' + str(document_id) + '.pdf')
+    # except Exception:
+    #     return 0
     return 1
