@@ -1,8 +1,8 @@
 import os
 
 import html2markdown
-import pypandoc
-import html2text
+from md2pdf.core import md2pdf
+
 from Summer.settings import BASE_DIR
 from utils.Bucket_utils import Bucket
 from utils.Sending_utils import create_code
@@ -139,10 +139,14 @@ def change_md_to_pdf(document_id):
     except Exception:
         pass
 
-    # try:
-    output = pypandoc.convert_file(md_url, 'docx', outputfile=pdf_url)
-    # except Exception:
-    #     return 0
+    try:
+        md2pdf(pdf_url,
+               md_content=None,
+               md_file_path=md_url,
+               css_file_path=None,
+               base_url=None)
+    except Exception:
+        return 0
     return pdf_url
 
 
