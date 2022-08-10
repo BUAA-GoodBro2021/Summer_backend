@@ -277,7 +277,7 @@ def delete_tree_document(request):
     project_list = Project.objects.all()
     no_del_document_id_list.extend([x.project_folder_id for x in project_list])
 
-    if document_id in no_del_document_id_list:
+    if int(document_id) in no_del_document_id_list:
         result = {'result': 0, 'message': r'该文件夹不允许删除!'}
         return JsonResponse(result)
 
@@ -309,7 +309,7 @@ def rename_tree_document(request):
     project_list = Project.objects.all()
     no_rename_document_id_list.extend([x.project_folder_id for x in project_list])
 
-    if document_id in no_rename_document_id_list:
+    if int(document_id) in no_rename_document_id_list:
         result = {'result': 0, 'message': r'该文件夹不允许重命名!'}
         return JsonResponse(result)
 
@@ -432,7 +432,7 @@ def copy_folder(request):
     project_list = Project.objects.all()
     no_copy_folder_id_list.extend([x.project_folder_id for x in project_list])
 
-    if folder_id in no_copy_folder_id_list:
+    if int(folder_id) in no_copy_folder_id_list:
         result = {'result': 0, 'message': r'该文件夹不允许拷贝!'}
         return JsonResponse(result)
 
