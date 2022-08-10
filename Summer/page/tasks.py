@@ -3,13 +3,14 @@ from page.models import Page
 
 
 @app.task
-def celery_save_page(page_id, page_name, page_height, page_width, element_list, num):
+def celery_save_page(page_id, page_dict):
     page = Page.objects.get(id=page_id)
-    page.page_name = page_name
-    page.page_height = page_height
-    page.page_width = page_width
-    page.element_list = element_list
-    page.num = num
+    page.page_name = page_dict['page_name']
+    page.page_width = page_dict['page_width']
+    page.page_height = page_dict['page_height']
+    page.element_list = page_dict['element_list']
+    page.num = page_dict['num']
+    page.is_preview = page_dict['is_preview']
     page.save()
     return page.to_dic()
 

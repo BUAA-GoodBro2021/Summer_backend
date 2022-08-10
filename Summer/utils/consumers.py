@@ -91,14 +91,7 @@ class Consumer(WebsocketConsumer):
             page_dict['is_preview'] = page_new_dict['is_preview']
             cache.set(page_key, page_dict)
             # 异步更新数据库
-            page = Page.objects.get(id=self.page_id)
-            page.page_name = page_dict['page_name']
-            page.page_width = page_dict['page_width']
-            page.page_height = page_dict['page_height']
-            page.element_list = page_dict['element_list']
-            page.num = page_dict['num']
-            page.is_preview = page_dict['is_preview']
-            page.save()
+            celery_save_page.delay(self.page_id, page_dict)
 
     def websocket_disconnect(self, message):
         # 获取url中的文档id，以此为键
