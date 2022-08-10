@@ -1,5 +1,5 @@
 import os
-
+import pdfkit
 import html2markdown
 
 
@@ -130,24 +130,20 @@ def write_html_file(document_id, document_content):
     return html_url
 
 
-# def change_md_to_pdf(document_id):
-#     md_url = os.getcwd() + '/document_md/md' + str(document_id) + '.md'
-#     pdf_url = os.getcwd() + '/document_pdf/pdf' + str(document_id) + '.pdf'
-#
-#     try:
-#         os.remove(pdf_url)
-#     except Exception:
-#         pass
-#
-#     try:
-#         md2pdf(pdf_url,
-#                md_content=None,
-#                md_file_path=md_url,
-#                css_file_path=None,
-#                base_url=None)
-#     except Exception:
-#         return 0
-#     return pdf_url
+def change_html_to_pdf(document_id):
+    html_url = os.getcwd() + '/document_html/html' + str(document_id) + '.html'
+    pdf_url = os.getcwd() + '/document_pdf/pdf' + str(document_id) + '.pdf'
+
+    try:
+        os.remove(pdf_url)
+    except Exception:
+        pass
+
+    try:
+        pdfkit.from_file(html_url, pdf_url)
+    except Exception:
+        return 0
+    return pdf_url
 
 
 def change_html_to_md(document_id):
