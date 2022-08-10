@@ -471,3 +471,24 @@ def get_model_list(request):
         model_list.append(user_model.to_dic())
     result = {'result': 1, 'message': '模板获取成功!', 'model_list': model_list}
     return JsonResponse(result)
+
+
+@login_checker
+def import_model(request):
+    user_id = request.user_id
+    # 获取表单信息
+    model_id = request.POST.get('model_id', 0)
+    project_id = request.POST.get('project_id', 0)
+    try:
+        UserModel.objects.get(id=model_id, user_id=user_id)
+    except Exception:
+        result = {'result': 0, 'message': '模板不存在!'}
+        return JsonResponse(result)
+    model_to_page_list = ModelToPage.objects.filter(model_id=model_id)
+    for every_model_to_page in model_to_page_list:
+        page = Page.objects.get(id=every_model_to_page.page_id)
+        page.id = None
+        page.save()
+        ProjectToPage.objects.create(project_id=project_id, page_id=page.id)
+    result = {'result': 1, 'message': '导入模板成功!'}
+    return JsonResponse(result)
