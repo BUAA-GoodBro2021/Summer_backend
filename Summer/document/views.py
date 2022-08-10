@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from django.http import FileResponse
 from django.utils.encoding import escape_uri_path
 
@@ -65,12 +64,29 @@ def edit_document(request):
     document_key, document_dict = cache_get_by_id('document', 'document', document_id)
 
     user_key, user_dict = cache_get_by_id('user', 'user', user_id)
-    # 签发令牌
-    document_token = sign_token_forever({
-        'document_id': int(document_dict['document_id']),
-        'document_title': document_dict['document_title'],
-        'username': user_dict['username'],
-    })
+
+    if document_dict['is_active'] == 0:
+        document_dict['is_active'] = 1
+        cache.set(document_key, document_dict)
+        document = Document.objects.get(id=document_id)
+        document.is_active = 1
+        document.save()
+        # 签发令牌
+        document_token = sign_token_forever({
+            'document_id': int(document_dict['document_id']),
+            'document_title': document_dict['document_title'],
+            'username': user_dict['username'],
+            'document_content': document_dict['document_content'],
+        })
+    else:
+        # 签发令牌
+        document_token = sign_token_forever({
+            'document_id': int(document_dict['document_id']),
+            'document_title': document_dict['document_title'],
+            'username': user_dict['username'],
+            'document_content': '',
+        })
+
     sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
     cache.set("sha1:" + sha1, document_token)
     result = {'result': 1, 'message': '获取文档token成功!', 'document_token': sha1}
@@ -227,7 +243,7 @@ def create_tree_token(request):
 
     document = Document.objects.create(document_title=document_title, document_content=document_content,
                                        creator_id=user_id, creator_name=user_dict['username'],
-                                       parent=parent_folder)
+                                       parent=parent_folder, is_active=1)
 
     # 签发令牌
     document_token = sign_token_forever({
@@ -393,16 +409,6 @@ def copy_document(request):
                                            creator_id=user_id, creator_name=user_dict['username'],
                                            parent_id=parent_id)
     new_document_key, new_document_dict = cache_get_by_id('document', 'document', new_document.id)
-
-    # 签发令牌
-    document_token = sign_token_forever({
-        'document_id': int(new_document_dict['document_id']),
-        'document_title': new_document_dict['document_title'],
-        'username': user_dict['username'],
-        'document_content': new_document_dict['document_content']
-    })
-    sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
-    cache.set("sha1:" + sha1, document_token)
 
     result = {'result': 1, 'message': r'拷贝文档成功!', 'document': new_document_dict}
     return JsonResponse(result)

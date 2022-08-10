@@ -17,6 +17,8 @@ class Document(models.Model):
 
     document_type = models.IntegerField('文件或者文件夹', default=0)  # 0-文件 1-文件夹
 
+    is_active = models.IntegerField('是否被编辑过', default=0)  # 0-否 1-是
+
     parent = models.ForeignKey('Document',
                                on_delete=models.CASCADE,
                                null=True, blank=True,
@@ -38,6 +40,7 @@ class Document(models.Model):
             'document_title': self.document_title,
             'document_content': self.document_content,
 
+            'is_active': self.is_active,
             'document_type': self.document_type,
             'parent_id': self.parent_id,
 
