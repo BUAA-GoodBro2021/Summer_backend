@@ -151,7 +151,6 @@ def change_html_to_md(document_id):
     try:
         md_text = open(html_url, 'r', encoding='utf-8').read()
         markdown = html2markdown.convert(md_text)
-
         with open(md_url, 'w', encoding='utf-8') as file:
             file.write(markdown)
     except Exception:
