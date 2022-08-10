@@ -445,22 +445,22 @@ def copy_folder(request):
     return JsonResponse(result)
 
 
-# 将文档转换为pdf
-def export_pdf_get(request):
-    # 获取表单信息
-    document_id = int(request.GET.get('document_id', 0))
-    document = Document.objects.get(id=document_id)
-    html_url = write_html_file(document_id, document.document_content)
-    md_url = change_html_to_md(document_id)
-    pdf_url = change_md_to_pdf(document_id)
-    if html_url == '' or md_url == '' or pdf_url == '':
-        result = {'result': 0}
-        return JsonResponse(result)
-
-    response = FileResponse(open(pdf_url, "rb"))
-    response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename={}'.format(escape_uri_path(document.document_title + '.pdf'))
-    return response
+# # 将文档转换为pdf
+# def export_pdf_get(request):
+#     # 获取表单信息
+#     document_id = int(request.GET.get('document_id', 0))
+#     document = Document.objects.get(id=document_id)
+#     html_url = write_html_file(document_id, document.document_content)
+#     md_url = change_html_to_md(document_id)
+#     pdf_url = change_md_to_pdf(document_id)
+#     if html_url == '' or md_url == '' or pdf_url == '':
+#         result = {'result': 0}
+#         return JsonResponse(result)
+#
+#     response = FileResponse(open(pdf_url, "rb"))
+#     response['Content-Type'] = 'application/octet-stream'
+#     response['Content-Disposition'] = 'attachment;filename={}'.format(escape_uri_path(document.document_title + '.pdf'))
+#     return response
 
 
 # 将文档转换为markdown

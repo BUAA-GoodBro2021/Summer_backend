@@ -1,7 +1,7 @@
 import os
 
 import html2markdown
-from md2pdf.core import md2pdf
+
 
 from Summer.settings import BASE_DIR
 from utils.Bucket_utils import Bucket
@@ -130,24 +130,24 @@ def write_html_file(document_id, document_content):
     return html_url
 
 
-def change_md_to_pdf(document_id):
-    md_url = os.getcwd() + '/document_md/md' + str(document_id) + '.md'
-    pdf_url = os.getcwd() + '/document_pdf/pdf' + str(document_id) + '.pdf'
-
-    try:
-        os.remove(pdf_url)
-    except Exception:
-        pass
-
-    try:
-        md2pdf(pdf_url,
-               md_content=None,
-               md_file_path=md_url,
-               css_file_path=None,
-               base_url=None)
-    except Exception:
-        return 0
-    return pdf_url
+# def change_md_to_pdf(document_id):
+#     md_url = os.getcwd() + '/document_md/md' + str(document_id) + '.md'
+#     pdf_url = os.getcwd() + '/document_pdf/pdf' + str(document_id) + '.pdf'
+#
+#     try:
+#         os.remove(pdf_url)
+#     except Exception:
+#         pass
+#
+#     try:
+#         md2pdf(pdf_url,
+#                md_content=None,
+#                md_file_path=md_url,
+#                css_file_path=None,
+#                base_url=None)
+#     except Exception:
+#         return 0
+#     return pdf_url
 
 
 def change_html_to_md(document_id):
