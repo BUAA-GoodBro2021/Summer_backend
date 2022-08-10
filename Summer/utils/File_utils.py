@@ -1,5 +1,8 @@
 import os
+
+import html2markdown
 import pypandoc
+import html2text
 from Summer.settings import BASE_DIR
 from utils.Bucket_utils import Bucket
 from utils.Sending_utils import create_code
@@ -113,20 +116,20 @@ def read_model_file(model_type):
 
 # 获取文件内容
 def write_html_file(document_id, document_content):
+    html_url = os.getcwd() + '/document_html/html' + str(document_id) + '.html'
     try:
-        os.remove(os.getcwd() + '/document_html/html' + str(document_id) + '.html')
+        os.remove(html_url)
     except Exception:
         pass
     try:
-        f = open(os.getcwd() + '/document_html/html' + str(document_id) + '.html', 'w', encoding="utf-8")
+        f = open(html_url, 'w', encoding="utf-8")
         f.write(document_content)
         f.close()
     except Exception:
-        return 0
-    return 1
+        return ''
+    return html_url
 
 
-# 获取文件内容
 def change_html_to_pdf(document_id):
     # try:
     pypandoc.convert_file(os.getcwd() + '/document_html/html' + str(document_id) + '.html', 'pdf',
@@ -134,3 +137,23 @@ def change_html_to_pdf(document_id):
     # except Exception:
     #     return 0
     return 1
+
+
+def change_html_to_md(document_id):
+
+    html_url = os.getcwd() + '/document_html/html' + str(document_id) + '.html'
+    md_url = os.getcwd() + '/document_md/html' + str(document_id) + '.md'
+    try:
+        os.remove(md_url)
+    except Exception:
+        pass
+
+    try:
+        md_text = open(html_url, 'r', encoding='utf-8').read()
+        markdown = html2markdown.convert(md_text)
+
+        with open(md_url, 'w', encoding='utf-8') as file:
+            file.write(markdown)
+    except Exception:
+        return ''
+    return md_url

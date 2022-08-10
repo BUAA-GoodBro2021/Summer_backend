@@ -1,5 +1,6 @@
 import json
 from django.core.cache import cache
+from django.http import FileResponse
 
 from document.tasks import *
 from project.models import Project
@@ -455,3 +456,41 @@ def export_pdf(request):
     r = change_html_to_pdf(document_id)
     result = {'result': r}
     return JsonResponse(result)
+
+
+def export_md(request):
+    # 获取表单信息
+    document_id = int(request.POST.get('document_id', 0))
+    print(document_id)
+    document = Document.objects.get(id=document_id)
+
+    html_url = write_html_file(document_id, document.document_content)
+    md_url = change_html_to_md(document_id)
+    # result = {'result': r}
+    if html_url == '' or md_url == '':
+        result = {'result': 0}
+        return JsonResponse(result)
+
+    response = FileResponse(open(md_url, "rb"))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = "attachment;filename=music.mp3"  # 注意filename不支持中文
+    return response
+
+
+def export_md_get(request):
+    # 获取表单信息
+    document_id = int(request.GET.get('document_id', 0))
+    print(document_id)
+    document = Document.objects.get(id=document_id)
+
+    html_url = write_html_file(document_id, document.document_content)
+    md_url = change_html_to_md(document_id)
+    # result = {'result': r}
+    if html_url == '' or md_url == '':
+        result = {'result': 0}
+        return JsonResponse(result)
+
+    response = FileResponse(open(md_url, "rb"))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = "attachment;filename=%s.mp3" % (document['document_title'])  # 注意filename不支持中文
+    return response
