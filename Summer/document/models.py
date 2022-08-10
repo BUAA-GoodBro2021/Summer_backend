@@ -1,5 +1,9 @@
+import hashlib
+
+from django.core.cache import cache
 from django.db import models
 
+from utils.Login_utils import sign_token_forever
 from utils.Redis_utils import cache_get_by_id
 
 
@@ -82,6 +86,16 @@ def recurse_display_copy(creator_id, old_document_query_set, parent_id, new_fold
         else:
             new_document.parent_id = parent_id
         new_document.save()
+
+        # 签发令牌
+        document_token = sign_token_forever({
+            'document_id': new_document.id,
+            'document_title': new_document.document_title,
+            'username': creator_id,
+            'document_content': new_document.document_content
+        })
+        sha1 = hashlib.sha1(document_token.encode('utf-8')).hexdigest()
+        cache.set("sha1:" + sha1, document_token)
 
         # 孩子信息
         children = every_old_document_query_set.children.all()
