@@ -47,8 +47,8 @@ def create_team(request):
 
     # 创建其他文件夹
     Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],
-                                           document_title='其他文件夹',
-                                           document_type=1, parent_id=folder.id)
+                            document_title='其他文件夹',
+                            document_type=1, parent_id=folder.id)
 
     # 创建团队介绍的文件
     Document.objects.create(creator_id=user_id, creator_name=user_dict['username'],

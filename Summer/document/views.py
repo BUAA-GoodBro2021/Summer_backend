@@ -121,7 +121,7 @@ def show_tree_id(parent_id=0, team_id=0):
     return data
 
 
-# 复制项目文件树
+# 复制项目文件树(把parent_id底下的内容拷贝到new_folder_id下)
 def copy_tree(creator_id, parent_id=0, new_folder_id=0):
     departs = Document.objects.filter(parent_id=parent_id)
     recurse_display_copy(creator_id, departs, parent_id, new_folder_id)
@@ -360,4 +360,62 @@ def list_folder_document(request):
             folder_list.append(document_dict)
     folder_list.extend(document_list)
     result = {'result': 1, 'message': r'获取文件夹的目录内容成功!', 'document_list': folder_list}
+    return JsonResponse(result)
+
+
+# 拷贝文档
+@login_checker
+def copy_document(request):
+    user_id = request.user_id
+    # 获取表单信息
+    document_id = request.POST.get('document_id', 0)
+    parent_id = request.POST.get('parent_id', 0)
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
+    # 创建一个新的文档
+    new_document = Document.objects.create(document_title=document_dict['document_title'] + '-副本',
+                                           document_content=document_dict['document_content'],
+                                           creator_id=user_id, creator_name=user_dict['username'],
+                                           parent_id=parent_id)
+    new_document_key, new_document_dict = cache_get_by_id('document', 'document', new_document.id)
+    result = {'result': 1, 'message': r'拷贝文档成功!', 'document': new_document_dict}
+    return JsonResponse(result)
+
+
+# 拷贝文件夹
+@login_checker
+def copy_folder(request):
+    user_id = request.user_id
+    # 获取表单信息
+    folder_id = request.POST.get('folder_id', 0)
+    parent_id = request.POST.get('parent_id', 0)
+
+    # 如果是文档中心或者是项目文档区或者是项目文件夹，不允许拷贝
+    no_copy_folder_id_list = []
+
+    team_list = Team.objects.all()
+    no_copy_folder_id_list.extend([x.team_folder_id for x in team_list])
+    no_copy_folder_id_list.extend([x.team_project_folder_id for x in team_list])
+
+    project_list = Project.objects.all()
+    no_copy_folder_id_list.extend([x.project_folder_id for x in project_list])
+
+    if folder_id in no_copy_folder_id_list:
+        result = {'result': 0, 'message': r'该文件夹不允许拷贝!'}
+        return JsonResponse(result)
+
+    # 获取缓存信息
+    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    folder_key, folder_dict = cache_get_by_id('document', 'document', folder_id)
+
+    # 创建一个文件夹
+    new_folder = Document.objects.create(document_title=folder_dict['document_title'] + '-副本',
+                                         document_content=folder_dict['document_content'],
+                                         creator_id=user_id, creator_name=user_dict['username'],
+                                         parent_id=parent_id)
+
+    # 拷贝文档信息
+    copy_tree(user_id, folder_id, new_folder.id)
+    result = {'result': 1, 'message': r'拷贝文件夹成功!'}
     return JsonResponse(result)
