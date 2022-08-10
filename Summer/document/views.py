@@ -1,5 +1,6 @@
 from django.core.cache import cache
 from django.http import FileResponse
+from django.utils.encoding import escape_uri_path
 
 from document.tasks import *
 from project.models import Project
@@ -472,7 +473,7 @@ def export_md(request):
 
     response = FileResponse(open(md_url, "rb"))
     response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = "attachment;filename=%s.md" % document.document_title  # 注意filename不支持中文
+    response['Content-Disposition'] = 'attachment;filename={}'.format(escape_uri_path(document.document_title+'.md'))
     return response
 
 
@@ -480,7 +481,6 @@ def export_md_get(request):
     # 获取表单信息
     document_id = int(request.GET.get('document_id', 0))
     document = Document.objects.get(id=document_id)
-    print(document.document_title)
     html_url = write_html_file(document_id, document.document_content)
     md_url = change_html_to_md(document_id)
     if html_url == '' or md_url == '':
