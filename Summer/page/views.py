@@ -491,7 +491,7 @@ def import_model(request):
     model_id = request.POST.get('model_id', 0)
     project_id = request.POST.get('project_id', 0)
     try:
-        UserModel.objects.get(id=model_id, user_id=user_id)
+        UserModel.objects.get(id=model_id)
     except Exception:
         result = {'result': 0, 'message': '模板不存在!'}
         return JsonResponse(result)
