@@ -4,7 +4,7 @@ from django.core.cache import cache
 from document.tasks import *
 from project.models import Project
 from team.models import Team, TeamToProject
-from utils.File_utils import read_file
+from utils.File_utils import *
 from utils.Login_utils import *
 from document.models import *
 
@@ -137,7 +137,7 @@ def list_project_tree_document(request):
 
     # 获取实体
     folder_key, folder_dict = cache_get_by_id('document', 'document', folder_id)
-    children = show_tree(project.project_folder_id)
+    children = show_tree(folder_id)
     if len(children) > 0:
         folder_dict.update({'children': children})
     else:
@@ -220,7 +220,7 @@ def create_tree_token(request):
         document_content = ''
     else:
         try:
-            document_content = read_file(int(model_type))
+            document_content = read_model_file(int(model_type))
         except Exception:
             document_content = ""
 
@@ -430,5 +430,22 @@ def copy_folder(request):
 
     # 拷贝文档信息
     copy_tree(user_id, folder_id, new_folder.id)
-    result = {'result': 1, 'message': r'拷贝文件夹成功!'}
+
+    # 获取实体
+    folder_key, folder_dict = cache_get_by_id('document', 'document', new_folder.id)
+    children = show_tree(new_folder.id)
+    if len(children) > 0:
+        folder_dict.update({'children': children})
+    else:
+        folder_dict.update({'children': []})
+    result = {'result': 1, 'message': '复制文件夹成功', 'tree_project_list': folder_dict}
     return JsonResponse(result)
+
+
+# 将文档转换为HTML
+@login_checker
+def export_pdf(request):
+    # 获取表单信息
+    document_id = request.POST.get('document_id', 0)
+    # 获取缓存信息
+    document_key, document_dict = cache_get_by_id('document', 'document', document_id)
