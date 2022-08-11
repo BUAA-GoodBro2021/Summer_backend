@@ -145,6 +145,7 @@ def remove_project_to_bin(request):
         return JsonResponse(result)
 
     # 修改信息，同步缓存
+    team_key, team_dict = cache_get_by_id('team', 'team', team_id)
     project_key, project_dict = cache_get_by_id('project', 'project', project_id)
 
     # 是否已经在回收站里面
@@ -152,6 +153,8 @@ def remove_project_to_bin(request):
         result = {'result': 0, 'message': r'该项目已经添加至回收站，请勿重复添加!'}
         return JsonResponse(result)
 
+    team_dict['project_num'] -= 1
+    cache.set(team_key, team_dict)
     project_dict['is_delete'] = 1
     cache.set(project_key, project_dict)
 
