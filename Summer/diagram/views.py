@@ -31,8 +31,7 @@ def create_token(request):
     diagram_token = sign_token({
         'project_id': int(project_id),
         'diagram_id': diagram.id,
-        'diagram_name': diagram.diagram_name,
-        'diagram_content': diagram.diagram_content
+        'diagram_name': diagram.diagram_name
     })
     result = {'result': 1, 'message': '获取绘图token成功!', 'diagram_token': diagram_token}
     return JsonResponse(result)
