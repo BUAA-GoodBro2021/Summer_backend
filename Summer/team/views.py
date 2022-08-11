@@ -1,7 +1,5 @@
 import random
 
-from django.core.cache import cache
-
 from document.models import *
 from team.tasks import *
 from properties import *
@@ -282,7 +280,7 @@ def remove_user(request):
     set_user_to_team.delete()
 
     # 获取缓存信息
-    user_key, user_dict = cache_get_by_id('user', 'user', user_id)
+    user_key, user_dict = cache_get_by_id('user', 'user', set_user_id)
     team_key, team_dict = cache_get_by_id('team', 'team', team_id)
 
     # 用户的团队数-1, 团队人数-1
